@@ -11,21 +11,16 @@ export enum Collections {
 	Mfas = "_mfas",
 	Otps = "_otps",
 	Superusers = "_superusers",
-	AiSpendByUser = "ai_spend_by_user",
-	AiTotalSpend = "ai_total_spend",
-	AiUsage = "ai_usage",
-	Books = "books",
-	Chapters = "chapters",
-	Chats = "chats",
-	Highlights = "highlights",
-	LastRead = "last_read",
-	Messages = "messages",
-	StripeCharges = "stripe_charges",
-	StripeCustomers = "stripe_customers",
-	StripeSubscriptions = "stripe_subscriptions",
-	UploadsByUser = "uploads_by_user",
+	ChecksPaid = "checks_paid",
+	DailyBalance = "daily_balance",
+	Deals = "deals",
+	ExtractionAgents = "extraction_agents",
+	ExtractionResults = "extraction_results",
+	Jobs = "jobs",
+	Organizations = "organizations",
+	Statements = "statements",
+	Transactions = "transactions",
 	Users = "users",
-	Vectors = "vectors",
 }
 
 // Alias types for improved usability
@@ -104,203 +99,158 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type AiSpendByUserRecord<Ttotal_spend = unknown> = {
-	email: string
-	id: string
-	total_spend?: null | Ttotal_spend
-}
-
-export type AiTotalSpendRecord<Tgoogle_total = unknown, Tgrand_total = unknown, Topenai_total = unknown> = {
-	google_total?: null | Tgoogle_total
-	grand_total?: null | Tgrand_total
-	id: string
-	openai_total?: null | Topenai_total
-}
-
-export enum AiUsageTaskOptions {
-	"embed" = "embed",
-	"chat" = "chat",
-}
-
-export enum AiUsageProviderOptions {
-	"google" = "google",
-	"openai" = "openai",
-}
-
-export enum AiUsageModelOptions {
-	"gemini-embedding-001" = "gemini-embedding-001",
-	"gpt-4o" = "gpt-4o",
-}
-export type AiUsageRecord = {
-	book?: RecordIdString
+export type ChecksPaidRecord = {
+	amount: number
+	check_number?: number
 	created?: IsoDateString
-	id: string
-	input_cost?: number
-	input_tokens?: number
-	model?: AiUsageModelOptions
-	output_cost?: number
-	output_tokens?: number
-	provider?: AiUsageProviderOptions
-	task?: AiUsageTaskOptions
-	total_cost?: number
-	updated?: IsoDateString
-	user?: RecordIdString
-}
-
-export type BooksRecord = {
-	author?: string
-	chapters?: RecordIdString[]
-	chats?: RecordIdString[]
-	cover_image?: string
-	created?: IsoDateString
-	current_chapter?: RecordIdString
 	date?: IsoDateString
-	description?: string
-	file: string
+	deal: RecordIdString
 	id: string
-	language?: string
-	subject?: string
-	title?: string
+	reference?: number
+	statement: RecordIdString
+	updated?: IsoDateString
+}
+
+export type DailyBalanceRecord = {
+	balance: number
+	created?: IsoDateString
+	date: IsoDateString
+	deal: RecordIdString
+	id: string
+	statement: RecordIdString
+	updated?: IsoDateString
+}
+
+export type DealsRecord = {
+	address?: string
+	bank?: string
+	created?: IsoDateString
+	credit_score?: number
+	founded?: IsoDateString
+	id: string
+	industry?: string
+	merchant?: string
+	organization?: RecordIdString
+	state?: string
+	statements?: RecordIdString[]
 	updated?: IsoDateString
 	user: RecordIdString
+	zipcode?: number
 }
 
-export type ChaptersRecord = {
-	book: RecordIdString
-	content: HTMLString
-	created?: IsoDateString
-	href?: string
-	id: string
-	order?: number
-	title?: string
-	updated?: IsoDateString
-	user: RecordIdString
-}
-
-export type ChatsRecord = {
-	book: RecordIdString
-	created?: IsoDateString
-	id: string
-	messages?: RecordIdString[]
-	title: string
-	updated?: IsoDateString
-	user: RecordIdString
-}
-
-export type HighlightsRecord<Tselection = unknown> = {
-	book?: RecordIdString
-	chapter: RecordIdString
-	created?: IsoDateString
-	hash: string
-	id: string
-	selection: null | Tselection
-	text: string
-	updated?: IsoDateString
-	user: RecordIdString
-}
-
-export type LastReadRecord = {
-	book?: RecordIdString
-	chapter?: RecordIdString
+export type ExtractionAgentsRecord = {
+	agent: string
+	agent_id: string
+	bank?: string
 	created?: IsoDateString
 	id: string
 	updated?: IsoDateString
-	user?: RecordIdString
 }
 
-export enum MessagesRoleOptions {
-	"user" = "user",
-	"assistant" = "assistant",
-}
-export type MessagesRecord<Tcitations = unknown> = {
-	chat: RecordIdString
-	citations?: null | Tcitations
-	content: string
+export type ExtractionResultsRecord = {
 	created?: IsoDateString
-	failed?: boolean
+	extracted_data: string
 	id: string
-	role: MessagesRoleOptions
+	job: RecordIdString
 	updated?: IsoDateString
-	user: RecordIdString
 }
 
-export enum StripeChargesStatusOptions {
-	"succeeded" = "succeeded",
-	"pending" = "pending",
-	"failed" = "failed",
+export enum JobsStatusOptions {
+	"PENDING" = "PENDING",
+	"SUCCESS" = "SUCCESS",
+	"ERROR" = "ERROR",
+	"PARTIAL_SUCCESS" = "PARTIAL_SUCCESS",
+	"CANCELLED" = "CANCELLED",
 }
-export type StripeChargesRecord<Tmetadata = unknown> = {
-	amount?: number
-	charge_id?: string
+export type JobsRecord<Tmetadata = unknown> = {
+	agent_id: string
 	created?: IsoDateString
-	customer_id: string
+	credits?: number
+	deal: RecordIdString
+	document_tokens?: number
+	extraction_result?: RecordIdString
 	id: string
+	job_id: string
 	metadata?: null | Tmetadata
-	paid?: boolean
-	receipt_url?: string
-	refunded?: boolean
-	status?: StripeChargesStatusOptions
-	user?: RecordIdString
+	num_pages?: number
+	organization?: RecordIdString
+	output_tokens?: number
+	run_id: string
+	statement: RecordIdString
+	status?: JobsStatusOptions
+	updated?: IsoDateString
+	user: RecordIdString
 }
 
-export type StripeCustomersRecord = {
+export type OrganizationsRecord = {
+	address?: string
 	created?: IsoDateString
-	customer_id: string
 	email?: string
 	id: string
+	logo?: string
+	name?: string
+	phone?: number
+	updated?: IsoDateString
+	website?: string
+}
+
+export type StatementsRecord = {
+	beginning_balance?: number
+	created?: IsoDateString
+	days_in_period?: number
+	deal: RecordIdString
+	ending_balance?: number
+	file: string
+	filename: string
+	id: string
+	interest_paid?: number
+	job?: RecordIdString
+	llama_index_file_id?: string
+	organization?: RecordIdString
+	service_charge?: number
+	statement_date?: IsoDateString
+	total_checks_debits?: number
+	total_deposits_credits?: number
+	total_overdraft_fee?: number
+	total_returned_item_fees?: number
 	updated?: IsoDateString
 	user: RecordIdString
 }
 
-export type StripeSubscriptionsRecord<Tmetadata = unknown> = {
-	cancel_at?: IsoDateString
-	cancel_at_period_end?: boolean
-	canceled_at?: IsoDateString
+export enum TransactionsTypeOptions {
+	"revenue" = "revenue",
+	"transfer" = "transfer",
+	"financing" = "financing",
+}
+export type TransactionsRecord = {
+	amount: number
 	created?: IsoDateString
-	current_period_end?: IsoDateString
-	current_period_start?: IsoDateString
-	customer_id: string
-	ended_at?: IsoDateString
+	date: IsoDateString
+	deal: RecordIdString
+	description: string
 	id: string
-	metadata?: null | Tmetadata
-	price_id?: string
-	status?: string
-	subscription_id?: string
+	statement: RecordIdString
+	trace_number?: number
+	type?: TransactionsTypeOptions
 	updated?: IsoDateString
-	user?: RecordIdString
 }
 
-export type UploadsByUserRecord = {
-	email: string
-	id: string
-	uploadCount?: number
+export enum UsersRoleOptions {
+	"admin" = "admin",
+	"agent" = "agent",
 }
-
 export type UsersRecord = {
-	avatar?: string
 	created?: IsoDateString
-	deleted?: boolean
 	email: string
 	emailVisibility?: boolean
 	id: string
 	name?: string
-	paid?: boolean
+	organization?: RecordIdString
 	password: string
+	role?: UsersRoleOptions
 	tokenKey: string
 	updated?: IsoDateString
 	verified?: boolean
-}
-
-export type VectorsRecord = {
-	book?: RecordIdString[]
-	chapter?: RecordIdString[]
-	content: string
-	created?: IsoDateString
-	id: string
-	index?: number
-	title?: string
-	updated?: IsoDateString
-	vector_id?: number
 }
 
 // Response types include system fields and match responses from the PocketBase API
@@ -309,21 +259,16 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type AiSpendByUserResponse<Ttotal_spend = unknown, Texpand = unknown> = Required<AiSpendByUserRecord<Ttotal_spend>> & BaseSystemFields<Texpand>
-export type AiTotalSpendResponse<Tgoogle_total = unknown, Tgrand_total = unknown, Topenai_total = unknown, Texpand = unknown> = Required<AiTotalSpendRecord<Tgoogle_total, Tgrand_total, Topenai_total>> & BaseSystemFields<Texpand>
-export type AiUsageResponse<Texpand = unknown> = Required<AiUsageRecord> & BaseSystemFields<Texpand>
-export type BooksResponse<Texpand = unknown> = Required<BooksRecord> & BaseSystemFields<Texpand>
-export type ChaptersResponse<Texpand = unknown> = Required<ChaptersRecord> & BaseSystemFields<Texpand>
-export type ChatsResponse<Texpand = unknown> = Required<ChatsRecord> & BaseSystemFields<Texpand>
-export type HighlightsResponse<Tselection = unknown, Texpand = unknown> = Required<HighlightsRecord<Tselection>> & BaseSystemFields<Texpand>
-export type LastReadResponse<Texpand = unknown> = Required<LastReadRecord> & BaseSystemFields<Texpand>
-export type MessagesResponse<Tcitations = unknown, Texpand = unknown> = Required<MessagesRecord<Tcitations>> & BaseSystemFields<Texpand>
-export type StripeChargesResponse<Tmetadata = unknown, Texpand = unknown> = Required<StripeChargesRecord<Tmetadata>> & BaseSystemFields<Texpand>
-export type StripeCustomersResponse<Texpand = unknown> = Required<StripeCustomersRecord> & BaseSystemFields<Texpand>
-export type StripeSubscriptionsResponse<Tmetadata = unknown, Texpand = unknown> = Required<StripeSubscriptionsRecord<Tmetadata>> & BaseSystemFields<Texpand>
-export type UploadsByUserResponse<Texpand = unknown> = Required<UploadsByUserRecord> & BaseSystemFields<Texpand>
+export type ChecksPaidResponse<Texpand = unknown> = Required<ChecksPaidRecord> & BaseSystemFields<Texpand>
+export type DailyBalanceResponse<Texpand = unknown> = Required<DailyBalanceRecord> & BaseSystemFields<Texpand>
+export type DealsResponse<Texpand = unknown> = Required<DealsRecord> & BaseSystemFields<Texpand>
+export type ExtractionAgentsResponse<Texpand = unknown> = Required<ExtractionAgentsRecord> & BaseSystemFields<Texpand>
+export type ExtractionResultsResponse<Texpand = unknown> = Required<ExtractionResultsRecord> & BaseSystemFields<Texpand>
+export type JobsResponse<Tmetadata = unknown, Texpand = unknown> = Required<JobsRecord<Tmetadata>> & BaseSystemFields<Texpand>
+export type OrganizationsResponse<Texpand = unknown> = Required<OrganizationsRecord> & BaseSystemFields<Texpand>
+export type StatementsResponse<Texpand = unknown> = Required<StatementsRecord> & BaseSystemFields<Texpand>
+export type TransactionsResponse<Texpand = unknown> = Required<TransactionsRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
-export type VectorsResponse<Texpand = unknown> = Required<VectorsRecord> & BaseSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
@@ -333,21 +278,16 @@ export type CollectionRecords = {
 	_mfas: MfasRecord
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
-	ai_spend_by_user: AiSpendByUserRecord
-	ai_total_spend: AiTotalSpendRecord
-	ai_usage: AiUsageRecord
-	books: BooksRecord
-	chapters: ChaptersRecord
-	chats: ChatsRecord
-	highlights: HighlightsRecord
-	last_read: LastReadRecord
-	messages: MessagesRecord
-	stripe_charges: StripeChargesRecord
-	stripe_customers: StripeCustomersRecord
-	stripe_subscriptions: StripeSubscriptionsRecord
-	uploads_by_user: UploadsByUserRecord
+	checks_paid: ChecksPaidRecord
+	daily_balance: DailyBalanceRecord
+	deals: DealsRecord
+	extraction_agents: ExtractionAgentsRecord
+	extraction_results: ExtractionResultsRecord
+	jobs: JobsRecord
+	organizations: OrganizationsRecord
+	statements: StatementsRecord
+	transactions: TransactionsRecord
 	users: UsersRecord
-	vectors: VectorsRecord
 }
 
 export type CollectionResponses = {
@@ -356,21 +296,16 @@ export type CollectionResponses = {
 	_mfas: MfasResponse
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
-	ai_spend_by_user: AiSpendByUserResponse
-	ai_total_spend: AiTotalSpendResponse
-	ai_usage: AiUsageResponse
-	books: BooksResponse
-	chapters: ChaptersResponse
-	chats: ChatsResponse
-	highlights: HighlightsResponse
-	last_read: LastReadResponse
-	messages: MessagesResponse
-	stripe_charges: StripeChargesResponse
-	stripe_customers: StripeCustomersResponse
-	stripe_subscriptions: StripeSubscriptionsResponse
-	uploads_by_user: UploadsByUserResponse
+	checks_paid: ChecksPaidResponse
+	daily_balance: DailyBalanceResponse
+	deals: DealsResponse
+	extraction_agents: ExtractionAgentsResponse
+	extraction_results: ExtractionResultsResponse
+	jobs: JobsResponse
+	organizations: OrganizationsResponse
+	statements: StatementsResponse
+	transactions: TransactionsResponse
 	users: UsersResponse
-	vectors: VectorsResponse
 }
 
 // Type for usage with type asserted PocketBase instance
@@ -382,19 +317,14 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_mfas'): RecordService<MfasResponse>
 	collection(idOrName: '_otps'): RecordService<OtpsResponse>
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
-	collection(idOrName: 'ai_spend_by_user'): RecordService<AiSpendByUserResponse>
-	collection(idOrName: 'ai_total_spend'): RecordService<AiTotalSpendResponse>
-	collection(idOrName: 'ai_usage'): RecordService<AiUsageResponse>
-	collection(idOrName: 'books'): RecordService<BooksResponse>
-	collection(idOrName: 'chapters'): RecordService<ChaptersResponse>
-	collection(idOrName: 'chats'): RecordService<ChatsResponse>
-	collection(idOrName: 'highlights'): RecordService<HighlightsResponse>
-	collection(idOrName: 'last_read'): RecordService<LastReadResponse>
-	collection(idOrName: 'messages'): RecordService<MessagesResponse>
-	collection(idOrName: 'stripe_charges'): RecordService<StripeChargesResponse>
-	collection(idOrName: 'stripe_customers'): RecordService<StripeCustomersResponse>
-	collection(idOrName: 'stripe_subscriptions'): RecordService<StripeSubscriptionsResponse>
-	collection(idOrName: 'uploads_by_user'): RecordService<UploadsByUserResponse>
+	collection(idOrName: 'checks_paid'): RecordService<ChecksPaidResponse>
+	collection(idOrName: 'daily_balance'): RecordService<DailyBalanceResponse>
+	collection(idOrName: 'deals'): RecordService<DealsResponse>
+	collection(idOrName: 'extraction_agents'): RecordService<ExtractionAgentsResponse>
+	collection(idOrName: 'extraction_results'): RecordService<ExtractionResultsResponse>
+	collection(idOrName: 'jobs'): RecordService<JobsResponse>
+	collection(idOrName: 'organizations'): RecordService<OrganizationsResponse>
+	collection(idOrName: 'statements'): RecordService<StatementsResponse>
+	collection(idOrName: 'transactions'): RecordService<TransactionsResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>
-	collection(idOrName: 'vectors'): RecordService<VectorsResponse>
 }

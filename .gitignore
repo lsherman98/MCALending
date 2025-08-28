@@ -12,7 +12,13 @@ dist
 dist-ssr
 *.local
 
+dist
+dist-ssr
+*.local
+count.txt
 .env
+.nitro
+.tanstack
 
 # Editor directories and files
 .vscode/*
@@ -32,5 +38,3 @@ pocketbase/pocketbase
 pocketbase/.env
 pocketbase/server
 pocketbase/pocketbase
-
-.tanstack
