@@ -12,9 +12,14 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
+import { Route as AppDealsIndexRouteImport } from './routes/_app/deals/index'
+import { Route as AppDealsCreateRouteImport } from './routes/_app/deals/create'
+import { Route as AppDealsDealIdRouteImport } from './routes/_app/deals/$dealId'
 
 const SigninLazyRouteImport = createFileRoute('/signin')()
-const AppUploadLazyRouteImport = createFileRoute('/_app/upload')()
 
 const SigninLazyRoute = SigninLazyRouteImport.update({
   id: '/signin',
@@ -25,32 +30,95 @@ const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppUploadLazyRoute = AppUploadLazyRouteImport.update({
-  id: '/upload',
-  path: '/upload',
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => AppRoute,
-} as any).lazy(() => import('./routes/_app/upload.lazy').then((d) => d.Route))
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDealsIndexRoute = AppDealsIndexRouteImport.update({
+  id: '/deals/',
+  path: '/deals/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDealsCreateRoute = AppDealsCreateRouteImport.update({
+  id: '/deals/create',
+  path: '/deals/create',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDealsDealIdRoute = AppDealsDealIdRouteImport.update({
+  id: '/deals/$dealId',
+  path: '/deals/$dealId',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/signin': typeof SigninLazyRoute
-  '/upload': typeof AppUploadLazyRoute
+  '/analytics': typeof AppAnalyticsRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/': typeof AppIndexRoute
+  '/deals/$dealId': typeof AppDealsDealIdRoute
+  '/deals/create': typeof AppDealsCreateRoute
+  '/deals': typeof AppDealsIndexRoute
 }
 export interface FileRoutesByTo {
   '/signin': typeof SigninLazyRoute
-  '/upload': typeof AppUploadLazyRoute
+  '/analytics': typeof AppAnalyticsRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/': typeof AppIndexRoute
+  '/deals/$dealId': typeof AppDealsDealIdRoute
+  '/deals/create': typeof AppDealsCreateRoute
+  '/deals': typeof AppDealsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/signin': typeof SigninLazyRoute
-  '/_app/upload': typeof AppUploadLazyRoute
+  '/_app/analytics': typeof AppAnalyticsRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/deals/$dealId': typeof AppDealsDealIdRoute
+  '/_app/deals/create': typeof AppDealsCreateRoute
+  '/_app/deals/': typeof AppDealsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/signin' | '/upload'
+  fullPaths:
+    | '/signin'
+    | '/analytics'
+    | '/dashboard'
+    | '/'
+    | '/deals/$dealId'
+    | '/deals/create'
+    | '/deals'
   fileRoutesByTo: FileRoutesByTo
-  to: '/signin' | '/upload'
-  id: '__root__' | '/_app' | '/signin' | '/_app/upload'
+  to:
+    | '/signin'
+    | '/analytics'
+    | '/dashboard'
+    | '/'
+    | '/deals/$dealId'
+    | '/deals/create'
+    | '/deals'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/signin'
+    | '/_app/analytics'
+    | '/_app/dashboard'
+    | '/_app/'
+    | '/_app/deals/$dealId'
+    | '/_app/deals/create'
+    | '/_app/deals/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -74,22 +142,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/upload': {
-      id: '/_app/upload'
-      path: '/upload'
-      fullPath: '/upload'
-      preLoaderRoute: typeof AppUploadLazyRouteImport
+    '/_app/': {
+      id: '/_app/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/analytics': {
+      id: '/_app/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AppAnalyticsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/deals/': {
+      id: '/_app/deals/'
+      path: '/deals'
+      fullPath: '/deals'
+      preLoaderRoute: typeof AppDealsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/deals/create': {
+      id: '/_app/deals/create'
+      path: '/deals/create'
+      fullPath: '/deals/create'
+      preLoaderRoute: typeof AppDealsCreateRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/deals/$dealId': {
+      id: '/_app/deals/$dealId'
+      path: '/deals/$dealId'
+      fullPath: '/deals/$dealId'
+      preLoaderRoute: typeof AppDealsDealIdRouteImport
       parentRoute: typeof AppRoute
     }
   }
 }
 
 interface AppRouteChildren {
-  AppUploadLazyRoute: typeof AppUploadLazyRoute
+  AppAnalyticsRoute: typeof AppAnalyticsRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppDealsDealIdRoute: typeof AppDealsDealIdRoute
+  AppDealsCreateRoute: typeof AppDealsCreateRoute
+  AppDealsIndexRoute: typeof AppDealsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppUploadLazyRoute: AppUploadLazyRoute,
+  AppAnalyticsRoute: AppAnalyticsRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppDealsDealIdRoute: AppDealsDealIdRoute,
+  AppDealsCreateRoute: AppDealsCreateRoute,
+  AppDealsIndexRoute: AppDealsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

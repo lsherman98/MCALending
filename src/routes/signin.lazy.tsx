@@ -1,5 +1,4 @@
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { AuthMethodsList, RecordAuthResponse } from "pocketbase";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { pb } from "@/lib/pocketbase";
 import { Separator } from "@/components/ui/separator";
 import { getRedirectAfterSignIn } from "@/lib/auth";
-import { UsersResponse } from "@/lib/pocketbase-types";
+import type { AuthMethodsList, RecordAuthResponse } from "pocketbase";
+import type { UsersResponse } from "@/lib/pocketbase-types";
 
 export const Route = createLazyFileRoute("/signin")({
   component: LoginForm,

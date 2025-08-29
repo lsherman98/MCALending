@@ -132,10 +132,9 @@ export type DealsRecord = {
 	merchant?: string
 	organization?: RecordIdString
 	state?: string
-	statements?: RecordIdString[]
 	updated?: IsoDateString
 	user: RecordIdString
-	zipcode?: number
+	zip_code?: string
 }
 
 export type ExtractionAgentsRecord = {

@@ -1,13 +1,15 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { protectPage } from "@/lib/auth";
-import Layout from "@/components/Layout";
 import { ThemeProvider } from "@/components/theme-provider";
+import Layout from "@/components/layout";
+import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createFileRoute("/_app")({
   component: () => (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider>
       <Layout>
         <Outlet />
+        <Toaster position="bottom-right" />
       </Layout>
     </ThemeProvider>
   ),
