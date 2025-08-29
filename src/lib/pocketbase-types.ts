@@ -14,8 +14,7 @@ export enum Collections {
 	ChecksPaid = "checks_paid",
 	DailyBalance = "daily_balance",
 	Deals = "deals",
-	ExtractionAgents = "extraction_agents",
-	ExtractionResults = "extraction_results",
+	Extractions = "extractions",
 	Jobs = "jobs",
 	Organizations = "organizations",
 	Statements = "statements",
@@ -137,18 +136,9 @@ export type DealsRecord = {
 	zip_code?: string
 }
 
-export type ExtractionAgentsRecord = {
-	agent: string
-	agent_id: string
-	bank?: string
+export type ExtractionsRecord = {
 	created?: IsoDateString
-	id: string
-	updated?: IsoDateString
-}
-
-export type ExtractionResultsRecord = {
-	created?: IsoDateString
-	extracted_data: string
+	data: string
 	id: string
 	job: RecordIdString
 	updated?: IsoDateString
@@ -172,13 +162,11 @@ export type JobsRecord<Tmetadata = unknown> = {
 	job_id: string
 	metadata?: null | Tmetadata
 	num_pages?: number
-	organization?: RecordIdString
 	output_tokens?: number
-	run_id: string
+	run_id?: string
 	statement: RecordIdString
-	status?: JobsStatusOptions
+	status: JobsStatusOptions
 	updated?: IsoDateString
-	user: RecordIdString
 }
 
 export type OrganizationsRecord = {
@@ -203,9 +191,7 @@ export type StatementsRecord = {
 	filename: string
 	id: string
 	interest_paid?: number
-	job?: RecordIdString
 	llama_index_file_id?: string
-	organization?: RecordIdString
 	service_charge?: number
 	statement_date?: IsoDateString
 	total_checks_debits?: number
@@ -213,7 +199,6 @@ export type StatementsRecord = {
 	total_overdraft_fee?: number
 	total_returned_item_fees?: number
 	updated?: IsoDateString
-	user: RecordIdString
 }
 
 export enum TransactionsTypeOptions {
@@ -261,8 +246,7 @@ export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> &
 export type ChecksPaidResponse<Texpand = unknown> = Required<ChecksPaidRecord> & BaseSystemFields<Texpand>
 export type DailyBalanceResponse<Texpand = unknown> = Required<DailyBalanceRecord> & BaseSystemFields<Texpand>
 export type DealsResponse<Texpand = unknown> = Required<DealsRecord> & BaseSystemFields<Texpand>
-export type ExtractionAgentsResponse<Texpand = unknown> = Required<ExtractionAgentsRecord> & BaseSystemFields<Texpand>
-export type ExtractionResultsResponse<Texpand = unknown> = Required<ExtractionResultsRecord> & BaseSystemFields<Texpand>
+export type ExtractionsResponse<Texpand = unknown> = Required<ExtractionsRecord> & BaseSystemFields<Texpand>
 export type JobsResponse<Tmetadata = unknown, Texpand = unknown> = Required<JobsRecord<Tmetadata>> & BaseSystemFields<Texpand>
 export type OrganizationsResponse<Texpand = unknown> = Required<OrganizationsRecord> & BaseSystemFields<Texpand>
 export type StatementsResponse<Texpand = unknown> = Required<StatementsRecord> & BaseSystemFields<Texpand>
@@ -280,8 +264,7 @@ export type CollectionRecords = {
 	checks_paid: ChecksPaidRecord
 	daily_balance: DailyBalanceRecord
 	deals: DealsRecord
-	extraction_agents: ExtractionAgentsRecord
-	extraction_results: ExtractionResultsRecord
+	extractions: ExtractionsRecord
 	jobs: JobsRecord
 	organizations: OrganizationsRecord
 	statements: StatementsRecord
@@ -298,8 +281,7 @@ export type CollectionResponses = {
 	checks_paid: ChecksPaidResponse
 	daily_balance: DailyBalanceResponse
 	deals: DealsResponse
-	extraction_agents: ExtractionAgentsResponse
-	extraction_results: ExtractionResultsResponse
+	extractions: ExtractionsResponse
 	jobs: JobsResponse
 	organizations: OrganizationsResponse
 	statements: StatementsResponse
@@ -319,8 +301,7 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'checks_paid'): RecordService<ChecksPaidResponse>
 	collection(idOrName: 'daily_balance'): RecordService<DailyBalanceResponse>
 	collection(idOrName: 'deals'): RecordService<DealsResponse>
-	collection(idOrName: 'extraction_agents'): RecordService<ExtractionAgentsResponse>
-	collection(idOrName: 'extraction_results'): RecordService<ExtractionResultsResponse>
+	collection(idOrName: 'extractions'): RecordService<ExtractionsResponse>
 	collection(idOrName: 'jobs'): RecordService<JobsResponse>
 	collection(idOrName: 'organizations'): RecordService<OrganizationsResponse>
 	collection(idOrName: 'statements'): RecordService<StatementsResponse>

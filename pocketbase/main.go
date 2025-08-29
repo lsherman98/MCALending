@@ -11,7 +11,8 @@ import (
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 
-	_ "github.com/lsherman98/mca-platform/pocketbase/migrations"
+	// _ "github.com/lsherman98/mca-platform/pocketbase/migrations"
+	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/statement_hooks"
 )
 
 func main() {
@@ -19,6 +20,11 @@ func main() {
 
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
+	}
+
+	err := statement_hooks.Init(app)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
