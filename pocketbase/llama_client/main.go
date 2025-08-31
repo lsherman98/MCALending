@@ -1,4 +1,4 @@
-package llamaindex_client
+package llama_client
 
 import (
 	"bytes"
@@ -11,21 +11,24 @@ import (
 	"net/url"
 	"os"
 	"path"
+
+	"github.com/pocketbase/pocketbase"
 )
 
 const (
 	defaultBaseURL = "https://api.cloud.llamaindex.ai/api/v1/"
 )
 
-type LlamaIndexClient struct {
+type LlamaClient struct {
 	client         *http.Client
 	BaseURL        *url.URL
 	ProjectID      string
 	OrganizationID string
 	APIKey         string
+	App            *pocketbase.PocketBase
 }
 
-func New() (*LlamaIndexClient, error) {
+func New(app *pocketbase.PocketBase) (*LlamaClient, error) {
 	baseURL, err := url.Parse(defaultBaseURL)
 	if err != nil {
 		return nil, err
@@ -43,16 +46,17 @@ func New() (*LlamaIndexClient, error) {
 
 	organizationId := os.Getenv("LLAMA_INDEX_ORGANIZATION_ID")
 
-	return &LlamaIndexClient{
+	return &LlamaClient{
 		client:         http.DefaultClient,
 		BaseURL:        baseURL,
 		APIKey:         apiKey,
 		ProjectID:      projectID,
 		OrganizationID: organizationId,
+		App: 		  app,
 	}, nil
 }
 
-func (c *LlamaIndexClient) UploadFileFromURL(ctx context.Context, data FileUploadRequest) (*FileUploadResponse, error) {
+func (c *LlamaClient) Upload(ctx context.Context, data UploadRequest) (*UploadResponse, error) {
 	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, "files/upload_from_url"))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse endpoint URL: %w", err)
@@ -88,7 +92,7 @@ func (c *LlamaIndexClient) UploadFileFromURL(ctx context.Context, data FileUploa
 		return nil, fmt.Errorf("API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
 	}
 
-	var apiResponse FileUploadResponse
+	var apiResponse UploadResponse
 	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
 		return nil, fmt.Errorf("failed to decode response body: %w", err)
 	}
@@ -96,7 +100,7 @@ func (c *LlamaIndexClient) UploadFileFromURL(ctx context.Context, data FileUploa
 	return &apiResponse, nil
 }
 
-func (c *LlamaIndexClient) RunExtractionJob(ctx context.Context, data ExtractionJobRequest) (*ExtractionJobResponse, error) {
+func (c *LlamaClient) RunJob(ctx context.Context, data JobRequest) (*JobResponse, error) {
 	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, "extraction/jobs"))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse endpoint URL: %w", err)
@@ -127,7 +131,7 @@ func (c *LlamaIndexClient) RunExtractionJob(ctx context.Context, data Extraction
 		return nil, fmt.Errorf("API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
 	}
 
-	var apiResponse ExtractionJobResponse
+	var apiResponse JobResponse
 	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
 		return nil, fmt.Errorf("failed to decode response body: %w", err)
 	}
@@ -135,7 +139,7 @@ func (c *LlamaIndexClient) RunExtractionJob(ctx context.Context, data Extraction
 	return &apiResponse, nil
 }
 
-func (c *LlamaIndexClient) GetJob(ctx context.Context, jobID string) (*ExtractionJobResponse, error) {
+func (c *LlamaClient) GetJob(ctx context.Context, jobID string) (*JobResponse, error) {
 	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, "extraction/jobs", jobID))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse endpoint URL: %w", err)
@@ -160,7 +164,7 @@ func (c *LlamaIndexClient) GetJob(ctx context.Context, jobID string) (*Extractio
 		return nil, fmt.Errorf("API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
 	}
 
-	var apiResponse ExtractionJobResponse
+	var apiResponse JobResponse
 	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
 		return nil, fmt.Errorf("failed to decode response body: %w", err)
 	}
@@ -168,7 +172,7 @@ func (c *LlamaIndexClient) GetJob(ctx context.Context, jobID string) (*Extractio
 	return &apiResponse, nil
 }
 
-func (c *LlamaIndexClient) GetJobResult(ctx context.Context, jobID string) (*JobResultResponse, error) {
+func (c *LlamaClient) GetJobResult(ctx context.Context, jobID string) (*JobResultResponse, error) {
 	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, "extraction/jobs", jobID, "result"))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse endpoint URL: %w", err)

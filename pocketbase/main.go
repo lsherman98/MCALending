@@ -11,7 +11,10 @@ import (
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 
-	// _ "github.com/lsherman98/mca-platform/pocketbase/migrations"
+	"github.com/lsherman98/mca-platform/pocketbase/llama_client"
+	_ "github.com/lsherman98/mca-platform/pocketbase/migrations"
+	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/extraction_hooks"
+	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/job_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/statement_hooks"
 )
 
@@ -22,7 +25,22 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	err := statement_hooks.Init(app)
+	llama, err := llama_client.New(app)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = statement_hooks.Init(app, llama)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = job_hooks.Init(app, llama)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = extraction_hooks.Init(app)
 	if err != nil {
 		log.Fatal(err)
 	}
