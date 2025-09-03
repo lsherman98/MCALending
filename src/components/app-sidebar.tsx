@@ -28,11 +28,11 @@ const data = {
       url: "/deals",
       icon: Handshake,
     },
-    {
-      title: "Analytics",
-      url: "/analytics",
-      icon: ChartPie,
-    },
+    // {
+    //   title: "Analytics",
+    //   url: "/analytics",
+    //   icon: ChartPie,
+    // },
   ],
   navSecondary: [
     {

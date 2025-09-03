@@ -8,6 +8,7 @@ import { TransactionsTypeOptions } from "@/lib/pocketbase-types";
 import { useGetTransactionsByDealId } from "@/lib/api/queries";
 import { useUpdateTransaction } from "@/lib/api/mutations";
 import { DollarSign, FileText } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 // interface Transaction {
 //   id: string;
@@ -157,12 +158,15 @@ export default function Transactions({ dealId }: { dealId: string }) {
               </div>
               <h1 className="text-xl font-semibold tracking-tight">Transaction History</h1>
             </div>
-            <Badge variant="secondary" className="text-sm">
+            {/* <Badge variant="secondary" className="text-sm">
               {transactions?.length || 0} transactions
-            </Badge>
+            </Badge> */}
+            <Button variant="outline" className="mb-4">
+              <Link to="/analytics/$dealId" params={{ dealId }}>
+                Analytics
+              </Link>
+            </Button>
           </div>
-
-          {/* Compact Category Legend */}
           <div className="flex items-center justify-between p-3 bg-muted/30 rounded-md">
             <div className="flex items-center gap-3">
               <span className="text-xs font-medium text-muted-foreground">Categories:</span>
@@ -188,8 +192,6 @@ export default function Transactions({ dealId }: { dealId: string }) {
           </div>
         </div>
       </div>
-
-      {/* Main Content Area */}
       <div className="flex-1 p-4 min-h-0">
         <Tabs defaultValue="all" className="h-full w-full flex flex-col">
           <TabsList className="mb-4">
@@ -202,7 +204,6 @@ export default function Transactions({ dealId }: { dealId: string }) {
               Recurring
             </TabsTrigger>
           </TabsList>
-
           <TabsContent value="all" className="flex-1 flex flex-col min-h-0">
             <div className="flex-1 flex flex-col gap-2 min-h-0">
               <Card className="flex-1 flex flex-col min-h-0 py-0">

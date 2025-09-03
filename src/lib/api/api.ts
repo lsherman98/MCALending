@@ -71,3 +71,34 @@ export async function bulkUpdateTransaction(ids: string[], data: Partial<Transac
     });
     return await batch.send();
 }
+
+// ANALYTICS
+export async function getFundingAsPercentageOfRevenue(deal: string) {
+    return await pb.collection(Collections.FundingAsPercentageOfRevenue).getFirstListItem(`deal = "${deal}"`);
+}
+
+export async function getPaymentsVsIncome(deal: string) {
+    return await pb.collection(Collections.PaymentsVsIncome).getFirstListItem(`deal = "${deal}"`);
+}
+
+export async function getRealRevenue(deal: string) {
+    return await pb.collection(Collections.RealRevenueByDeal).getFirstListItem(`deal = "${deal}"`);
+}
+
+export async function getBalanceOverTime(deal: string) {
+    return await pb.collection(Collections.BalanceOverTime).getList(1, 50, {
+        filter: `deal = "${deal}"`
+    });
+}
+
+export async function getChecksVsDebits(deal: string) {
+    return await pb.collection(Collections.ChecksVsDebits).getList(1, 50, {
+        filter: `deal = "${deal}"`
+    });
+}
+
+export async function getEndingBalanceOverTime(deal: string) {
+    return await pb.collection(Collections.EndingBalanceOverTime).getList(1, 50, {
+        filter: `deal = "${deal}"`
+    });
+}

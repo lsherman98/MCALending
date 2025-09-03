@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getDealById, getDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTransactionsByDealId } from "./api";
+import { getBalanceOverTime, getChecksVsDebits, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getPaymentsVsIncome, getRealRevenue, getStatementById, getStatementsByDealId, getStatementUrl, getTransactionsByDealId } from "./api";
 
 // DEALS
 export function useGetDeals() {
@@ -48,6 +48,55 @@ export function useGetTransactionsByDealId(dealId: string) {
     return useQuery({
         queryKey: ["transactions"],
         queryFn: () => getTransactionsByDealId(dealId),
+        placeholderData: keepPreviousData
+    });
+}
+
+//ANALYTICS
+export function useGetFundingAsPercentageOfRevenue(dealId: string) {
+    return useQuery({
+        queryKey: ["fundingAsPercentageOfRevenue", dealId],
+        queryFn: () => getFundingAsPercentageOfRevenue(dealId),
+        placeholderData: keepPreviousData
+    });
+}
+
+export function useGetPaymentsVsIncome(dealId: string) {
+    return useQuery({
+        queryKey: ["paymentsVsIncome", dealId],
+        queryFn: () => getPaymentsVsIncome(dealId),
+        placeholderData: keepPreviousData
+    });
+}
+
+export function useGetRealRevenue(dealId: string) {
+    return useQuery({
+        queryKey: ["realRevenue", dealId],
+        queryFn: () => getRealRevenue(dealId),
+        placeholderData: keepPreviousData
+    });
+}
+
+export function useGetBalanceOverTime(dealId: string) {
+    return useQuery({
+        queryKey: ["balanceOverTime", dealId],
+        queryFn: () => getBalanceOverTime(dealId),
+        placeholderData: keepPreviousData
+    });
+}
+
+export function useGetChecksVsDebits(dealId: string) {
+    return useQuery({
+        queryKey: ["checksVsDebits", dealId],
+        queryFn: () => getChecksVsDebits(dealId),
+        placeholderData: keepPreviousData
+    });
+}
+
+export function useGetEndingBalanceOverTime(dealId: string) {
+    return useQuery({
+        queryKey: ["endingBalanceOverTime", dealId],
+        queryFn: () => getEndingBalanceOverTime(dealId),
         placeholderData: keepPreviousData
     });
 }
