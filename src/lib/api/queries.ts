@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getDealById, getDeals, getStatementById, getStatementsByDealId, getStatementUrl } from "./api";
+import { getDealById, getDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTransactionsByDealId } from "./api";
 
 // DEALS
 export function useGetDeals() {
@@ -40,5 +40,14 @@ export function useGetStatementUrl(id: string) {
         queryKey: ["statementUrl", id],
         queryFn: () => getStatementUrl(id),
         staleTime: 60000
+    });
+}
+
+// TRANSACTIONS
+export function useGetTransactionsByDealId(dealId: string) {
+    return useQuery({
+        queryKey: ["transactions"],
+        queryFn: () => getTransactionsByDealId(dealId),
+        placeholderData: keepPreviousData
     });
 }

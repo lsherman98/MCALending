@@ -16,6 +16,7 @@ import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
 import { Route as AppDealsIndexRouteImport } from './routes/_app/deals/index'
+import { Route as AppTransactionsChar123dealIdChar125RouteImport } from './routes/_app/transactions.{$dealId}'
 import { Route as AppDealsCreateRouteImport } from './routes/_app/deals/create'
 import { Route as AppDealsDealIdRouteImport } from './routes/_app/deals/$dealId'
 
@@ -50,6 +51,12 @@ const AppDealsIndexRoute = AppDealsIndexRouteImport.update({
   path: '/deals/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTransactionsChar123dealIdChar125Route =
+  AppTransactionsChar123dealIdChar125RouteImport.update({
+    id: '/transactions/{$dealId}',
+    path: '/transactions/{$dealId}',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppDealsCreateRoute = AppDealsCreateRouteImport.update({
   id: '/deals/create',
   path: '/deals/create',
@@ -68,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/deals/$dealId': typeof AppDealsDealIdRoute
   '/deals/create': typeof AppDealsCreateRoute
+  '/transactions/{$dealId}': typeof AppTransactionsChar123dealIdChar125Route
   '/deals': typeof AppDealsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +85,7 @@ export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/deals/$dealId': typeof AppDealsDealIdRoute
   '/deals/create': typeof AppDealsCreateRoute
+  '/transactions/{$dealId}': typeof AppTransactionsChar123dealIdChar125Route
   '/deals': typeof AppDealsIndexRoute
 }
 export interface FileRoutesById {
@@ -88,6 +97,7 @@ export interface FileRoutesById {
   '/_app/': typeof AppIndexRoute
   '/_app/deals/$dealId': typeof AppDealsDealIdRoute
   '/_app/deals/create': typeof AppDealsCreateRoute
+  '/_app/transactions/{$dealId}': typeof AppTransactionsChar123dealIdChar125Route
   '/_app/deals/': typeof AppDealsIndexRoute
 }
 export interface FileRouteTypes {
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/'
     | '/deals/$dealId'
     | '/deals/create'
+    | '/transactions/{$dealId}'
     | '/deals'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/'
     | '/deals/$dealId'
     | '/deals/create'
+    | '/transactions/{$dealId}'
     | '/deals'
   id:
     | '__root__'
@@ -118,6 +130,7 @@ export interface FileRouteTypes {
     | '/_app/'
     | '/_app/deals/$dealId'
     | '/_app/deals/create'
+    | '/_app/transactions/{$dealId}'
     | '/_app/deals/'
   fileRoutesById: FileRoutesById
 }
@@ -170,6 +183,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealsIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/transactions/{$dealId}': {
+      id: '/_app/transactions/{$dealId}'
+      path: '/transactions/{$dealId}'
+      fullPath: '/transactions/{$dealId}'
+      preLoaderRoute: typeof AppTransactionsChar123dealIdChar125RouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/deals/create': {
       id: '/_app/deals/create'
       path: '/deals/create'
@@ -193,6 +213,7 @@ interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppDealsDealIdRoute: typeof AppDealsDealIdRoute
   AppDealsCreateRoute: typeof AppDealsCreateRoute
+  AppTransactionsChar123dealIdChar125Route: typeof AppTransactionsChar123dealIdChar125Route
   AppDealsIndexRoute: typeof AppDealsIndexRoute
 }
 
@@ -202,6 +223,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppDealsDealIdRoute: AppDealsDealIdRoute,
   AppDealsCreateRoute: AppDealsCreateRoute,
+  AppTransactionsChar123dealIdChar125Route:
+    AppTransactionsChar123dealIdChar125Route,
   AppDealsIndexRoute: AppDealsIndexRoute,
 }
 

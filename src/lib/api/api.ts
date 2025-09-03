@@ -1,46 +1,46 @@
 import { pb } from "../pocketbase";
-import { Collections, type DealsRecord } from "../pocketbase-types";
+import { Collections, type DealsRecord, type TransactionsRecord } from "../pocketbase-types";
 import type { UploadStatementData } from "../types";
 
 // DEALS
-export function getDeals() {
-    return pb.collection(Collections.Deals).getFullList();
+export async function getDeals() {
+    return await pb.collection(Collections.Deals).getFullList();
 }
 
-export function getDealById(id?: string) {
+export async function getDealById(id?: string) {
     if (!id) throw new Error("No ID provided");
-    return pb.collection(Collections.Deals).getOne(id);
+    return await pb.collection(Collections.Deals).getOne(id);
 }
 
-export function createDeal(data: Omit<DealsRecord, 'id'>) {
-    return pb.collection(Collections.Deals).create(data);
+export async function createDeal(data: Omit<DealsRecord, 'id'>) {
+    return await pb.collection(Collections.Deals).create(data);
 }
 
-export function updateDeal(id: string, data: Partial<DealsRecord>) {
-    return pb.collection(Collections.Deals).update(id, data);
+export async function updateDeal(id: string, data: Partial<DealsRecord>) {
+    return await pb.collection(Collections.Deals).update(id, data);
 }
 
-export function deleteDeal(id: string) {
-    return pb.collection(Collections.Deals).delete(id);
+export async function deleteDeal(id: string) {
+    return await pb.collection(Collections.Deals).delete(id);
 }
 
 // STATEMENTS
-export function getStatementsByDealId(dealId: string) {
-    return pb.collection(Collections.Statements).getFullList({
+export async function getStatementsByDealId(dealId: string) {
+    return await pb.collection(Collections.Statements).getFullList({
         filter: `deal = "${dealId}"`,
     })
 }
 
-export function getStatementById(id: string) {
-    return pb.collection(Collections.Statements).getOne(id);
+export async function getStatementById(id: string) {
+    return await pb.collection(Collections.Statements).getOne(id);
 }
 
-export function uploadStatement(data: UploadStatementData) {
-    return pb.collection(Collections.Statements).create(data);
+export async function uploadStatement(data: UploadStatementData) {
+    return await pb.collection(Collections.Statements).create(data);
 }
 
-export function deleteStatement(id: string) {
-    return pb.collection(Collections.Statements).delete(id);
+export async function deleteStatement(id: string) {
+    return await pb.collection(Collections.Statements).delete(id);
 }
 
 export async function getStatementUrl(id: string) {
@@ -52,3 +52,22 @@ export async function getStatementUrl(id: string) {
     return pb.files.getURL(record, record.file, { "token": token });
 }
 
+
+// TRANSACTIONS
+export async function getTransactionsByDealId(dealId: string) {
+    return await pb.collection(Collections.Transactions).getFullList({
+        filter: `deal = "${dealId}"`,
+    });
+}
+
+export async function updateTransaction(id: string, data: Partial<TransactionsRecord>) {
+    return await pb.collection(Collections.Transactions).update(id, { ...data, type: data.type || "" });
+}
+
+export async function bulkUpdateTransaction(ids: string[], data: Partial<TransactionsRecord>) {
+    const batch = pb.createBatch()
+    ids.forEach(id => {
+        batch.collection(Collections.Transactions).update(id, { ...data, type: data.type || "" });
+    });
+    return await batch.send();
+}

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { DealsRecord } from "../pocketbase-types";
-import { createDeal, deleteDeal, updateDeal, uploadStatement } from "./api";
+import type { DealsRecord, TransactionsRecord } from "../pocketbase-types";
+import { bulkUpdateTransaction, createDeal, deleteDeal, updateDeal, updateTransaction, uploadStatement } from "./api";
 import { handleError } from "../utils";
 import type { UploadStatementData } from "../types";
 
@@ -50,6 +50,31 @@ export function useUploadStatement() {
         onError: handleError,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["statements"] });
+        }
+    })
+}
+
+// TRANSACTIONS
+export function useUpdateTransaction() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ id, data }: { id: string, data: Partial<TransactionsRecord> }) => updateTransaction(id, data),
+        onError: handleError,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+        }
+    })
+}
+
+export function useBulkUpdateTransaction() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ ids, data }: { ids: string[], data: Partial<TransactionsRecord> }) => bulkUpdateTransaction(ids, data),
+        onError: handleError,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["transactions"] });
         }
     })
 }

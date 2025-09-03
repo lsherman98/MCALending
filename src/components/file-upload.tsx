@@ -5,17 +5,21 @@ import type { Upload } from "@/lib/types";
 import { UploadedFile } from "@/components/uploaded-file";
 import { Button } from "./ui/button";
 import { Progress } from "./ui/progress";
+import type { StatementsResponse } from "@/lib/pocketbase-types";
+import { UploadedStatement } from "./uploaded-statement";
 
 export function FileUpload({
   uploads,
   setUploads,
   handleUpload,
   disabled,
+  statements,
 }: {
   uploads: Upload[];
   setUploads: React.Dispatch<React.SetStateAction<Upload[]>>;
   handleUpload: () => void;
   disabled?: boolean;
+  statements: StatementsResponse[];
 }) {
   const allowedMimeTypes = ["application/pdf"];
 
@@ -64,16 +68,15 @@ export function FileUpload({
   const totalFiles = uploads.length;
   const successFiles = uploads.filter((u) => u.status === "success").length;
   const progress = totalFiles === 0 ? 0 : Math.round((successFiles / totalFiles) * 100);
-  const allUploaded = totalFiles > 0 && successFiles === totalFiles;
 
   return (
     <Dropzone {...dropzone}>
       <DropZoneArea
         className={`h-full w-full p-2 ${
-          uploads.length === 0 ? "border-2 border-dashed border-gray-300" : "border-2 border-gray-300"
+          uploads.length === 0 && !statements.length ? "border-2 border-dashed border-gray-300" : "border-2 border-gray-300"
         } ${disabled ? "pointer-events-none opacity-50" : ""}`}
       >
-        {uploads.length === 0 && (
+        {uploads.length === 0 && statements.length === 0 && (
           <DropzoneTrigger
             className={`flex h-full w-full flex-col items-center justify-center bg-transparent text-center text-sm ${
               disabled ? "pointer-events-none" : ""
@@ -89,7 +92,7 @@ export function FileUpload({
             </div>
           </DropzoneTrigger>
         )}
-        {uploads.length > 0 && (
+        {(uploads.length > 0 || statements.length > 0) && (
           <div className="flex flex-col h-full w-full overflow-y-auto">
             {uploads.map((upload) => (
               <UploadedFile
@@ -99,6 +102,9 @@ export function FileUpload({
                 error={upload.error}
                 onClear={() => clearFile(upload.file.name)}
               />
+            ))}
+            {statements.map((statement) => (
+              <UploadedStatement key={statement.id} statement={statement} />
             ))}
             <div className="pt-2 border-t mt-auto flex justify-between gap-2 items-center">
               {uploads.some((u) => u.status === "uploading" || u.status === "success") && (

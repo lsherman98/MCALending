@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"strings"
@@ -16,6 +17,7 @@ import (
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/extraction_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/job_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/statement_hooks"
+	"google.golang.org/genai"
 )
 
 func main() {
@@ -30,6 +32,14 @@ func main() {
 		log.Fatal(err)
 	}
 
+	gemini, err := genai.NewClient(context.Background(), &genai.ClientConfig{
+        APIKey:  os.Getenv("GEMINI_API_KEY"),
+        Backend: genai.BackendGeminiAPI,
+    })
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	err = statement_hooks.Init(app, llama)
 	if err != nil {
 		log.Fatal(err)
@@ -40,7 +50,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = extraction_hooks.Init(app)
+	err = extraction_hooks.Init(app, gemini)
 	if err != nil {
 		log.Fatal(err)
 	}

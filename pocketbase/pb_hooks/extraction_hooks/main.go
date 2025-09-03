@@ -1,12 +1,16 @@
 package extraction_hooks
 
 import (
+	"context"
+	"encoding/json"
+
 	"github.com/lsherman98/mca-platform/pocketbase/llama_client"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
+	"google.golang.org/genai"
 )
 
-func Init(app *pocketbase.PocketBase) error {
+func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 	app.OnRecordAfterCreateSuccess("extractions").BindFunc(func(e *core.RecordEvent) error {
 		extraction := e.Record
 
@@ -59,6 +63,7 @@ func Init(app *pocketbase.PocketBase) error {
 
 		statement_details := core.NewRecord(statementDetailsCollection)
 		statement_details.Set("statement", statement.Id)
+		statement_details.Set("deal", deal.Id)
 		statement_details.Set("date", data.BankInformation.StatementDate)
 		statement_details.Set("beginning_balance", data.AccountSummary.BeginningBalance)
 		statement_details.Set("total_deposits_credits", data.AccountSummary.TotalDepositsCredits)
@@ -100,7 +105,65 @@ func Init(app *pocketbase.PocketBase) error {
 			}
 		}
 
-		for _, transaction := range data.Transactions {
+		transactionsJSON, err := json.Marshal(data.Transactions)
+		if err != nil {
+			e.App.Logger().Error("Failed to marshal transactions: " + err.Error())
+			return err
+		}
+
+		transactionsJSONString := "```" + string(transactionsJSON) + "```"
+
+		parts := []*genai.Part{
+			genai.NewPartFromText(
+				`For each transaction in the following JSON, add a field "type" with one of: "revenue", "transfer", or "financing". If the type is unclear or cannot be determined, leave the "type" field blank. Return the array of transactions in the same order as received, with all original fields plus the new "type" field. JSON: ` + transactionsJSONString,
+			),
+		}
+		contents := []*genai.Content{
+			genai.NewContentFromParts(parts, genai.RoleUser),
+		}
+
+		config := &genai.GenerateContentConfig{
+			ResponseMIMEType: "application/json",
+			ResponseSchema: &genai.Schema{
+				Type: genai.TypeArray,
+				Items: &genai.Schema{
+					Type: genai.TypeObject,
+					Properties: map[string]*genai.Schema{
+						"date":         {Type: genai.TypeString},
+						"amount":       {Type: genai.TypeNumber},
+						"description":  {Type: genai.TypeString},
+						"trace_number": {Type: genai.TypeString},
+						"type":         {Type: genai.TypeString},
+					},
+					PropertyOrdering: []string{"date", "amount", "description", "trace_number", "type"},
+				},
+			},
+		}
+
+		result, err := gemini.Models.GenerateContent(
+			context.Background(),
+			"gemini-2.5-flash",
+			contents,
+			config,
+		)
+		if err != nil {
+			e.App.Logger().Error("Gemini transaction categorization failed: " + err.Error())
+			return err
+		}
+
+		var categorized []struct {
+			Date        string  `json:"date"`
+			Amount      float64 `json:"amount"`
+			Description string  `json:"description"`
+			TraceNumber string  `json:"trace_number"`
+			Type        string  `json:"type"`
+		}
+		if err := json.Unmarshal([]byte(result.Text()), &categorized); err != nil {
+			e.App.Logger().Error("Failed to parse Gemini response: " + err.Error())
+			return err
+		}
+
+		for i, transaction := range data.Transactions {
 			transactionRecord := core.NewRecord(transactionsCollection)
 			transactionRecord.Set("date", transaction.Date)
 			transactionRecord.Set("amount", transaction.Amount)
@@ -108,6 +171,13 @@ func Init(app *pocketbase.PocketBase) error {
 			transactionRecord.Set("trace_number", transaction.TraceNumber)
 			transactionRecord.Set("statement", statement.Id)
 			transactionRecord.Set("deal", deal.Id)
+
+			if i < len(categorized) {
+				transactionType := categorized[i].Type
+				if transactionType == "revenue" || transactionType == "financing" || transactionType == "transfer" {
+					transactionRecord.Set("type", transactionType)
+				}
+			}
 
 			if err := e.App.Save(transactionRecord); err != nil {
 				e.App.Logger().Error("Failed to create transactions record: " + err.Error())
