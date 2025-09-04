@@ -1,4 +1,4 @@
-import type { StatementsRecord } from "./pocketbase-types";
+import type { DealsResponse, StatementsRecord } from "./pocketbase-types";
 
 export type Upload = {
     file: File;
@@ -7,3 +7,7 @@ export type Upload = {
 };
 
 export type UploadStatementData = Omit<StatementsRecord, 'file' | 'id'> & { file: File; id?: string };
+
+export type ExpandDeal = {
+    deal: DealsResponse
+}

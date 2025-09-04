@@ -3,13 +3,13 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useCurrentDealStore } from "@/lib/stores/current-deal-store";
+import type { DealsResponse } from "@/lib/pocketbase-types";
 
 export const Route = createFileRoute("/_app/deals/")({
   component: RouteComponent,
@@ -21,10 +21,15 @@ export const Route = createFileRoute("/_app/deals/")({
 function RouteComponent() {
   const { data: deals } = useGetDeals();
   const navigate = useNavigate();
+  const { setCurrentDeal } = useCurrentDealStore();
+
+  const handleDealClick = (deal: DealsResponse) => {
+    navigate({ to: `/deals/${deal.id}` });
+    setCurrentDeal(deal);
+  };
 
   return (
     <Table>
-      <TableCaption>A list of your deals.</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Merchant</TableHead>
@@ -35,7 +40,7 @@ function RouteComponent() {
       </TableHeader>
       <TableBody>
         {deals?.map((deal) => (
-          <TableRow key={deal.id} className="cursor-pointer" onClick={() => navigate({ to: `/deals/${deal.id}` })}>
+          <TableRow key={deal.id} className="cursor-pointer" onClick={() => handleDealClick(deal)}>
             <TableCell className="font-medium">{deal.merchant ?? "-"}</TableCell>
             <TableCell>{deal.industry ?? "-"}</TableCell>
             <TableCell>{deal.state ?? "-"}</TableCell>
@@ -43,7 +48,6 @@ function RouteComponent() {
           </TableRow>
         ))}
       </TableBody>
-      {/* Optionally add a footer if needed */}
     </Table>
   );
 }

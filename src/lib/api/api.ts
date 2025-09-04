@@ -1,6 +1,7 @@
 import { pb } from "../pocketbase";
-import { Collections, type DealsRecord, type TransactionsRecord } from "../pocketbase-types";
-import type { UploadStatementData } from "../types";
+import { Collections, TransactionsTypeOptions, type CurrentDealResponse, type DealsRecord, type TransactionsRecord } from "../pocketbase-types";
+import type { ExpandDeal, UploadStatementData } from "../types";
+import { getUserId } from "../utils";
 
 // DEALS
 export async function getDeals() {
@@ -54,9 +55,23 @@ export async function getStatementUrl(id: string) {
 
 
 // TRANSACTIONS
-export async function getTransactionsByDealId(dealId: string) {
+export async function getTransactionsByDealId(dealId: string, from?: Date, to?: Date, type?: TransactionsTypeOptions[]) {
+    let filter = `deal = "${dealId}"`;
+
+    if (from) {
+        filter += ` && created >= "${from.toISOString()}"`;
+    }
+
+    if (to) {
+        filter += ` && created <= "${to.toISOString()}"`;
+    }
+
+    if (type && type.length > 0) {
+        filter += ` && type ?= ("${type.join('","')}")`;
+    }
+
     return await pb.collection(Collections.Transactions).getFullList({
-        filter: `deal = "${dealId}"`,
+        filter: filter,
     });
 }
 
@@ -70,6 +85,19 @@ export async function bulkUpdateTransaction(ids: string[], data: Partial<Transac
         batch.collection(Collections.Transactions).update(id, { ...data, type: data.type || "" });
     });
     return await batch.send();
+}
+
+//CURRENT DEAL
+export async function getCurrentDeal() {
+    return await pb.collection(Collections.CurrentDeal).getFirstListItem<CurrentDealResponse<ExpandDeal>>(`user = "${getUserId()}"`, {
+        expand: 'deal'
+    });
+}
+
+export async function updateCurrentDeal(currentDealId: string, dealId: string) {
+    await pb.collection(Collections.CurrentDeal).update(currentDealId, {
+        deal: dealId
+    });
 }
 
 // ANALYTICS
@@ -100,5 +128,16 @@ export async function getChecksVsDebits(deal: string) {
 export async function getEndingBalanceOverTime(deal: string) {
     return await pb.collection(Collections.EndingBalanceOverTime).getList(1, 50, {
         filter: `deal = "${deal}"`
+    });
+}
+
+// JOBS 
+export async function getJobs() {
+    const now = new Date();
+    const lastWeek = new Date(now.setDate(now.getDate() - 7));
+    const lastWeekISO = lastWeek.toISOString();
+
+    return await pb.collection(Collections.Jobs).getFullList({
+        filter: `status = "PENDING" || (status = "SUCCESS" && created > "${lastWeekISO}")`,
     });
 }

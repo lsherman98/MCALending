@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getBalanceOverTime, getChecksVsDebits, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getPaymentsVsIncome, getRealRevenue, getStatementById, getStatementsByDealId, getStatementUrl, getTransactionsByDealId } from "./api";
+import { getBalanceOverTime, getChecksVsDebits, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getJobs, getPaymentsVsIncome, getRealRevenue, getStatementById, getStatementsByDealId, getStatementUrl, getTransactionsByDealId } from "./api";
 
 // DEALS
 export function useGetDeals() {
@@ -98,5 +98,21 @@ export function useGetEndingBalanceOverTime(dealId: string) {
         queryKey: ["endingBalanceOverTime", dealId],
         queryFn: () => getEndingBalanceOverTime(dealId),
         placeholderData: keepPreviousData
+    });
+}
+
+// JOBS
+export function useGetJobs() {
+    return useQuery({
+        queryKey: ["jobs"],
+        queryFn: () => getJobs(),
+        placeholderData: keepPreviousData,
+        refetchInterval: (query) => {
+            const jobs = query.state.data;
+            if (jobs && jobs.some((job) => job.status === "PENDING")) {
+                return 5000;
+            }
+            return false;
+        }
     });
 }

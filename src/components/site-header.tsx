@@ -6,7 +6,7 @@ import { useLocation, useMatches } from "@tanstack/react-router";
 export function SiteHeader() {
   const route = useLocation();
   const matches = useMatches();
-  const match = matches.find((m) => m.fullPath === route.pathname);
+  const match = matches.find((m) => m.pathname === route.pathname + "/" || m.pathname === route.pathname);
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">

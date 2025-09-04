@@ -14,6 +14,7 @@ export enum Collections {
 	BalanceOverTime = "balance_over_time",
 	ChecksPaid = "checks_paid",
 	ChecksVsDebits = "checks_vs_debits",
+	CurrentDeal = "current_deal",
 	DailyBalance = "daily_balance",
 	Deals = "deals",
 	EndingBalanceOverTime = "ending_balance_over_time",
@@ -131,6 +132,14 @@ export type ChecksVsDebitsRecord<Tdeal = unknown, Ttotal_checks_amount = unknown
 	statement?: RecordIdString
 	total_checks_amount?: null | Ttotal_checks_amount
 	total_checks_debits?: number
+}
+
+export type CurrentDealRecord = {
+	created?: IsoDateString
+	deal?: RecordIdString
+	id: string
+	updated?: IsoDateString
+	user?: RecordIdString
 }
 
 export type DailyBalanceRecord = {
@@ -308,6 +317,7 @@ export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> &
 export type BalanceOverTimeResponse<Tdeal = unknown, Texpand = unknown> = Required<BalanceOverTimeRecord<Tdeal>> & BaseSystemFields<Texpand>
 export type ChecksPaidResponse<Texpand = unknown> = Required<ChecksPaidRecord> & BaseSystemFields<Texpand>
 export type ChecksVsDebitsResponse<Tdeal = unknown, Ttotal_checks_amount = unknown, Texpand = unknown> = Required<ChecksVsDebitsRecord<Tdeal, Ttotal_checks_amount>> & BaseSystemFields<Texpand>
+export type CurrentDealResponse<Texpand = unknown> = Required<CurrentDealRecord> & BaseSystemFields<Texpand>
 export type DailyBalanceResponse<Texpand = unknown> = Required<DailyBalanceRecord> & BaseSystemFields<Texpand>
 export type DealsResponse<Texpand = unknown> = Required<DealsRecord> & BaseSystemFields<Texpand>
 export type EndingBalanceOverTimeResponse<Tdeal = unknown, Texpand = unknown> = Required<EndingBalanceOverTimeRecord<Tdeal>> & BaseSystemFields<Texpand>
@@ -333,6 +343,7 @@ export type CollectionRecords = {
 	balance_over_time: BalanceOverTimeRecord
 	checks_paid: ChecksPaidRecord
 	checks_vs_debits: ChecksVsDebitsRecord
+	current_deal: CurrentDealRecord
 	daily_balance: DailyBalanceRecord
 	deals: DealsRecord
 	ending_balance_over_time: EndingBalanceOverTimeRecord
@@ -357,6 +368,7 @@ export type CollectionResponses = {
 	balance_over_time: BalanceOverTimeResponse
 	checks_paid: ChecksPaidResponse
 	checks_vs_debits: ChecksVsDebitsResponse
+	current_deal: CurrentDealResponse
 	daily_balance: DailyBalanceResponse
 	deals: DealsResponse
 	ending_balance_over_time: EndingBalanceOverTimeResponse
@@ -384,6 +396,7 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'balance_over_time'): RecordService<BalanceOverTimeResponse>
 	collection(idOrName: 'checks_paid'): RecordService<ChecksPaidResponse>
 	collection(idOrName: 'checks_vs_debits'): RecordService<ChecksVsDebitsResponse>
+	collection(idOrName: 'current_deal'): RecordService<CurrentDealResponse>
 	collection(idOrName: 'daily_balance'): RecordService<DailyBalanceResponse>
 	collection(idOrName: 'deals'): RecordService<DealsResponse>
 	collection(idOrName: 'ending_balance_over_time'): RecordService<EndingBalanceOverTimeResponse>

@@ -5,6 +5,9 @@ import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/transactions/{$dealId}")({
   component: RouteComponent,
+  staticData: {
+    routeName: "Transactions",
+  },
 });
 
 function RouteComponent() {
