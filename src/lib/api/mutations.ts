@@ -13,6 +13,7 @@ export function useCreateDeal() {
         onError: handleError,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["deals"] });
+            await queryClient.invalidateQueries({ queryKey: ["recentDeals"] });
         }
     })
 }
@@ -46,10 +47,13 @@ export function useUploadStatement() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: UploadStatementData) => uploadStatement(data),
+        mutationFn: (statement: UploadStatementData) => uploadStatement(statement),
         onError: handleError,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["statements"] });
+            setTimeout(async () => {
+                await queryClient.invalidateQueries({ queryKey: ["jobs"] });
+            }, 2000);
         }
     })
 }

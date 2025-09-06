@@ -1,11 +1,18 @@
 import { pb } from "../pocketbase";
-import { Collections, TransactionsTypeOptions, type CurrentDealResponse, type DealsRecord, type TransactionsRecord } from "../pocketbase-types";
-import type { ExpandDeal, UploadStatementData } from "../types";
+import { Collections, TransactionsTypeOptions, type CurrentDealResponse, type DealsRecord, type JobsResponse, type TransactionsRecord } from "../pocketbase-types";
+import type { ExpandDeal, ExpandStatement, UploadStatementData } from "../types";
 import { getUserId } from "../utils";
 
 // DEALS
 export async function getDeals() {
     return await pb.collection(Collections.Deals).getFullList();
+}
+
+export async function getRecentDeals() {
+    return await pb.collection(Collections.Deals).getFullList({
+        sort: '-updated',
+        limit: 5
+    });
 }
 
 export async function getDealById(id?: string) {
@@ -37,7 +44,7 @@ export async function getStatementById(id: string) {
 }
 
 export async function uploadStatement(data: UploadStatementData) {
-    return await pb.collection(Collections.Statements).create(data);
+    return await pb.collection(Collections.Statements).create(data, { requestKey: data.file.name });
 }
 
 export async function deleteStatement(id: string) {
@@ -137,7 +144,8 @@ export async function getJobs() {
     const lastWeek = new Date(now.setDate(now.getDate() - 7));
     const lastWeekISO = lastWeek.toISOString();
 
-    return await pb.collection(Collections.Jobs).getFullList({
+    return await pb.collection(Collections.Jobs).getFullList<JobsResponse<ExpandStatement>>({
         filter: `status = "PENDING" || (status = "SUCCESS" && created > "${lastWeekISO}")`,
+        expand: "statement"
     });
 }

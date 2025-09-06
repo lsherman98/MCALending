@@ -57,7 +57,7 @@ const UserLoginForm = () => {
         const form = event.target as HTMLFormElement;
         const email = form.email.value;
         const password = form.password.value;
-        const isAdmin = form["admin-auth"][1].checked;
+        const isAdmin = form["admin-auth"]?.[1]?.checked;
 
         if (isAdmin) {
           await pb.collection("_superusers").authWithPassword(email, password);

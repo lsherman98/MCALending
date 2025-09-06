@@ -1,7 +1,6 @@
 import { useCreateDeal } from "@/lib/api/mutations";
 import { getUserId } from "@/lib/utils";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Loader } from "lucide-react";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/_app/deals/create")({
@@ -17,7 +16,7 @@ function RouteComponent() {
 
   const createDeal = () => {
     createDealMutation.mutate(
-      { user: getUserId() || "" },
+      { user: getUserId() || "", merchant: "New Deal" },
       {
         onSuccess: (data) => {
           navigate({
@@ -29,14 +28,8 @@ function RouteComponent() {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      createDeal();
-    }, 250);
+    createDeal();
   }, []);
 
-  return (
-    <div className="flex h-full w-full items-center justify-center">
-      <Loader className="animate-spin" />
-    </div>
-  );
+  return;
 }

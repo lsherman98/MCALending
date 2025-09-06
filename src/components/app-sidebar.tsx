@@ -12,7 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { ChartPie, Handshake, HelpCircle, Landmark, Settings } from "lucide-react";
+import { ChartPie, Handshake, HelpCircle, Landmark, Settings, TableProperties } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "./ui/button";
 
@@ -28,11 +28,16 @@ const data = {
       url: "/deals",
       icon: Handshake,
     },
-    // {
-    //   title: "Analytics",
-    //   url: "/analytics",
-    //   icon: ChartPie,
-    // },
+    {
+      title: "Transactions",
+      url: "/transactions",
+      icon: TableProperties,
+    },
+    {
+      title: "Analytics",
+      url: "/analytics",
+      icon: ChartPie,
+    },
   ],
   navSecondary: [
     {

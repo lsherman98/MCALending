@@ -1,4 +1,4 @@
-import type { DealsResponse, StatementsRecord } from "./pocketbase-types";
+import type { DealsResponse, StatementsRecord, StatementsResponse } from "./pocketbase-types";
 
 export type Upload = {
     file: File;
@@ -10,4 +10,8 @@ export type UploadStatementData = Omit<StatementsRecord, 'file' | 'id'> & { file
 
 export type ExpandDeal = {
     deal: DealsResponse
+}
+
+export type ExpandStatement = {
+    statement: StatementsResponse
 }

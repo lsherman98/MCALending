@@ -7,6 +7,7 @@ import (
 	"github.com/lsherman98/mca-platform/pocketbase/llama_client"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
+	"github.com/pocketbase/pocketbase/tools/routine"
 )
 
 // func buildUrl(statement *core.Record, token string) string {
@@ -45,50 +46,49 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		}
 
 		statement := e.Record
-		// token, err := e.Auth.NewFileToken()
-		// if err != nil {
-		// 	e.App.Logger().Error("Failed to create file token: " + err.Error())
-		// 	return nil
-		// }
 
-		// url := buildUrl(statement, token)
-		url := buildS3Url(statement.Collection().Id, statement.Id, statement.GetString("file"))
-		upload, err := llama.Upload(context.Background(), llama_client.UploadRequest{
-			Name: statement.GetString("filename"),
-			URL:  url,
+		routine.FireAndForget(func() {
+			// token, err := e.Auth.NewFileToken()
+			// if err != nil {
+			// 	e.App.Logger().Error("Failed to create file token: " + err.Error())
+			// 	return nil
+			// }
+
+			// url := buildUrl(statement, token)
+			url := buildS3Url(statement.Collection().Id, statement.Id, statement.GetString("file"))
+			upload, err := llama.Upload(context.Background(), llama_client.UploadRequest{
+				Name: statement.GetString("filename"),
+				URL:  url,
+			})
+			if err != nil {
+				e.App.Logger().Error("Failed to upload file to LlamaIndex: " + err.Error())
+			}
+
+			statement.Set("llama_index_file_id", upload.ID)
+
+			if err := app.Save(statement); err != nil {
+				e.App.Logger().Error("Failed to save statement record: " + err.Error())
+			}
+
+			job, err := llama.RunJob(context.Background(), llama_client.JobRequest{
+				FileID:            upload.ID,
+				ExtractionAgentID: agentId,
+			})
+			if err != nil {
+				e.App.Logger().Error("Failed to run extraction job: " + err.Error())
+			}
+
+			jobRecord := core.NewRecord(jobsCollection)
+			jobRecord.Set("job_id", job.ID)
+			jobRecord.Set("status", job.Status)
+			jobRecord.Set("agent_id", agentId)
+			jobRecord.Set("deal", statement.GetString("deal"))
+			jobRecord.Set("statement", statement.Id)
+
+			if err := app.Save(jobRecord); err != nil {
+				e.App.Logger().Error("Failed to save job record: " + err.Error())
+			}
 		})
-		if err != nil {
-			e.App.Logger().Error("Failed to upload file to LlamaIndex: " + err.Error())
-			return nil
-		}
-
-		statement.Set("llama_index_file_id", upload.ID)
-
-		if err := app.Save(statement); err != nil {
-			e.App.Logger().Error("Failed to save statement record: " + err.Error())
-			return nil
-		}
-
-		job, err := llama.RunJob(context.Background(), llama_client.JobRequest{
-			FileID:            upload.ID,
-			ExtractionAgentID: agentId,
-		})
-		if err != nil {
-			e.App.Logger().Error("Failed to run extraction job: " + err.Error())
-			return nil
-		}
-
-		jobRecord := core.NewRecord(jobsCollection)
-		jobRecord.Set("job_id", job.ID)
-		jobRecord.Set("status", job.Status)
-		jobRecord.Set("agent_id", agentId)
-		jobRecord.Set("deal", statement.GetString("deal"))
-		jobRecord.Set("statement", statement.Id)
-
-		if err := app.Save(jobRecord); err != nil {
-			e.App.Logger().Error("Failed to save job record: " + err.Error())
-			return nil
-		}
 
 		return nil
 	})

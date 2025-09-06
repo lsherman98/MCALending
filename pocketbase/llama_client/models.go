@@ -48,7 +48,7 @@ type JobResponse struct {
 	ID              string         `json:"id"`
 	ExtractionAgent map[string]any `json:"extraction_agent"`
 	Status          StatusEnum     `json:"status"`
-	Error           map[string]any `json:"error,omitempty"`
+	Error           string         `json:"error,omitempty"`
 	File            map[string]any `json:"file,omitempty"`
 }
 

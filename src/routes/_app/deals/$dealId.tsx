@@ -6,6 +6,7 @@ import { useGetDealById, useGetStatementsByDealId } from "@/lib/api/queries";
 import type { Upload } from "@/lib/types";
 import { getUserId } from "@/lib/utils";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { MoveRight } from "lucide-react";
 import { useState } from "react";
 import type z from "zod";
 
@@ -55,20 +56,19 @@ function RouteComponent() {
   };
 
   const handleUpload = () => {
-    uploads.forEach((statement) => {
-      const userId = getUserId();
-      if (!userId) throw new Error("No logged in user detected.");
-      if (!dealId) throw new Error("No deal ID provided.");
-
+    const userId = getUserId();
+    if (!userId) throw new Error("No logged in user detected.");
+    if (!dealId) throw new Error("No deal ID provided.");
+    uploads.forEach(async (statement) => {
       if (statement.status === "pending") {
         updateStatus(statement.file.name, "uploading");
-        uploadStatementMutation
+        await uploadStatementMutation
           .mutateAsync({
             deal: dealId,
             file: statement.file,
             filename: statement.file.name,
           })
-          .then(() => updateStatus(statement.file.name, "success"))
+          .then(() => setUploads((prev) => prev.filter((u) => u.file.name !== statement.file.name)))
           .then(() => {
             refetch();
             setFormDisabled(false);
@@ -88,16 +88,20 @@ function RouteComponent() {
           handleUpload={handleUpload}
         />
       </div>
-      <div className={`flex-[2] px-2`}>
-        <div className="flex justify-end mb-4">
-          <Button>
-            <Link to={`/transactions/{$dealId}`} params={{ dealId }}>
-              View Transactions
+      <div className="flex-[2] px-2 flex flex-col justify-center">
+        <div className="mt-16">
+          {!isFetched && <CreateDealForm handleUpdateDeal={handleUpdateDeal} disabled={formDisabled} deal={deal} />}
+          {isFetched && <CreateDealForm handleUpdateDeal={handleUpdateDeal} disabled={formDisabled} deal={deal} />}
+        </div>
+        <div className="flex-grow"></div>
+        <div className="flex w-full justify-end mb-4">
+          <Button variant={"ghost"}>
+            <Link to={`/transactions/$dealId`} params={{ dealId }} className="flex items-center gap-2">
+              Transactions
+              <MoveRight />
             </Link>
           </Button>
         </div>
-        {!isFetched && <CreateDealForm handleUpdateDeal={handleUpdateDeal} disabled={formDisabled} deal={deal} />}
-        {isFetched && <CreateDealForm handleUpdateDeal={handleUpdateDeal} disabled={formDisabled} deal={deal} />}
       </div>
     </div>
   );

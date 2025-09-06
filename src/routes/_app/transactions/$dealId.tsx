@@ -3,7 +3,7 @@ import Transactions from "@/components/transactions";
 import { useGetStatementById, useGetStatementsByDealId, useGetStatementUrl } from "@/lib/api/queries";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_app/transactions/{$dealId}")({
+export const Route = createFileRoute("/_app/transactions/$dealId")({
   component: RouteComponent,
   staticData: {
     routeName: "Transactions",

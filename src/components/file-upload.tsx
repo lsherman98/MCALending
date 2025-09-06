@@ -115,7 +115,7 @@ export function FileUpload({
                   </span>
                 </div>
               )}
-              <div>
+              <div className="flex w-full justify-end gap-2">
                 <Button
                   variant={"ghost"}
                   onClick={() => {

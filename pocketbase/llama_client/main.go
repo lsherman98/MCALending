@@ -52,7 +52,7 @@ func New(app *pocketbase.PocketBase) (*LlamaClient, error) {
 		APIKey:         apiKey,
 		ProjectID:      projectID,
 		OrganizationID: organizationId,
-		App: 		  app,
+		App:            app,
 	}, nil
 }
 
