@@ -125,21 +125,39 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 		config := &genai.GenerateContentConfig{
 			ResponseMIMEType: "application/json",
 			ResponseSchema: &genai.Schema{
-				Type: genai.TypeArray,
-				Items: &genai.Schema{
-					Type: genai.TypeObject,
-					Properties: map[string]*genai.Schema{
-						"date":         {Type: genai.TypeString},
-						"amount":       {Type: genai.TypeNumber},
-						"description":  {Type: genai.TypeString},
-						"trace_number": {Type: genai.TypeString},
-						"type":         {Type: genai.TypeString},
+				Type: genai.TypeObject,
+				Properties: map[string]*genai.Schema{
+					"transactions": {
+						Type:        genai.TypeArray,
+						Description: "A list of transactions and their types.",
+						Items: &genai.Schema{
+							Type: genai.TypeObject,
+							Properties: map[string]*genai.Schema{
+								"id": {
+									Type:        genai.TypeString,
+									Description: "The unique identifier for the transaction.",
+								},
+								"type": {
+									Type:        genai.TypeString,
+									Description: "The determined category (e.g., 'revenue', 'transfer', 'financing').",
+								},
+							},
+							Required: []string{"id", "type"},
+						},
 					},
-					PropertyOrdering: []string{"date", "amount", "description", "trace_number", "type"},
 				},
+				Required: []string{"transactions"},
 			},
 		}
 
+		// Items: &genai.Schema{
+		// 	Type: genai.TypeObject,
+		// 	Properties: map[string]*genai.Schema{
+		// 		"id":   {Type: genai.TypeString},
+		// 		"type": {Type: genai.TypeString},
+		// 	},
+		// 	PropertyOrdering: []string{"id", "type"},
+		// },
 		result, err := gemini.Models.GenerateContent(
 			context.Background(),
 			"gemini-2.5-flash",
@@ -151,14 +169,8 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			return err
 		}
 
-		var categorized []struct {
-			Date        string  `json:"date"`
-			Amount      float64 `json:"amount"`
-			Description string  `json:"description"`
-			TraceNumber string  `json:"trace_number"`
-			Type        string  `json:"type"`
-		}
-		if err := json.Unmarshal([]byte(result.Text()), &categorized); err != nil {
+		var transactionsWithTypes TransactionTypeList
+		if err := json.Unmarshal([]byte(result.Text()), &transactionsWithTypes); err != nil {
 			e.App.Logger().Error("Failed to parse Gemini response: " + err.Error())
 			return err
 		}
@@ -172,8 +184,8 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			transactionRecord.Set("statement", statement.Id)
 			transactionRecord.Set("deal", deal.Id)
 
-			if i < len(categorized) {
-				transactionType := categorized[i].Type
+			if i < len(transactionsWithTypes.Transactions) {
+				transactionType := transactionsWithTypes.Transactions[i].Type
 				if transactionType == "revenue" || transactionType == "financing" || transactionType == "transfer" {
 					transactionRecord.Set("type", transactionType)
 				}
