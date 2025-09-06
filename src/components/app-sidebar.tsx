@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
@@ -12,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { ChartPie, Handshake, HelpCircle, Landmark, Settings, TableProperties } from "lucide-react";
+import { BarChart3, FileText, Handshake, HelpCircle, Landmark, Settings } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "./ui/button";
 
@@ -31,12 +29,12 @@ const data = {
     {
       title: "Transactions",
       url: "/transactions",
-      icon: TableProperties,
+      icon: FileText,
     },
     {
       title: "Analytics",
       url: "/analytics",
-      icon: ChartPie,
+      icon: BarChart3,
     },
   ],
   navSecondary: [

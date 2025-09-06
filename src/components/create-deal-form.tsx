@@ -3,7 +3,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
-import { BriefcaseBusiness, Building2, CalendarIcon, House, Landmark, Map, MapPin, PiggyBank } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  Building2,
+  CalendarIcon,
+  House,
+  Landmark,
+  Map,
+  MapPin,
+  PencilLine,
+  PiggyBank,
+} from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
@@ -11,6 +21,7 @@ import { format } from "date-fns";
 import type { DealsResponse } from "@/lib/pocketbase-types";
 
 export const createDealFormSchema = z.object({
+  title: z.string().min(2).max(100),
   merchant: z.string().optional(),
   industry: z.string().optional(),
   bank: z.string().optional(),
@@ -33,6 +44,7 @@ export function CreateDealForm({
   const form = useForm<z.infer<typeof createDealFormSchema>>({
     resolver: zodResolver(createDealFormSchema),
     defaultValues: {
+      title: deal?.title || "",
       merchant: deal?.merchant || "",
       industry: deal?.industry || "",
       bank: deal?.bank || "",
@@ -61,6 +73,32 @@ export function CreateDealForm({
         className="space-y-8 flex items-center justify-center h-full"
       >
         <div className="space-y-4">
+          <div className="italic text-sm text-muted-foreground">Deal Reference #{deal?.id}</div>
+          <FormField
+            disabled={disabled}
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem className="flex flex-col gap-2 items-start min-w-sm max-w-md">
+                <FormLabel>Title</FormLabel>
+                <div className="w-full">
+                  <FormControl>
+                    <div className="relative w-full">
+                      <Input key="text-input-0" placeholder="" type="text" id="title" className="ps-9" {...field} />
+                      <div
+                        className={
+                          "text-muted-foreground pointer-events-none absolute inset-y-0 flex items-center justify-center peer-disabled:opacity-50 start-0 ps-3"
+                        }
+                      >
+                        <PencilLine className="size-4" strokeWidth={2} />
+                      </div>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
           <FormField
             disabled={disabled}
             control={form.control}

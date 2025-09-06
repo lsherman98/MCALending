@@ -79,8 +79,8 @@ function RouteComponent() {
   };
 
   return (
-    <div className="relative flex h-full">
-      <div className={`flex-[1.5] px-2`}>
+    <div className="relative flex h-full w-full">
+      <div className="flex-[1.5] px-2">
         <FileUpload
           uploads={uploads}
           statements={statements || []}

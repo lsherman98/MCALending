@@ -1,5 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getBalanceOverTime, getChecksVsDebits, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getJobs, getPaymentsVsIncome, getRealRevenue, getRecentDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTransactionsByDealId } from "./api";
+import { getBalanceOverTime, getChecksVsDebits, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getJobs, getPaymentsVsIncome, getRealRevenue, getRecentDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTransactions } from "./api";
+import type { TransactionsTypeOptions } from "../pocketbase-types";
 
 // DEALS
 export function useGetDeals() {
@@ -52,10 +53,10 @@ export function useGetStatementUrl(id: string) {
 }
 
 // TRANSACTIONS
-export function useGetTransactionsByDealId(dealId: string) {
+export function useGetTransactions(dealId: string, statement?: string, from?: Date, to?: Date, type?: TransactionsTypeOptions[] | "uncategorized") {
     return useQuery({
-        queryKey: ["transactions"],
-        queryFn: () => getTransactionsByDealId(dealId),
+        queryKey: ["transactions", dealId, statement, from, to, type],
+        queryFn: () => getTransactions(dealId, statement, from, to, type),
         placeholderData: keepPreviousData
     });
 }

@@ -16,7 +16,7 @@ function RouteComponent() {
 
   const createDeal = () => {
     createDealMutation.mutate(
-      { user: getUserId() || "", merchant: "New Deal" },
+      { user: getUserId() || "", title: "New Deal" },
       {
         onSuccess: (data) => {
           navigate({

@@ -5,7 +5,7 @@ import { useLocation, useMatches, useNavigate } from "@tanstack/react-router";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
 import { useCurrentDealStore } from "@/lib/stores/current-deal-store";
 import { useGetJobs, useGetRecentDeals } from "@/lib/api/queries";
-import type { DealsResponse, StatementsResponse } from "@/lib/pocketbase-types";
+import type { DealsResponse } from "@/lib/pocketbase-types";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
 import { CircleCheckBig, CloudAlert, File, ListCheck, LoaderCircle } from "lucide-react";
@@ -48,21 +48,21 @@ export function SiteHeader() {
         <Select
           value={currentDeal?.id || ""}
           onValueChange={(value) => {
-            const deal = recentDeals?.find((d) => d.id === value);
+            const deal = recentDeals?.items?.find((d) => d.id === value);
             if (deal) {
               handleDealClick(deal);
             }
           }}
         >
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-54">
             <SelectValue placeholder="Select a deal" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Recent Deals</SelectLabel>
-              {recentDeals?.map((deal) => (
+              {recentDeals?.items?.map((deal) => (
                 <SelectItem key={deal.id} value={deal.id}>
-                  {deal.merchant}
+                  {deal.title} - #{deal.id}
                 </SelectItem>
               ))}
             </SelectGroup>

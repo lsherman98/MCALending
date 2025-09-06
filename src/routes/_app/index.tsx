@@ -5,5 +5,7 @@ export const Route = createFileRoute("/_app/")({
 });
 
 function RouteComponent() {
-  return <div>Hello "/"!</div>;
+  const navigate = Route.useNavigate();
+  navigate({ to: "/deals" });
+  return <div></div>;
 }

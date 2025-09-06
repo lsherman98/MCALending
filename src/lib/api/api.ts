@@ -9,9 +9,8 @@ export async function getDeals() {
 }
 
 export async function getRecentDeals() {
-    return await pb.collection(Collections.Deals).getFullList({
+    return await pb.collection(Collections.Deals).getList(1, 5, {
         sort: '-updated',
-        limit: 5
     });
 }
 
@@ -62,8 +61,12 @@ export async function getStatementUrl(id: string) {
 
 
 // TRANSACTIONS
-export async function getTransactionsByDealId(dealId: string, from?: Date, to?: Date, type?: TransactionsTypeOptions[]) {
+export async function getTransactions(dealId: string, statement?: string, from?: Date, to?: Date, type?: TransactionsTypeOptions[] | "uncategorized") {
     let filter = `deal = "${dealId}"`;
+
+    if (statement) {
+        filter += ` && statement = "${statement}"`;
+    }
 
     if (from) {
         filter += ` && created >= "${from.toISOString()}"`;
@@ -73,8 +76,10 @@ export async function getTransactionsByDealId(dealId: string, from?: Date, to?: 
         filter += ` && created <= "${to.toISOString()}"`;
     }
 
-    if (type && type.length > 0) {
-        filter += ` && type ?= ("${type.join('","')}")`;
+    if (type === "uncategorized") {
+        filter += ` && (type = "")`;
+    } else if (type && type.length > 0) {
+        filter += ` && type ?= "${type.join('","')}"`;
     }
 
     return await pb.collection(Collections.Transactions).getFullList({

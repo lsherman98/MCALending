@@ -16,12 +16,12 @@ export default function Layout({ children }: PropsWithChildren) {
       className={
         "text-foreground group/body overscroll-none font-sans antialiased [--footer-height:calc(var(--spacing)*14)] [--header-height:calc(var(--spacing)*14)] xl:[--footer-height:calc(var(--spacing)*24)]"
       }
-      defaultOpen={false}
+      defaultOpen={true}
     >
-      <AppSidebar variant="inset" />
-      <SidebarInset>
+      <AppSidebar variant="inset"/>
+      <SidebarInset className="overflow-hidden">
         <SiteHeader />
-        <div className="flex flex-1 flex-col p-4">{children}</div>
+        <div className="flex flex-1 p-4">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

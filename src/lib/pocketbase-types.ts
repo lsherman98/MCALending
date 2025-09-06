@@ -163,6 +163,7 @@ export type DealsRecord = {
 	merchant?: string
 	organization?: RecordIdString
 	state?: string
+	title?: string
 	updated?: IsoDateString
 	user: RecordIdString
 	zip_code?: string
