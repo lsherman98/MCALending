@@ -276,7 +276,9 @@ export type StatementsRecord = {
 export enum TransactionsTypeOptions {
 	"revenue" = "revenue",
 	"transfer" = "transfer",
-	"financing" = "financing",
+	"funding" = "funding",
+	"loan_payment" = "loan_payment",
+	"business_expense" = "business_expense",
 }
 export type TransactionsRecord = {
 	amount?: number

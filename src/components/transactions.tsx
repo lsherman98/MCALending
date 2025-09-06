@@ -48,11 +48,23 @@ const colorCategories = {
     border: "border-l-4 border-blue-500",
     text: "text-blue-700 dark:text-blue-300",
   },
-  financing: {
-    name: "Financing",
+  funding: {
+    name: "Funding",
     bg: "bg-purple-50 dark:bg-purple-950/20",
     border: "border-l-4 border-purple-500",
     text: "text-purple-700 dark:text-purple-300",
+  },
+  loan_payment: {
+    name: "Loan Payment",
+    bg: "bg-red-50 dark:bg-red-950/20",
+    border: "border-l-4 border-red-500",
+    text: "text-red-700 dark:text-red-300",
+  },
+  business_expense: {
+    name: "Business Expense",
+    bg: "bg-orange-50 dark:bg-orange-950/20",
+    border: "border-l-4 border-orange-500",
+    text: "text-orange-700 dark:text-orange-300",
   },
 };
 
@@ -113,7 +125,19 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
         case "3":
           event.preventDefault();
           if (isKeyboardMode) {
-            updateTransactionColor(transactions[selectedRowIndex].id, TransactionsTypeOptions.financing);
+            updateTransactionColor(transactions[selectedRowIndex].id, TransactionsTypeOptions.funding);
+          }
+          break;
+        case "4":
+          event.preventDefault();
+          if (isKeyboardMode) {
+            updateTransactionColor(transactions[selectedRowIndex].id, TransactionsTypeOptions.loan_payment);
+          }
+          break;
+        case "5":
+          event.preventDefault();
+          if (isKeyboardMode) {
+            updateTransactionColor(transactions[selectedRowIndex].id, TransactionsTypeOptions.business_expense);
           }
           break;
         case "0":
@@ -194,12 +218,43 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                   <SelectItem value={"uncategorized"}>Uncategorized</SelectItem>
                   <SelectItem value={TransactionsTypeOptions.revenue}>Revenue</SelectItem>
                   <SelectItem value={TransactionsTypeOptions.transfer}>Transfer</SelectItem>
-                  <SelectItem value={TransactionsTypeOptions.financing}>Financing</SelectItem>
+                  <SelectItem value={TransactionsTypeOptions.funding}>Funding</SelectItem>
+                  <SelectItem value={TransactionsTypeOptions.loan_payment}>Loan Payment</SelectItem>
+                  <SelectItem value={TransactionsTypeOptions.business_expense}>Business Expense</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <TabsContent value="transactions" className="space-y-2 mt-2">
+            <div className="flex items-center justify-between pr-2 gap-2">
+              <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2 px-2 py-1 rounded bg-green-50">
+                  <Kbd>1</Kbd>
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                  <span className="text-xs text-muted-foreground">Revenue</span>
+                </div>
+                <div className="flex items-center gap-2 px-2 py-1 rounded bg-blue-50">
+                  <Kbd>2</Kbd>
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                  <span className="text-xs text-muted-foreground">Transfer</span>
+                </div>
+                <div className="flex items-center gap-2 px-2 py-1 rounded bg-purple-50">
+                  <Kbd>3</Kbd>
+                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                  <span className="text-xs text-muted-foreground">Funding</span>
+                </div>
+                <div className="flex items-center gap-2 px-2 py-1 rounded bg-pink-50">
+                  <Kbd>4</Kbd>
+                  <div className="w-1.5 h-1.5 bg-pink-500 rounded-full"></div>
+                  <span className="text-xs text-muted-foreground">Loan Payment</span>
+                </div>
+                <div className="flex items-center gap-2 px-2 py-1 rounded bg-red-50">
+                  <Kbd>5</Kbd>
+                  <div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div>
+                  <span className="text-xs text-muted-foreground">Business Expense</span>
+                </div>
+              </div>
+            </div>
             <div
               ref={tableRef}
               tabIndex={0}
@@ -220,7 +275,7 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
               </Table>
               <div
                 className={`overflow-auto ${
-                  selectedTransaction && isKeyboardMode ? "max-h-[calc(100vh-360px)]" : "max-h-[calc(100vh-226px)]"
+                  selectedTransaction && isKeyboardMode ? "max-h-[calc(100vh-388px)]" : "max-h-[calc(100vh-254px)]"
                 }`}
               >
                 <Table>
@@ -267,12 +322,33 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                                     ? "bg-green-500"
                                     : transaction.type === "transfer"
                                     ? "bg-blue-500"
-                                    : transaction.type === "financing"
+                                    : transaction.type === "funding"
                                     ? "bg-purple-500"
+                                    : transaction.type === "loan_payment"
+                                    ? "bg-pink-500"
+                                    : transaction.type === "business_expense"
+                                    ? "bg-red-500"
                                     : "bg-gray-300"
                                 }`}
                               />
-                              <span className="capitalize text-sm truncate">{transaction.type || "Uncategorized"}</span>
+                              {transaction.type === "business_expense" && (
+                                <span className="text-xs text-muted-foreground">Business Expense</span>
+                              )}
+                              {transaction.type === "loan_payment" && (
+                                <span className="text-xs text-muted-foreground">Loan Payment</span>
+                              )}
+                              {transaction.type === "funding" && (
+                                <span className="text-xs text-muted-foreground">Funding</span>
+                              )}
+                              {transaction.type === "transfer" && (
+                                <span className="text-xs text-muted-foreground">Transfer</span>
+                              )}
+                              {transaction.type === "revenue" && (
+                                <span className="text-xs text-muted-foreground">Revenue</span>
+                              )}
+                              {!transaction.type && (
+                                <span className="text-xs text-muted-foreground">Uncategorized</span>
+                              )}
                             </div>
                           </TableCell>
                           <TableCell className="text-right font-mono py-3 w-24">
@@ -293,28 +369,11 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                 </Table>
               </div>
             </div>
-            <div className="flex items-center justify-between pr-2 gap-2">
-              <div className="flex items-center gap-1">
-                <div className="flex items-center gap-1 px-2 py-1 rounded bg-green-50">
-                  <Kbd>1</Kbd>
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                  <span className="text-xs text-muted-foreground">Revenue</span>
-                </div>
-                <div className="flex items-center gap-1 px-2 py-1 rounded bg-blue-50">
-                  <Kbd>2</Kbd>
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                  <span className="text-xs text-muted-foreground">Transfer</span>
-                </div>
-                <div className="flex items-center gap-1 px-2 py-1 rounded bg-purple-50">
-                  <Kbd>3</Kbd>
-                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                  <span className="text-xs text-muted-foreground">Financing</span>
-                </div>
-              </div>
+            <div className="flex items-center justify-center">
               <div className="text-xs text-muted-foreground flex items-center gap-1.5">
                 <Kbd>↑</Kbd>
                 <Kbd>↓</Kbd>
-                navigate •<Kbd>1</Kbd>-<Kbd>3</Kbd>
+                navigate •<Kbd>0</Kbd>-<Kbd>5</Kbd>
                 categorize •<Kbd>ESC</Kbd>
                 exit
               </div>
@@ -333,8 +392,12 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                                 ? "bg-green-500"
                                 : selectedTransaction.type === "transfer"
                                 ? "bg-blue-500"
-                                : selectedTransaction.type === "financing"
+                                : selectedTransaction.type === "funding"
                                 ? "bg-purple-500"
+                                : selectedTransaction.type === "loan_payment"
+                                ? "bg-pink-500"
+                                : selectedTransaction.type === "business_expense"
+                                ? "bg-red-500"
                                 : "bg-gray-300"
                             }`}
                           />

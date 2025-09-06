@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { DealsRecord, TransactionsRecord } from "../pocketbase-types";
-import { bulkUpdateTransaction, createDeal, deleteDeal, updateDeal, updateTransaction, uploadStatement } from "./api";
+import { bulkUpdateTransaction, createDeal, deleteDeal, deleteStatement, updateDeal, updateTransaction, uploadStatement } from "./api";
 import { handleError } from "../utils";
 import type { UploadStatementData } from "../types";
 
@@ -53,7 +53,26 @@ export function useUploadStatement() {
             await queryClient.invalidateQueries({ queryKey: ["statements"] });
             setTimeout(async () => {
                 await queryClient.invalidateQueries({ queryKey: ["jobs"] });
-            }, 2000);
+            }, 3000);
+            setTimeout(async () => {
+                await queryClient.invalidateQueries({ queryKey: ["jobs"] });
+            }, 4000);
+            setTimeout(async () => {
+                await queryClient.invalidateQueries({ queryKey: ["jobs"] });
+            }, 5000);
+        }
+    })
+}
+
+export function useDeleteStatement() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: string) => deleteStatement(id),
+        onError: handleError,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["statements"] });
+            await queryClient.invalidateQueries({ queryKey: ["jobs"] });
         }
     })
 }

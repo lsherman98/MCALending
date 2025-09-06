@@ -111,12 +111,11 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			return err
 		}
 
-		transactionsJSONString := "```" + string(transactionsJSON) + "```"
+		transactionsJSONString := "```json\n" + string(transactionsJSON) + "\n```"
+		systemPrompt := "For each transaction in the following JSON, add a field 'type' with one of: 'revenue', 'transfer', 'funding', 'loan_payment', 'business_expense'. If the type is unclear or cannot be determined, leave the 'type' field blank.\nHere is some guidance on how to categorize each transaction:\n- the revenue type should be applied to transaction are that are deposits into the account that are real business revenue, not a transfer from another account.\n- the transfer type will be transactions that are deposits from another account. It should not be confused for a financing deposit from a lender.\n- the funding type is a deposit from a lender. It is not revenue or a transfer.\n- the loan_payment type is a credit from the account that is a payment on a loan from a lender\n- the business_expense type is a transaction that is not a loan payment and is cleary a business expense. if not confident just leave it blank.\n\nWe should always lean on not setting a type if the confidence is low.\n\nReturn the array of transactions in the same order as received, with all original fields plus the new 'type' field. JSON: " + transactionsJSONString
 
 		parts := []*genai.Part{
-			genai.NewPartFromText(
-				`For each transaction in the following JSON, add a field "type" with one of: "revenue", "transfer", or "financing". If the type is unclear or cannot be determined, leave the "type" field blank. Return the array of transactions in the same order as received, with all original fields plus the new "type" field. JSON: ` + transactionsJSONString,
-			),
+			genai.NewPartFromText("JSON: " + transactionsJSONString),
 		}
 		contents := []*genai.Content{
 			genai.NewContentFromParts(parts, genai.RoleUser),
@@ -139,7 +138,7 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 								},
 								"type": {
 									Type:        genai.TypeString,
-									Description: "The determined category (e.g., 'revenue', 'transfer', 'financing').",
+									Description: "The determined category (e.g., 'revenue', 'transfer', 'funding', 'loan_payment', 'business_expense').",
 								},
 							},
 							Required: []string{"id", "type"},
@@ -148,16 +147,9 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 				},
 				Required: []string{"transactions"},
 			},
+			SystemInstruction: genai.NewContentFromText(systemPrompt, genai.RoleUser),
 		}
 
-		// Items: &genai.Schema{
-		// 	Type: genai.TypeObject,
-		// 	Properties: map[string]*genai.Schema{
-		// 		"id":   {Type: genai.TypeString},
-		// 		"type": {Type: genai.TypeString},
-		// 	},
-		// 	PropertyOrdering: []string{"id", "type"},
-		// },
 		result, err := gemini.Models.GenerateContent(
 			context.Background(),
 			"gemini-2.5-flash",
@@ -186,7 +178,7 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 
 			if i < len(transactionsWithTypes.Transactions) {
 				transactionType := transactionsWithTypes.Transactions[i].Type
-				if transactionType == "revenue" || transactionType == "financing" || transactionType == "transfer" {
+				if transactionType == "revenue" || transactionType == "funding" || transactionType == "transfer" || transactionType == "loan_payment" || transactionType == "business_expense" {
 					transactionRecord.Set("type", transactionType)
 				}
 			}

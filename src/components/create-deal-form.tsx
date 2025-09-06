@@ -73,7 +73,7 @@ export function CreateDealForm({
         className="space-y-8 flex items-center justify-center h-full"
       >
         <div className="space-y-4">
-          <div className="italic text-sm text-muted-foreground">Deal Reference #{deal?.id}</div>
+          <div className="italic text-sm text-muted-foreground">Deal Reference number: {deal?.id}</div>
           <FormField
             disabled={disabled}
             control={form.control}
