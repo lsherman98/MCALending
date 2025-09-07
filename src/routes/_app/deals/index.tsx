@@ -63,6 +63,7 @@ function RouteComponent() {
         <TableHeader className="sticky top-0 bg-white">
           <TableRow>
             <TableHead className="min-w-[100px] max-w-[100px]">Id</TableHead>
+            <TableHead className="min-w-[150px] max-w-[150px]">Title</TableHead>
             <TableHead className="min-w-[150px] max-w-[150px]">Merchant</TableHead>
             <TableHead className="min-w-[150px] max-w-[150px]">Industry</TableHead>
             <TableHead className="min-w-[150px] max-w-[150px]">Bank</TableHead>
@@ -79,6 +80,7 @@ function RouteComponent() {
             {deals?.map((deal) => (
               <TableRow key={deal.id} className="cursor-pointer" onClick={() => handleDealClick(deal)}>
                 <TableCell className="min-w-[100px] max-w-[100px]">{deal.id}</TableCell>
+                <TableCell className="min-w-[150px] max-w-[150px]">{deal.title}</TableCell>
                 <TableCell className="min-w-[150px] max-w-[150px]">{deal.merchant}</TableCell>
                 <TableCell className="min-w-[150px] max-w-[150px]">{deal.industry}</TableCell>
                 <TableCell className="min-w-[150px] max-w-[150px]">{deal.bank}</TableCell>

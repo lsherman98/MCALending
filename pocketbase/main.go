@@ -14,6 +14,7 @@ import (
 
 	"github.com/lsherman98/mca-platform/pocketbase/llama_client"
 	// _ "github.com/lsherman98/mca-platform/pocketbase/migrations"
+	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/current_deal_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/extraction_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/job_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/statement_hooks"
@@ -33,9 +34,9 @@ func main() {
 	}
 
 	gemini, err := genai.NewClient(context.Background(), &genai.ClientConfig{
-        APIKey:  os.Getenv("GEMINI_API_KEY"),
-        Backend: genai.BackendGeminiAPI,
-    })
+		APIKey:  os.Getenv("GEMINI_API_KEY"),
+		Backend: genai.BackendGeminiAPI,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,6 +52,11 @@ func main() {
 	}
 
 	err = extraction_hooks.Init(app, gemini)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = current_deal_hooks.Init(app)
 	if err != nil {
 		log.Fatal(err)
 	}

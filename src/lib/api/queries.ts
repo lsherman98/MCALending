@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getBalanceOverTime, getChecksVsDebits, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getJobs, getPaymentsVsIncome, getRealRevenue, getRecentDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTransactions } from "./api";
+import { getBalanceOverTime, getChecksVsDebits, getCurrentDeal, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getJobs, getPaymentsVsIncome, getRealRevenue, getRecentDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTransactions } from "./api";
 import type { TransactionsTypeOptions } from "../pocketbase-types";
 
 // DEALS
@@ -122,5 +122,15 @@ export function useGetJobs() {
             }
             return false;
         }
+    });
+}
+
+// CURRENT_DEAL
+export function useGetCurrentDeal() {
+    return useQuery({
+        queryKey: ["currentDeal"],
+        queryFn: getCurrentDeal,
+        placeholderData: keepPreviousData,
+        retryDelay: 1000
     });
 }

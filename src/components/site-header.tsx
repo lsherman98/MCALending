@@ -4,12 +4,13 @@ import { ModeToggle } from "./mode-toggle";
 import { useLocation, useMatches, useNavigate } from "@tanstack/react-router";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
 import { useCurrentDealStore } from "@/lib/stores/current-deal-store";
-import { useGetJobs, useGetRecentDeals } from "@/lib/api/queries";
+import { useGetCurrentDeal, useGetJobs, useGetRecentDeals } from "@/lib/api/queries";
 import type { DealsResponse } from "@/lib/pocketbase-types";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
 import { CircleCheckBig, CloudAlert, File, ListCheck, LoaderCircle } from "lucide-react";
 import type { ExpandStatement } from "@/lib/types";
+import { useEffect } from "react";
 
 export function SiteHeader() {
   const route = useLocation();
@@ -17,9 +18,17 @@ export function SiteHeader() {
   const matches = useMatches();
   const match = matches.find((m) => m.pathname === route.pathname + "/" || m.pathname === route.pathname);
   const { data: recentDeals } = useGetRecentDeals();
-  const { currentDeal, setCurrentDeal } = useCurrentDealStore();
+  const { currentDeal, setCurrentDeal, setCurrentDealId } = useCurrentDealStore();
   const { data: jobs } = useGetJobs();
+  const { data: currentDealData } = useGetCurrentDeal();
   const extractionInProgress = jobs?.some((job) => job.status === "PENDING");
+
+  useEffect(() => {
+    if (currentDealData) {
+      setCurrentDeal(currentDealData.expand.deal);
+      setCurrentDealId(currentDealData.id);
+    }
+  }, [currentDealData]);
 
   const handleDealClick = (deal: DealsResponse) => {
     setCurrentDeal(deal);

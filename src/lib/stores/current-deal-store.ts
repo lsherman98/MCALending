@@ -1,20 +1,21 @@
 import { type DealsResponse } from "../pocketbase-types";
 import { create } from 'zustand';
-import { getCurrentDeal, updateCurrentDeal } from "../api/api";
+import { updateCurrentDeal } from "../api/api";
 
 interface CurrentDealStore {
     currentDeal: DealsResponse | null;
     currentDealId: string | null;
     setCurrentDeal: (deal: DealsResponse) => Promise<void>;
-    fetchCurrentDeal: () => Promise<void>;
+    setCurrentDealId: (id: string) => Promise<void>;
 }
+
+
 
 export const useCurrentDealStore = create<CurrentDealStore>((set, get) => ({
     currentDeal: null,
     currentDealId: null,
     setCurrentDeal: async (deal: DealsResponse) => {
         set({ currentDeal: deal });
-        set({ currentDealId: deal.id });
         if (get().currentDealId && deal) {
             try {
                 await updateCurrentDeal(get().currentDealId!, deal.id);
@@ -23,15 +24,7 @@ export const useCurrentDealStore = create<CurrentDealStore>((set, get) => ({
             }
         }
     },
-    fetchCurrentDeal: async () => {
-        try {
-            const currentDeal = await getCurrentDeal()
-            set({ currentDeal: currentDeal.expand.deal });
-        } catch (error) {
-            console.error('Failed to fetch current deal:', error);
-            set({ currentDeal: null });
-        }
+    setCurrentDealId: async (id: string) => {
+        set({ currentDealId: id });
     },
 }));
-
-useCurrentDealStore.getState().fetchCurrentDeal();
