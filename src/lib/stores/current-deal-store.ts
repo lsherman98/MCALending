@@ -9,13 +9,12 @@ interface CurrentDealStore {
     setCurrentDealId: (id: string) => Promise<void>;
 }
 
-
-
 export const useCurrentDealStore = create<CurrentDealStore>((set, get) => ({
     currentDeal: null,
     currentDealId: null,
     setCurrentDeal: async (deal: DealsResponse) => {
         set({ currentDeal: deal });
+        console.log(get().currentDealId)
         if (get().currentDealId && deal) {
             try {
                 await updateCurrentDeal(get().currentDealId!, deal.id);

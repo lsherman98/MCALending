@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal, FileText, BarChart3, Edit, Trash2 } from "lucide-react";
 import { useCurrentDealStore } from "@/lib/stores/current-deal-store";
 import type { DealsResponse } from "@/lib/pocketbase-types";
-import { useDeleteDeal } from "@/lib/api/mutations";
+import { useCreateDeal, useDeleteDeal } from "@/lib/api/mutations";
+import { getUserId } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/deals/")({
   component: RouteComponent,
@@ -25,6 +26,7 @@ function RouteComponent() {
   const { data: deals } = useGetDeals();
   const { setCurrentDeal } = useCurrentDealStore();
   const deleteDealMutation = useDeleteDeal();
+  const createDealMutation = useCreateDeal();
 
   const handleDealClick = (deal: DealsResponse) => {
     navigate({ to: `/deals/${deal.id}` });
@@ -52,10 +54,24 @@ function RouteComponent() {
     }
   };
 
+  const createDeal = () => {
+    createDealMutation.mutate(
+      { user: getUserId() || "", title: "New Deal" },
+      {
+        onSuccess: (data) => {
+          setCurrentDeal(data);
+          navigate({
+            to: `/deals/${data.id}`,
+          });
+        },
+      }
+    );
+  };
+
   return (
     <div className="w-full flex flex-col gap-2">
       <div className="flex justify-end">
-        <Button variant="outline" onClick={() => navigate({ to: `/deals/create` })}>
+        <Button variant="outline" onClick={createDeal}>
           New Deal
         </Button>
       </div>

@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getBalanceOverTime, getChecksVsDebits, getCurrentDeal, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getJobs, getPaymentsVsIncome, getRealRevenue, getRecentDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTransactions } from "./api";
 import type { TransactionsTypeOptions } from "../pocketbase-types";
+import { fa } from "zod/v4/locales";
 
 // DEALS
 export function useGetDeals() {
@@ -131,6 +132,7 @@ export function useGetCurrentDeal() {
         queryKey: ["currentDeal"],
         queryFn: getCurrentDeal,
         placeholderData: keepPreviousData,
-        retryDelay: 1000
+        retryDelay: 1000,
+        refetchOnWindowFocus: false
     });
 }
