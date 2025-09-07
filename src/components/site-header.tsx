@@ -21,7 +21,7 @@ export function SiteHeader() {
   const { currentDeal, setCurrentDeal, setCurrentDealId } = useCurrentDealStore();
   const { data: jobs } = useGetJobs();
   const { data: currentDealData } = useGetCurrentDeal();
-  const extractionInProgress = jobs?.some((job) => job.status === "PENDING");
+  const extractionInProgress = jobs?.some((job) => job.status === "PENDING" || job.status === "CLASSIFY");
 
   useEffect(() => {
     if (currentDealData) {
@@ -103,6 +103,12 @@ export function SiteHeader() {
                     <div className="flex items-center gap-2">
                       <div className="text-xs italic">Extracting...</div>
                       <LoaderCircle size={18} className="animate-spin text-blue-500" />
+                    </div>
+                  )}
+                  {job.status === "CLASSIFY" && (
+                    <div className="flex items-center gap-2">
+                      <div className="text-xs italic">Processing...</div>
+                      <LoaderCircle size={18} className="animate-spin text-orange-500" />
                     </div>
                   )}
                   {job.status === "SUCCESS" && <CircleCheckBig size={18} className="text-green-500" />}

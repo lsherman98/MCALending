@@ -97,8 +97,6 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
   const { data: transactions } = useGetTransactions(
     dealId,
     showStatementOnly ? statementId : undefined,
-    undefined,
-    undefined,
     type
   );
   const updateTransactionMutation = useUpdateTransaction();

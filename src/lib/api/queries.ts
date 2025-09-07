@@ -54,11 +54,19 @@ export function useGetStatementUrl(id: string) {
 }
 
 // TRANSACTIONS
-export function useGetTransactions(dealId: string, statement?: string, from?: Date, to?: Date, type?: TransactionsTypeOptions[] | "uncategorized") {
+export function useGetTransactions(dealId: string, statement?: string, type?: TransactionsTypeOptions[] | "uncategorized") {
     return useQuery({
-        queryKey: ["transactions", dealId, statement, from, to, type],
-        queryFn: () => getTransactions(dealId, statement, from, to, type),
-        placeholderData: keepPreviousData
+        queryKey: ["transactions", dealId, statement, type],
+        queryFn: () => getTransactions(dealId, statement, type),
+        placeholderData: keepPreviousData,
+        refetchOnMount: true,
+        refetchOnWindowFocus: false,
+        refetchInterval: (query) => {
+            if (query.state.data?.length === 0) {
+                return 5000
+            }
+            return false
+        }
     });
 }
 
@@ -115,11 +123,15 @@ export function useGetEndingBalanceOverTime(dealId: string) {
 export function useGetJobs() {
     const queryClient = useQueryClient();
     const { currentDeal } = useCurrentDealStore();
+
     return useQuery({
         queryKey: ["jobs"],
         queryFn: getJobs,
         refetchInterval: (query) => {
             const jobs = query.state.data;
+            if (jobs && jobs.some((job) => job.status === "CLASSIFY")) {
+                return 2000;
+            }
             if (jobs && jobs.some((job) => job.status === "PENDING")) {
                 return 5000;
             }

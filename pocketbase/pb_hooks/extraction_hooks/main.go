@@ -48,6 +48,12 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			return err
 		}
 
+		job, err := e.App.FindRecordById("jobs", extraction.GetString("job"))
+		if err != nil {
+			e.App.Logger().Error("Failed to find job record: " + err.Error())
+			return err
+		}
+
 		deal, err := e.App.FindRecordById("deals", statement.GetString("deal"))
 		if err != nil {
 			e.App.Logger().Error("Failed to find deal record: " + err.Error())
@@ -175,25 +181,33 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			return err
 		}
 
-		for i, transaction := range data.Transactions {
-			transactionRecord := core.NewRecord(transactionsCollection)
-			transactionRecord.Set("date", transaction.Date)
-			transactionRecord.Set("amount", transaction.Amount)
-			transactionRecord.Set("description", transaction.Description)
-			transactionRecord.Set("trace_number", transaction.TraceNumber)
-			transactionRecord.Set("statement", statement.Id)
-			transactionRecord.Set("deal", deal.Id)
+		routine.FireAndForget(func() {
+			for i, transaction := range data.Transactions {
+				transactionRecord := core.NewRecord(transactionsCollection)
+				transactionRecord.Set("date", transaction.Date)
+				transactionRecord.Set("amount", transaction.Amount)
+				transactionRecord.Set("description", transaction.Description)
+				transactionRecord.Set("trace_number", transaction.TraceNumber)
+				transactionRecord.Set("statement", statement.Id)
+				transactionRecord.Set("deal", deal.Id)
 
-			if i < len(transactionsWithTypes.Transactions) {
-				transactionType := transactionsWithTypes.Transactions[i].Type
-				if transactionType == "revenue" || transactionType == "funding" || transactionType == "transfer" || transactionType == "loan_payment" || transactionType == "business_expense" {
-					transactionRecord.Set("type", transactionType)
+				if i < len(transactionsWithTypes.Transactions) {
+					transactionType := transactionsWithTypes.Transactions[i].Type
+					if transactionType == "revenue" || transactionType == "funding" || transactionType == "transfer" || transactionType == "loan_payment" || transactionType == "business_expense" {
+						transactionRecord.Set("type", transactionType)
+					}
+				}
+
+				if err := e.App.Save(transactionRecord); err != nil {
+					e.App.Logger().Error("Failed to create transactions record: " + err.Error())
 				}
 			}
+		})
 
-			if err := e.App.Save(transactionRecord); err != nil {
-				e.App.Logger().Error("Failed to create transactions record: " + err.Error())
-			}
+		job.Set("status", "SUCCESS")
+		if err := e.App.Save(job); err != nil {
+			e.App.Logger().Error("Failed to save job record: " + err.Error())
+			return err
 		}
 
 		return e.Next()

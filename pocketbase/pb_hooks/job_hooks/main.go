@@ -19,7 +19,6 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		job := &llama_client.JobResponse{}
 		time.Sleep(10 * time.Second)
 		for !completed {
-			e.App.Logger().Info("Checking job status for job id: " + jobRecord.GetString("job_id"))
 			res, err := llama.GetJob(context.Background(), jobRecord.GetString("job_id"))
 			if err != nil {
 				e.App.Logger().Error("Failed to get job status: " + err.Error())
@@ -38,7 +37,7 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 			time.Sleep(10 * time.Second)
 		}
 
-		jobRecord.Set("status", job.Status)
+		jobRecord.Set("status", "CLASSIFY")
 		if err := app.Save(jobRecord); err != nil {
 			e.App.Logger().Error("Failed to save job record: " + err.Error())
 			return nil

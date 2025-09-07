@@ -61,19 +61,11 @@ export async function getStatementUrl(id: string) {
 
 
 // TRANSACTIONS
-export async function getTransactions(dealId: string, statement?: string, from?: Date, to?: Date, type?: TransactionsTypeOptions[] | "uncategorized") {
+export async function getTransactions(dealId: string, statement?: string, type?: TransactionsTypeOptions[] | "uncategorized") {
     let filter = `deal = "${dealId}"`;
 
     if (statement) {
         filter += ` && statement = "${statement}"`;
-    }
-
-    if (from) {
-        filter += ` && created >= "${from.toISOString()}"`;
-    }
-
-    if (to) {
-        filter += ` && created <= "${to.toISOString()}"`;
     }
 
     if (type === "uncategorized") {
@@ -150,7 +142,7 @@ export async function getJobs() {
     const lastWeekISO = lastWeek.toISOString();
 
     return await pb.collection(Collections.Jobs).getFullList<JobsResponse<ExpandStatement>>({
-        filter: `status = "PENDING" || (status = "SUCCESS" && created > "${lastWeekISO}")`,
+        filter: `status = "PENDING" || status = "CLASSIFY" || (status = "SUCCESS" && created > "${lastWeekISO}")`,
         expand: "statement"
     });
 }

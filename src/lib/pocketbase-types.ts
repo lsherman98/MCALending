@@ -201,6 +201,7 @@ export enum JobsStatusOptions {
 	"ERROR" = "ERROR",
 	"PARTIAL_SUCCESS" = "PARTIAL_SUCCESS",
 	"CANCELLED" = "CANCELLED",
+	"CLASSIFY" = "CLASSIFY",
 }
 export type JobsRecord<Tmetadata = unknown> = {
 	agent_id: string
