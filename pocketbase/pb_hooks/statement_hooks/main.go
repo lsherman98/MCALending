@@ -10,29 +10,29 @@ import (
 	"github.com/pocketbase/pocketbase/tools/routine"
 )
 
-// func buildUrl(statement *core.Record, token string) string {
-// 	return fmt.Sprintf(
-// 		"/api/files/%s/%s/%s?token=%s",
-// 		"statements",
-// 		statement.Id,
-// 		statement.GetString("file"),
-// 		token,
-// 	)
-// }
+func buildUrl(statement *core.Record, token string) string {
+	return fmt.Sprintf(
+		"https://mca.levisherman.xyz/api/files/%s/%s/%s?token=%s",
+		"statements",
+		statement.Id,
+		statement.GetString("file"),
+		token,
+	)
+}
 
 const (
 	agentId = "75a67a3c-c668-4a2a-8acb-bed0d5111e12"
 )
 
-func buildS3Url(collectionId, recordId, filename string) string {
-	return fmt.Sprintf(
-		"https://storage.googleapis.com/%s/%s/%s/%s",
-		"mca-bank-statement-parser-raw-test",
-		collectionId,
-		recordId,
-		filename,
-	)
-}
+// func buildS3Url(collectionId, recordId, filename string) string {
+// 	return fmt.Sprintf(
+// 		"https://storage.googleapis.com/%s/%s/%s/%s",
+// 		"mca-bank-statement-parser-raw-test",
+// 		collectionId,
+// 		recordId,
+// 		filename,
+// 	)
+// }
 
 func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 	app.OnRecordCreateRequest("statements").BindFunc(func(e *core.RecordRequestEvent) error {
@@ -48,14 +48,14 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		statement := e.Record
 
 		routine.FireAndForget(func() {
-			// token, err := e.Auth.NewFileToken()
-			// if err != nil {
-			// 	e.App.Logger().Error("Failed to create file token: " + err.Error())
-			// 	return nil
-			// }
+			token, err := e.Auth.NewFileToken()
+			if err != nil {
+				e.App.Logger().Error("Failed to create file token: " + err.Error())
+				return
+			}
 
-			// url := buildUrl(statement, token)
-			url := buildS3Url(statement.Collection().Id, statement.Id, statement.GetString("file"))
+			url := buildUrl(statement, token)
+			// url := buildS3Url(statement.Collection().Id, statement.Id, statement.GetString("file"))
 			upload, err := llama.Upload(context.Background(), llama_client.UploadRequest{
 				Name: statement.GetString("filename"),
 				URL:  url,
