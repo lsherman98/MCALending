@@ -1,4 +1,4 @@
-import { CheckCircleIcon, LoaderIcon, Trash } from "lucide-react";
+import { CheckCircleIcon, LoaderCircle, Trash } from "lucide-react";
 import { Button } from "./ui/button";
 import { formatFileSize } from "@/lib/utils";
 
@@ -16,7 +16,7 @@ export function UploadedFile({
   const getStatusIcon = () => {
     switch (status) {
       case "uploading":
-        return <LoaderIcon className="text-blue-500 animate-spin" />;
+        return <LoaderCircle className="text-blue-500 animate-spin" />;
       case "success":
         return <CheckCircleIcon className="text-green-500" />;
       default:

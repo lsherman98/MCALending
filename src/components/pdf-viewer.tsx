@@ -19,9 +19,16 @@ interface PDFViewerProps {
   statements?: any[];
   selectedStatement?: any;
   onStatementSelect?: (statement: any) => void;
+  showFileViewer?: boolean;
 }
 
-export function PDFViewer({ pdfFile, statements, selectedStatement, onStatementSelect }: PDFViewerProps) {
+export function PDFViewer({
+  pdfFile,
+  statements,
+  selectedStatement,
+  onStatementSelect,
+  showFileViewer = true,
+}: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [scale, setScale] = useState<number>(1);
@@ -84,14 +91,16 @@ export function PDFViewer({ pdfFile, statements, selectedStatement, onStatementS
 
   return (
     <div className="relative h-full">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => setShowFileBrowser(!showFileBrowser)}
-        className="absolute top-2 left-2 z-40 bg-white shadow-sm"
-      >
-        <List />
-      </Button>
+      {showFileViewer && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowFileBrowser(!showFileBrowser)}
+          className="absolute top-2 left-2 z-40 bg-white shadow-sm"
+        >
+          <List />
+        </Button>
+      )}
       {showFileBrowser && (
         <div className="absolute top-0 left-0 w-80 h-full bg-white dark:bg-gray-800 border-r border-border z-50 shadow-lg">
           <div className="p-4 h-full flex flex-col">
@@ -147,6 +156,7 @@ export function PDFViewer({ pdfFile, statements, selectedStatement, onStatementS
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadError={onDocumentLoadError}
               options={options}
+              key={pdfFile}
             >
               {Array.from(new Array(numPages), (_, index) => (
                 <div key={`page_${index + 1}`} data-page-number={index + 1} className="mb-4">

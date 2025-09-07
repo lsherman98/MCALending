@@ -52,6 +52,10 @@ type JobResponse struct {
 	File            map[string]any `json:"file,omitempty"`
 }
 
+type RunResponse struct {
+	ID string `json:"id"`
+}
+
 type WebhookConfiguration struct {
 	WebhookURL          string            `json:"webhook_url"`
 	WebhookHeaders      map[string]string `json:"webhook_headers,omitempty"`

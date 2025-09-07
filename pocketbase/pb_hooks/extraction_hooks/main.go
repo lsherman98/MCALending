@@ -7,6 +7,7 @@ import (
 	"github.com/lsherman98/mca-platform/pocketbase/llama_client"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
+	"github.com/pocketbase/pocketbase/tools/routine"
 	"google.golang.org/genai"
 )
 
@@ -82,31 +83,35 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			e.App.Logger().Error("Failed to create statement_details record: " + err.Error())
 		}
 
-		for _, checkPaid := range data.ChecksPaid {
-			checkPaidRecord := core.NewRecord(checksPaidCollection)
-			checkPaidRecord.Set("date", checkPaid.Date)
-			checkPaidRecord.Set("check_number", checkPaid.CheckNumber)
-			checkPaidRecord.Set("reference", checkPaid.Reference)
-			checkPaidRecord.Set("amount", checkPaid.Amount)
-			checkPaidRecord.Set("statement", statement.Id)
-			checkPaidRecord.Set("deal", deal.Id)
+		routine.FireAndForget(func() {
+			for _, checkPaid := range data.ChecksPaid {
+				checkPaidRecord := core.NewRecord(checksPaidCollection)
+				checkPaidRecord.Set("date", checkPaid.Date)
+				checkPaidRecord.Set("check_number", checkPaid.CheckNumber)
+				checkPaidRecord.Set("reference", checkPaid.Reference)
+				checkPaidRecord.Set("amount", checkPaid.Amount)
+				checkPaidRecord.Set("statement", statement.Id)
+				checkPaidRecord.Set("deal", deal.Id)
 
-			if err := e.App.Save(checkPaidRecord); err != nil {
-				e.App.Logger().Error("Failed to create checks_paid record: " + err.Error())
+				if err := e.App.Save(checkPaidRecord); err != nil {
+					e.App.Logger().Error("Failed to create checks_paid record: " + err.Error())
+				}
 			}
-		}
+		})
 
-		for _, dailyBalance := range data.DailyBalanceSummary {
-			dailyBalanceRecord := core.NewRecord(dailyBalanceCollection)
-			dailyBalanceRecord.Set("date", dailyBalance.Date)
-			dailyBalanceRecord.Set("balance", dailyBalance.Balance)
-			dailyBalanceRecord.Set("statement", statement.Id)
-			dailyBalanceRecord.Set("deal", deal.Id)
+		routine.FireAndForget(func() {
+			for _, dailyBalance := range data.DailyBalanceSummary {
+				dailyBalanceRecord := core.NewRecord(dailyBalanceCollection)
+				dailyBalanceRecord.Set("date", dailyBalance.Date)
+				dailyBalanceRecord.Set("balance", dailyBalance.Balance)
+				dailyBalanceRecord.Set("statement", statement.Id)
+				dailyBalanceRecord.Set("deal", deal.Id)
 
-			if err := e.App.Save(dailyBalanceRecord); err != nil {
-				e.App.Logger().Error("Failed to create daily_balance record: " + err.Error())
+				if err := e.App.Save(dailyBalanceRecord); err != nil {
+					e.App.Logger().Error("Failed to create daily_balance record: " + err.Error())
+				}
 			}
-		}
+		})
 
 		transactionsJSON, err := json.Marshal(data.Transactions)
 		if err != nil {

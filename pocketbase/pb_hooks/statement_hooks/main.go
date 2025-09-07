@@ -3,6 +3,7 @@ package statement_hooks
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/lsherman98/mca-platform/pocketbase/llama_client"
 	"github.com/pocketbase/pocketbase"
@@ -24,17 +25,19 @@ const (
 	agentId = "75a67a3c-c668-4a2a-8acb-bed0d5111e12"
 )
 
-// func buildS3Url(collectionId, recordId, filename string) string {
-// 	return fmt.Sprintf(
-// 		"https://storage.googleapis.com/%s/%s/%s/%s",
-// 		"mca-bank-statement-parser-raw-test",
-// 		collectionId,
-// 		recordId,
-// 		filename,
-// 	)
-// }
+func buildS3Url(collectionId, recordId, filename string) string {
+	return fmt.Sprintf(
+		"https://storage.googleapis.com/%s/%s/%s/%s",
+		"mca-bank-statement-parser-raw-test",
+		collectionId,
+		recordId,
+		filename,
+	)
+}
 
 func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
+	dev := os.Getenv("DEV")
+	
 	app.OnRecordCreateRequest("statements").BindFunc(func(e *core.RecordRequestEvent) error {
 		if err := e.Next(); err != nil {
 			return err
@@ -54,8 +57,13 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 				return
 			}
 
-			url := buildUrl(statement, token)
-			// url := buildS3Url(statement.Collection().Id, statement.Id, statement.GetString("file"))
+			var url string
+			if dev == "true" {
+				url = buildS3Url(statement.Collection().Id, statement.Id, statement.GetString("file"))
+			} else {
+				url = buildUrl(statement, token)
+			}
+
 			upload, err := llama.Upload(context.Background(), llama_client.UploadRequest{
 				Name: statement.GetString("filename"),
 				URL:  url,
@@ -78,8 +86,15 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 				e.App.Logger().Error("Failed to run extraction job: " + err.Error())
 			}
 
+			run, err := llama.GetRunByJobID(context.Background(), job.ID)
+			if err != nil {
+				e.App.Logger().Error("Failed to get run information: " + err.Error())
+				return
+			}
+
 			jobRecord := core.NewRecord(jobsCollection)
 			jobRecord.Set("job_id", job.ID)
+			jobRecord.Set("run_id", run.ID)
 			jobRecord.Set("status", job.Status)
 			jobRecord.Set("agent_id", agentId)
 			jobRecord.Set("deal", statement.GetString("deal"))

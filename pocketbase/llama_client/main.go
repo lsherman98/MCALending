@@ -209,3 +209,74 @@ func (c *LlamaClient) GetJobResult(ctx context.Context, jobID string) (*JobResul
 
 	return &apiResponse, nil
 }
+
+func (c *LlamaClient) DeleteExtractionRun(ctx context.Context, runID string) error {
+	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, "extraction/runs", runID))
+	if err != nil {
+		return fmt.Errorf("failed to parse endpoint URL: %w", err)
+	}
+
+	params := url.Values{}
+	params.Add("project_id", c.ProjectID)
+	params.Add("organization_id", c.OrganizationID)
+	endpoint.RawQuery = params.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, "DELETE", endpoint.String(), nil)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Authorization", "Bearer "+c.APIKey)
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to execute request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
+	}
+
+	return nil
+}
+
+func (c *LlamaClient) GetRunByJobID(ctx context.Context, jobID string) (*RunResponse, error) {
+	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, "extraction/runs/by-job", jobID))
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse endpoint URL: %w", err)
+	}
+
+	params := url.Values{}
+	params.Add("project_id", c.ProjectID)
+	params.Add("organization_id", c.OrganizationID)
+	endpoint.RawQuery = params.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", endpoint.String(), nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Authorization", "Bearer "+c.APIKey)
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
+	}
+
+	var apiResponse RunResponse
+	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
+		return nil, fmt.Errorf("failed to decode response body: %w", err)
+	}
+
+	return &apiResponse, nil
+}

@@ -99,7 +99,6 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		}
 
 		job.Set("extraction", extractionRecord.Id)
-		job.Set("run_id", extraction.RunID)
 		job.Set("metadata", extraction.ExtractionMetadata)
 		job.Set("num_pages", extraction.ExtractionMetadata.Usage.NumPagesExtracted)
 		job.Set("document_tokens", extraction.ExtractionMetadata.Usage.NumDocumentTokens)
@@ -109,6 +108,18 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		if err := app.Save(job); err != nil {
 			e.App.Logger().Error("Failed to save job record: " + err.Error())
 			return nil
+		}
+
+		return e.Next()
+	})
+
+	app.OnRecordAfterDeleteSuccess("jobs").BindFunc(func(e *core.RecordEvent) error {
+		job := e.Record
+		run_id := job.GetString("run_id")
+
+		if err := llama.DeleteExtractionRun(context.Background(), run_id); err != nil {
+			e.App.Logger().Error("Failed to delete extraction run: " + err.Error())
+			return e.Next()
 		}
 
 		return e.Next()
