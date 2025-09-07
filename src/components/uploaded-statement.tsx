@@ -1,5 +1,5 @@
 import type { StatementsResponse } from "@/lib/pocketbase-types";
-import { CircleCheck, Trash, MoreVertical } from "lucide-react";
+import { CircleCheck, MoreVertical } from "lucide-react";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { useDeleteStatement } from "@/lib/api/mutations";

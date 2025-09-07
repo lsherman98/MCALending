@@ -10,16 +10,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { BarChart3, FileText, Handshake, HelpCircle, Landmark, Settings } from "lucide-react";
+import { BarChart3, FileText, Handshake, Landmark, Settings } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "./ui/button";
+import { pb } from "@/lib/pocketbase";
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
       title: "Deals",
@@ -43,15 +39,11 @@ const data = {
       url: "/settings",
       icon: Settings,
     },
-    {
-      title: "Get Help",
-      url: "/help",
-      icon: HelpCircle,
-    },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const user = pb.authStore.model
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -76,7 +68,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser email={user?.email} />
       </SidebarFooter>
     </Sidebar>
   );

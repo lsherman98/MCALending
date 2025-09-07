@@ -1,28 +1,20 @@
 #!/bin/bash
-# filepath: /Users/levisherman/Documents/code/projects/ai-reader/pocketbase/deploy.sh
+# filepath: /Users/levisherman/Documents/code/projects/mca-platform/pocketbase/deploy.sh
 
 set -e
 
-# Build Docker image
-docker build -t pocketbase-app .
+go mod download && go mod verify
 
-# Create temp container
-docker create --name pocketbase-temp pocketbase-app
-
-# Copy built binary out
-docker cp pocketbase-temp:/server ./server
-
-# Remove temp container
-docker rm pocketbase-temp
+GOOS=linux GOARCH=amd64 go build -o server .
 
 # Rsync to remote server
-rsync -avz -e ssh /Users/levisherman/Documents/code/projects/ai-reader/pocketbase/server root@162.243.70.98:/root/pb/
+rsync -avz -e ssh /Users/levisherman/Documents/code/projects/mca-platform/pocketbase/server root@162.243.70.98:/root/pb-mca/
 
 # Rsync pb_public folder to remote server
-rsync -avz -e ssh /Users/levisherman/Documents/code/projects/ai-reader/pocketbase/pb_public/ root@162.243.70.98:/root/pb/pb_public/
+rsync -avz -e ssh /Users/levisherman/Documents/code/projects/mca-platform/pocketbase/pb_public/ root@162.243.70.98:/root/pb-mca/pb_public/
 
 # Rsync .env file to remote server
-rsync -avz -e ssh /Users/levisherman/Documents/code/projects/ai-reader/pocketbase/.env root@162.243.70.98:/root/pb/.env
+rsync -avz -e ssh /Users/levisherman/Documents/code/projects/mca-platform/pocketbase/.env root@162.243.70.98:/root/pb-mca/.env
 
-# Restart pocketbase.service on remote server
-ssh root@162.243.70.98 'systemctl restart pocketbase.service'
+# # Restart pocketbase.service on remote server
+ssh root@162.243.70.98 'systemctl restart mca.service'

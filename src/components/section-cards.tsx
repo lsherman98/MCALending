@@ -1,7 +1,5 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGetFundingAsPercentageOfRevenue, useGetPaymentsVsIncome, useGetRealRevenue } from "@/lib/api/queries";
-import { DollarSign, Percent, TrendingUp, CreditCard, Calculator, PiggyBank, BarChart3 } from "lucide-react";
 
 export function SectionCards({ dealId }: { dealId: string }) {
   const { data: fundingAsPercentageOfRevenue } = useGetFundingAsPercentageOfRevenue(dealId);
