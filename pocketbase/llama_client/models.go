@@ -106,6 +106,9 @@ type BusinessInformation struct {
 	AccountNumber  string `json:"account_number"`
 	AccountTitle   string `json:"account_title"`
 	CompanyAddress string `json:"company_address"`
+	City           string `json:"city"`
+	State          string `json:"state"`
+	ZipCode        string `json:"zip_code"`
 	CompanyName    string `json:"company_name"`
 }
 

@@ -89,7 +89,7 @@ function RouteComponent() {
         />
       </div>
       <div className="flex-[2] px-2 flex flex-col justify-center">
-        <div className="mt-14">
+        <div className="mt-24">
           {!isFetched && <CreateDealForm handleUpdateDeal={handleUpdateDeal} disabled={formDisabled} deal={deal} />}
           {isFetched && <CreateDealForm handleUpdateDeal={handleUpdateDeal} disabled={formDisabled} deal={deal} />}
         </div>

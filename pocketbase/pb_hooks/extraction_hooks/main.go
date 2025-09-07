@@ -55,6 +55,9 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 
 		deal.Set("merchant", data.BusinessInformation.CompanyName)
 		deal.Set("address", data.BusinessInformation.CompanyAddress)
+		deal.Set("city", data.BusinessInformation.City)
+		deal.Set("state", data.BusinessInformation.State)
+		deal.Set("zip_code", data.BusinessInformation.ZipCode)
 		deal.Set("bank", data.BankInformation.BankName)
 
 		if err := e.App.Save(deal); err != nil {

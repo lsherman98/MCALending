@@ -155,6 +155,7 @@ export type DailyBalanceRecord = {
 export type DealsRecord = {
 	address?: string
 	bank?: string
+	city?: string
 	created?: IsoDateString
 	credit_score?: number
 	founded?: IsoDateString
