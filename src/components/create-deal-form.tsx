@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useEffect } from "react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import {
@@ -57,6 +58,23 @@ export function CreateDealForm({
       creditScore: deal?.credit_score || undefined,
     },
   });
+
+  useEffect(() => {
+    if (deal) {
+      form.reset({
+        title: deal.title || "",
+        merchant: deal.merchant || "",
+        industry: deal.industry || "",
+        bank: deal.bank || "",
+        founded: deal.founded ? new Date(deal.founded) : undefined,
+        address: deal.address || "",
+        city: deal.city || "",
+        state: deal.state || "",
+        zipCode: deal.zip_code || "",
+        creditScore: deal.credit_score || undefined,
+      });
+    }
+  }, [deal, form]);
 
   function onSubmit(values: z.infer<typeof createDealFormSchema>) {
     handleUpdateDeal(values);

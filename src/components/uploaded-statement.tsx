@@ -12,7 +12,7 @@ export function UploadedStatement({ statement }: { statement: StatementsResponse
       <div className="flex flex-col">
         <div className="font-medium text-sm">{statement.filename}</div>
       </div>
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex items-center justify-end gap-2 pr-2">
         <CircleCheck className="text-green-500" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

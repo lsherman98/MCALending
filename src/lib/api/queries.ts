@@ -1,6 +1,7 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getBalanceOverTime, getChecksVsDebits, getCurrentDeal, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getJobs, getPaymentsVsIncome, getRealRevenue, getRecentDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTransactions } from "./api";
 import type { TransactionsTypeOptions } from "../pocketbase-types";
+import { useCurrentDealStore } from "../stores/current-deal-store";
 
 // DEALS
 export function useGetDeals() {
@@ -112,6 +113,8 @@ export function useGetEndingBalanceOverTime(dealId: string) {
 
 // JOBS
 export function useGetJobs() {
+    const queryClient = useQueryClient();
+    const { currentDeal } = useCurrentDealStore();
     return useQuery({
         queryKey: ["jobs"],
         queryFn: getJobs,
@@ -120,6 +123,9 @@ export function useGetJobs() {
             if (jobs && jobs.some((job) => job.status === "PENDING")) {
                 return 5000;
             }
+            setTimeout(async () => {
+                await queryClient.invalidateQueries({ queryKey: ["deal", currentDeal?.id] });
+            }, 2000);
             return false;
         }
     });
