@@ -1,7 +1,7 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGetFundingAsPercentageOfRevenue, useGetPaymentsVsIncome, useGetRealRevenue } from "@/lib/api/queries";
 
-export function SectionCards({ dealId }: { dealId: string }) {
+export function AnalyticsCards({ dealId }: { dealId: string }) {
   const { data: fundingAsPercentageOfRevenue } = useGetFundingAsPercentageOfRevenue(dealId);
   const { data: paymentsVsIncome } = useGetPaymentsVsIncome(dealId);
   const { data: realRevenue } = useGetRealRevenue(dealId);

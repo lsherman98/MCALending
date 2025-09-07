@@ -34,37 +34,54 @@ import { Switch } from "./ui/switch";
 //   nextDue?: string;
 // }
 
-const colorCategories = {
-  none: { name: "None", bg: "", border: "", text: "" },
+const transactionColors = {
   revenue: {
-    name: "Revenue",
-    bg: "bg-green-50",
+    bg: "bg-green-500",
+    text: "text-green-600",
+    keyboard: "bg-green-50",
+    rowBg: "bg-green-50",
     border: "border-l-4 border-green-500",
-    text: "text-green-700 dark:text-green-300",
+    rowText: "text-green-700",
   },
   transfer: {
-    name: "Transfer",
-    bg: "bg-blue-50 dark:bg-blue-950/20",
+    bg: "bg-blue-500",
+    text: "text-blue-600",
+    keyboard: "bg-blue-50",
+    rowBg: "bg-blue-50",
     border: "border-l-4 border-blue-500",
-    text: "text-blue-700 dark:text-blue-300",
+    rowText: "text-blue-700",
   },
   funding: {
-    name: "Funding",
-    bg: "bg-purple-50 dark:bg-purple-950/20",
+    bg: "bg-purple-500",
+    text: "text-purple-600",
+    keyboard: "bg-purple-50",
+    rowBg: "bg-purple-50",
     border: "border-l-4 border-purple-500",
-    text: "text-purple-700 dark:text-purple-300",
+    rowText: "text-purple-700",
   },
   loan_payment: {
-    name: "Loan Payment",
-    bg: "bg-red-50 dark:bg-red-950/20",
-    border: "border-l-4 border-red-500",
-    text: "text-red-700 dark:text-red-300",
+    bg: "bg-yellow-500",
+    text: "text-yellow-600",
+    keyboard: "bg-yellow-50",
+    rowBg: "bg-yellow-50 ",
+    border: "border-l-4 border-yellow-500",
+    rowText: "text-yellow-700",
   },
   business_expense: {
-    name: "Business Expense",
-    bg: "bg-orange-50 dark:bg-orange-950/20",
-    border: "border-l-4 border-orange-500",
-    text: "text-orange-700 dark:text-orange-300",
+    bg: "bg-red-500",
+    text: "text-red-600",
+    keyboard: "bg-red-50",
+    rowBg: "bg-red-50 ",
+    border: "border-l-4 border-red-500",
+    rowText: "text-red-700",
+  },
+  none: {
+    bg: "bg-gray-300",
+    text: "text-gray-600",
+    keyboard: "",
+    rowBg: "",
+    border: "",
+    rowText: "",
   },
 };
 
@@ -228,29 +245,31 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
           <TabsContent value="transactions" className="space-y-2 mt-2">
             <div className="flex items-center justify-between pr-2 gap-2">
               <div className="flex items-center gap-1">
-                <div className="flex items-center gap-2 px-2 py-1 rounded bg-green-50">
+                <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.revenue.keyboard}`}>
                   <Kbd>1</Kbd>
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                  <div className={`w-1.5 h-1.5 ${transactionColors.revenue.bg} rounded-full`}></div>
                   <span className="text-xs text-muted-foreground">Revenue</span>
                 </div>
-                <div className="flex items-center gap-2 px-2 py-1 rounded bg-blue-50">
+                <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.transfer.keyboard}`}>
                   <Kbd>2</Kbd>
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                  <div className={`w-1.5 h-1.5 ${transactionColors.transfer.bg} rounded-full`}></div>
                   <span className="text-xs text-muted-foreground">Transfer</span>
                 </div>
-                <div className="flex items-center gap-2 px-2 py-1 rounded bg-purple-50">
+                <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.funding.keyboard}`}>
                   <Kbd>3</Kbd>
-                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                  <div className={`w-1.5 h-1.5 ${transactionColors.funding.bg} rounded-full`}></div>
                   <span className="text-xs text-muted-foreground">Funding</span>
                 </div>
-                <div className="flex items-center gap-2 px-2 py-1 rounded bg-pink-50">
+                <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.loan_payment.keyboard}`}>
                   <Kbd>4</Kbd>
-                  <div className="w-1.5 h-1.5 bg-pink-500 rounded-full"></div>
+                  <div className={`w-1.5 h-1.5 ${transactionColors.loan_payment.bg} rounded-full`}></div>
                   <span className="text-xs text-muted-foreground">Loan Payment</span>
                 </div>
-                <div className="flex items-center gap-2 px-2 py-1 rounded bg-red-50">
+                <div
+                  className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.business_expense.keyboard}`}
+                >
                   <Kbd>5</Kbd>
-                  <div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div>
+                  <div className={`w-1.5 h-1.5 ${transactionColors.business_expense.bg} rounded-full`}></div>
                   <span className="text-xs text-muted-foreground">Business Expense</span>
                 </div>
               </div>
@@ -281,7 +300,7 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                 <Table>
                   <TableBody>
                     {transactions?.map((transaction, index) => {
-                      const colorStyle = colorCategories[transaction.type || "none"];
+                      const colorStyle = transactionColors[transaction.type || "none"];
                       const isSelected = isKeyboardMode && index === selectedRowIndex;
                       return (
                         <TableRow
@@ -290,9 +309,9 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                           }}
                           key={transaction.id}
                           className={`
-                                ${colorStyle.bg} ${colorStyle.border} 
+                                ${colorStyle.rowBg} ${colorStyle.border} 
                                 ${isSelected ? "bg-secondary border-l-4 border-l-primary" : ""}
-                                cursor-pointer
+                                cursor-pointer 
                               `}
                           onClick={() => {
                             setSelectedRowIndex(index);
@@ -318,17 +337,7 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                             <div className="flex items-center gap-2">
                               <div
                                 className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                                  transaction.type === "revenue"
-                                    ? "bg-green-500"
-                                    : transaction.type === "transfer"
-                                    ? "bg-blue-500"
-                                    : transaction.type === "funding"
-                                    ? "bg-purple-500"
-                                    : transaction.type === "loan_payment"
-                                    ? "bg-pink-500"
-                                    : transaction.type === "business_expense"
-                                    ? "bg-red-500"
-                                    : "bg-gray-300"
+                                  transactionColors[transaction.type || "none"].bg
                                 }`}
                               />
                               {transaction.type === "business_expense" && (
@@ -355,8 +364,8 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                             <span
                               className={`font-semibold ${
                                 transaction.amount > 0
-                                  ? "text-green-600 dark:text-green-400"
-                                  : "text-red-600 dark:text-red-400"
+                                  ? transactionColors.revenue.text
+                                  : transactionColors.business_expense.text
                               }`}
                             >
                               {transaction.amount > 0 ? "+" : ""}${transaction.amount.toFixed(2)}
@@ -388,17 +397,7 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                         <div className="flex items-center gap-1">
                           <div
                             className={`w-2 h-2 rounded-full ${
-                              selectedTransaction.type === "revenue"
-                                ? "bg-green-500"
-                                : selectedTransaction.type === "transfer"
-                                ? "bg-blue-500"
-                                : selectedTransaction.type === "funding"
-                                ? "bg-purple-500"
-                                : selectedTransaction.type === "loan_payment"
-                                ? "bg-pink-500"
-                                : selectedTransaction.type === "business_expense"
-                                ? "bg-red-500"
-                                : "bg-gray-300"
+                              transactionColors[selectedTransaction.type || "none"].bg
                             }`}
                           />
                           <span className="capitalize">{selectedTransaction.type || "Uncategorized"}</span>
@@ -418,7 +417,9 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                         <div className="text-muted-foreground text-sm">Amount</div>
                         <div
                           className={`font-bold font-mono ${
-                            selectedTransaction.amount > 0 ? "text-green-600" : "text-red-600 "
+                            selectedTransaction.amount > 0
+                              ? transactionColors.revenue.text
+                              : transactionColors.business_expense.text
                           }`}
                         >
                           {selectedTransaction.amount > 0 ? "+" : ""}${selectedTransaction.amount.toFixed(2)}

@@ -19,8 +19,10 @@ export const Route = createFileRoute("/_app/deals/$dealId")({
 
 function RouteComponent() {
   const { dealId } = Route.useParams();
-  const { data: deal, refetch, isFetched } = useGetDealById(dealId);
+
+  const { data: deal, refetch: refetchDeal, isFetched } = useGetDealById(dealId);
   const { data: statements } = useGetStatementsByDealId(dealId);
+
   const [formDisabled, setFormDisabled] = useState<boolean>(false);
   const [uploads, setUploads] = useState<Upload[]>([]);
 
@@ -40,6 +42,7 @@ function RouteComponent() {
         founded: data.founded?.toISOString(),
         industry: data.industry,
         merchant: data.merchant,
+        title: data.title,
       },
     });
   };
@@ -59,6 +62,7 @@ function RouteComponent() {
     const userId = getUserId();
     if (!userId) throw new Error("No logged in user detected.");
     if (!dealId) throw new Error("No deal ID provided.");
+
     uploads.forEach(async (statement) => {
       if (statement.status === "pending") {
         updateStatus(statement.file.name, "uploading");
@@ -70,7 +74,7 @@ function RouteComponent() {
           })
           .then(() => setUploads((prev) => prev.filter((u) => u.file.name !== statement.file.name)))
           .then(() => {
-            refetch();
+            refetchDeal();
             setFormDisabled(false);
           })
           .catch((error: Error) => updateStatus(statement.file.name, "error", error.message));

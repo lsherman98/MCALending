@@ -49,7 +49,6 @@ export function PDFViewer({ pdfFile, statements, selectedStatement, onStatementS
         const rect = page.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
 
-        // Check if page is in the center of the viewport
         if (rect.top <= containerRect.height / 2 && rect.bottom >= containerRect.height / 2) {
           currentPageInView = parseInt(page.getAttribute("data-page-number") || "1");
         }
@@ -85,7 +84,6 @@ export function PDFViewer({ pdfFile, statements, selectedStatement, onStatementS
 
   return (
     <div className="relative h-full">
-      {/* File Browser Trigger Button */}
       <Button
         variant="outline"
         size="sm"
@@ -133,7 +131,6 @@ export function PDFViewer({ pdfFile, statements, selectedStatement, onStatementS
           </div>
         </div>
       )}
-
       {pdfFile && (
         <div
           ref={containerRef}

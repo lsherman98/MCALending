@@ -13,7 +13,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
-import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppTransactionsIndexRouteImport } from './routes/_app/transactions/index'
 import { Route as AppDealsIndexRouteImport } from './routes/_app/deals/index'
 import { Route as AppAnalyticsIndexRouteImport } from './routes/_app/analytics/index'
@@ -36,11 +35,6 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppDashboardRoute = AppDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
 const AppTransactionsIndexRoute = AppTransactionsIndexRouteImport.update({
@@ -81,7 +75,6 @@ const AppAnalyticsDealIdRoute = AppAnalyticsDealIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/signin': typeof SigninLazyRoute
-  '/dashboard': typeof AppDashboardRoute
   '/': typeof AppIndexRoute
   '/analytics/$dealId': typeof AppAnalyticsDealIdRoute
   '/deals/$dealId': typeof AppDealsDealIdRoute
@@ -93,7 +86,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/signin': typeof SigninLazyRoute
-  '/dashboard': typeof AppDashboardRoute
   '/': typeof AppIndexRoute
   '/analytics/$dealId': typeof AppAnalyticsDealIdRoute
   '/deals/$dealId': typeof AppDealsDealIdRoute
@@ -107,7 +99,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/signin': typeof SigninLazyRoute
-  '/_app/dashboard': typeof AppDashboardRoute
   '/_app/': typeof AppIndexRoute
   '/_app/analytics/$dealId': typeof AppAnalyticsDealIdRoute
   '/_app/deals/$dealId': typeof AppDealsDealIdRoute
@@ -121,7 +112,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/signin'
-    | '/dashboard'
     | '/'
     | '/analytics/$dealId'
     | '/deals/$dealId'
@@ -133,7 +123,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/signin'
-    | '/dashboard'
     | '/'
     | '/analytics/$dealId'
     | '/deals/$dealId'
@@ -146,7 +135,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/signin'
-    | '/_app/dashboard'
     | '/_app/'
     | '/_app/analytics/$dealId'
     | '/_app/deals/$dealId'
@@ -183,13 +171,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/dashboard': {
-      id: '/_app/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/transactions/': {
@@ -245,7 +226,6 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
-  AppDashboardRoute: typeof AppDashboardRoute
   AppIndexRoute: typeof AppIndexRoute
   AppAnalyticsDealIdRoute: typeof AppAnalyticsDealIdRoute
   AppDealsDealIdRoute: typeof AppDealsDealIdRoute
@@ -257,7 +237,6 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppDashboardRoute: AppDashboardRoute,
   AppIndexRoute: AppIndexRoute,
   AppAnalyticsDealIdRoute: AppAnalyticsDealIdRoute,
   AppDealsDealIdRoute: AppDealsDealIdRoute,

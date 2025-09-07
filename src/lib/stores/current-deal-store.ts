@@ -14,7 +14,6 @@ export const useCurrentDealStore = create<CurrentDealStore>((set, get) => ({
     currentDealId: null,
     setCurrentDeal: async (deal: DealsResponse) => {
         set({ currentDeal: deal });
-        console.log(get().currentDealId)
         if (get().currentDealId && deal) {
             try {
                 await updateCurrentDeal(get().currentDealId!, deal.id);

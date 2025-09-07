@@ -5,33 +5,10 @@ import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, Cartesia
 import { format } from "date-fns";
 
 export function Charts({ dealId }: { dealId: string }) {
-  // type BalanceOverTimeRecord<Tdeal = unknown> = {
-  //     beginning_balance?: number
-  //     date?: IsoDateString
-  //     deal?: null | Tdeal
-  //     id: string
-  // }
   const { data: balanceOverTime } = useGetBalanceOverTime(dealId);
-
-  // type ChecksVsDebitsRecord<Tdeal = unknown, Ttotal_checks_amount = unknown> = {
-  //     date?: IsoDateString
-  //     deal?: null | Tdeal
-  //     id: string
-  //     statement?: RecordIdString
-  //     total_checks_amount?: null | Ttotal_checks_amount
-  //     total_checks_debits?: number
-  // }
   const { data: checksVsDebits } = useGetChecksVsDebits(dealId);
-
-  // export type EndingBalanceOverTimeRecord<Tdeal = unknown> = {
-  //     date?: IsoDateString
-  //     deal?: null | Tdeal
-  //     ending_balance?: number
-  //     id: string
-  // }
   const { data: endingBalanceOverTime } = useGetEndingBalanceOverTime(dealId);
 
-  // Transform data for charts
   const balanceChartData =
     balanceOverTime?.items.map((record) => ({
       date: record.date ? format(new Date(record.date), "MMM dd") : "",
@@ -113,8 +90,6 @@ export function Charts({ dealId }: { dealId: string }) {
             </ChartContainer>
           </CardContent>
         </Card>
-
-        {/* Ending Balance Over Time */}
         <Card className="flex flex-col min-h-0 max-h-[750px]">
           <CardHeader className="p-3 pb-2 flex-shrink-0">
             <CardTitle className="text-base">Ending Balance Over Time</CardTitle>
@@ -150,8 +125,6 @@ export function Charts({ dealId }: { dealId: string }) {
             </ChartContainer>
           </CardContent>
         </Card>
-
-        {/* Checks vs Debits */}
         <Card className="flex flex-col min-h-0 max-h-[750px]">
           <CardHeader className="p-3 pb-2 flex-shrink-0">
             <CardTitle className="text-base">Checks vs Debits</CardTitle>
