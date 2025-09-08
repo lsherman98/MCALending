@@ -12,6 +12,7 @@ import { Label } from "./ui/label";
 import type { StatementsResponse } from "@/lib/pocketbase-types";
 import { Switch } from "./ui/switch";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { useSidebar } from "./ui/sidebar";
 
 const transactionColors = {
   revenue: {
@@ -75,6 +76,7 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
 
   const { data: transactions } = useGetTransactions(dealId, showStatementOnly ? statementId : undefined, type);
   const updateTransactionMutation = useUpdateTransaction();
+  const { open } = useSidebar();
 
   const tableRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
@@ -269,7 +271,7 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                     <div className="flex-shrink-0 w-27 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
                       Date
                     </div>
-                    <div className="flex-shrink-0 w-80 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
+                    <div className={`flex-shrink-0 ${open ? "w-80" : "w-120"} px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden`}>
                       Description
                     </div>
                     <div className="flex-shrink-0 w-26 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
@@ -341,9 +343,9 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                             </span>
                           </div>
                           <div
-                            className={`flex-shrink-0 w-80 px-3 py-3 border-r flex items-center whitespace-nowrap overflow-hidden ${
+                            className={`flex-shrink-0 px-3 py-3 border-r flex items-center whitespace-nowrap overflow-hidden ${
                               isSelected ? "text-primary font-bold" : "font-medium"
-                            }`}
+                            } ${open ? "w-80" : "w-120"}`}
                           >
                             <span className="text-sm truncate" title={transaction.description}>
                               {transaction.description}
