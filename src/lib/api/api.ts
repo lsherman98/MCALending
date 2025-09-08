@@ -35,6 +35,7 @@ export async function deleteDeal(id: string) {
 export async function getStatementsByDealId(dealId: string) {
     return await pb.collection(Collections.Statements).getFullList({
         filter: `deal = "${dealId}"`,
+        sort: '-details.date',
     })
 }
 

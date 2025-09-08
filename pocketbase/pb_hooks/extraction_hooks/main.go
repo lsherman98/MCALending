@@ -91,6 +91,11 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			if err := e.App.Save(statement_details); err != nil {
 				e.App.Logger().Error("Failed to create statement_details record: " + err.Error())
 			}
+
+			statement.Set("details", statement_details.Id)
+			if err := e.App.Save(statement); err != nil {
+				e.App.Logger().Error("Failed to update statement record: " + err.Error())
+			}
 		})
 
 		for _, checkPaid := range data.ChecksPaid {

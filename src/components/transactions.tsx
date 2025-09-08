@@ -478,7 +478,7 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                   </div>
                   <div className="space-y-1">
                     <div className="text-muted-foreground text-sm">Description</div>
-                    <div className="leading-tight">{selectedTransaction.description}</div>
+                    <div className="leading-tight text-xs">{selectedTransaction.description}</div>
                   </div>
                 </CardContent>
               </Card>

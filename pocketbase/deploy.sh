@@ -13,8 +13,8 @@ rsync -avz -e ssh /Users/levisherman/Documents/code/projects/mca-platform/pocket
 # Rsync pb_public folder to remote server
 rsync -avz -e ssh /Users/levisherman/Documents/code/projects/mca-platform/pocketbase/pb_public/ root@162.243.70.98:/root/pb-mca/pb_public/
 
-# Rsync .env file to remote server
-rsync -avz -e ssh /Users/levisherman/Documents/code/projects/mca-platform/pocketbase/.env root@162.243.70.98:/root/pb-mca/.env
+# # Rsync .env file to remote server
+# rsync -avz -e ssh /Users/levisherman/Documents/code/projects/mca-platform/pocketbase/.env root@162.243.70.98:/root/pb-mca/.env
 
 # # Restart pocketbase.service on remote server
 ssh root@162.243.70.98 'systemctl restart mca.service'
