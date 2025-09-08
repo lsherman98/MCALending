@@ -361,6 +361,7 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                                 month: "short",
                                 day: "numeric",
                                 year: "numeric",
+                                timeZone: "UTC",
                               })}
                             </span>
                           </div>
@@ -448,10 +449,11 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                       <div className="flex items-center gap-2">
                         <div className="text-muted-foreground text-sm">Date</div>
                         <div>
-                          {new Date(selectedTransaction.date).toLocaleDateString("en-US", {
+                          {new Date(selectedTransaction.date + "T00:00:00Z").toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
                             year: "numeric",
+                            timeZone: "UTC",
                           })}
                         </div>
                       </div>

@@ -86,7 +86,6 @@ export function RecurringTransactions({ transactions }: { transactions?: Transac
         (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
       );
 
-      // Check if all transactions have the same type
       const types = [...new Set(groupTransactions.map((t) => t.type))];
       const hasUniformType = types.length === 1;
       const sharedType = hasUniformType ? types[0] : null;
@@ -174,6 +173,7 @@ export function RecurringTransactions({ transactions }: { transactions?: Transac
                               month: "short",
                               day: "numeric",
                               year: "numeric",
+                              timeZone: "UTC",
                             })}
                           </div>
                           <div className="w-1/4 capitalize">
