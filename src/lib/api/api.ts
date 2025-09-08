@@ -106,31 +106,31 @@ export async function updateCurrentDeal(currentDealId: string, dealId: string) {
 
 // ANALYTICS
 export async function getFundingAsPercentageOfRevenue(deal: string) {
-    return await pb.collection(Collections.FundingAsPercentageOfRevenue).getFirstListItem(`deal=${deal}`);
+    return await pb.collection(Collections.FundingAsPercentageOfRevenue).getOne(deal);
 }
 
 export async function getPaymentsVsIncome(deal: string) {
-    return await pb.collection(Collections.PaymentsVsIncome).getFirstListItem(`deal=${deal}`);
+    return await pb.collection(Collections.PaymentsVsIncome).getOne(deal);
 }
 
 export async function getRealRevenue(deal: string) {
-    return await pb.collection(Collections.RealRevenueByDeal).getFirstListItem(`deal=${deal}`);
+    return await pb.collection(Collections.RealRevenueByDeal).getOne(deal);
 }
 
 export async function getBalanceOverTime(deal: string) {
-    return await pb.collection(Collections.BalanceOverTime).getList(1, 50, {
+    return await pb.collection(Collections.BalanceOverTime).getFullList({
         filter: `deal=${deal}`
     });
 }
 
 export async function getChecksVsDebits(deal: string) {
-    return await pb.collection(Collections.ChecksVsDebits).getList(1, 50, {
+    return await pb.collection(Collections.ChecksVsDebits).getFullList({
         filter: `deal=${deal}`
     });
 }
 
 export async function getEndingBalanceOverTime(deal: string) {
-    return await pb.collection(Collections.EndingBalanceOverTime).getList(1, 50, {
+    return await pb.collection(Collections.EndingBalanceOverTime).getFullList({
         filter: `deal=${deal}`
     });
 }

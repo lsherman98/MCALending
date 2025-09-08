@@ -48,7 +48,7 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 
 	app.OnRecordAfterUpdateSuccess("jobs").BindFunc(func(e *core.RecordEvent) error {
 		job := e.Record
-		status := e.Record.Get("status")
+		status := job.GetString("status")
 
 		if !job.GetDateTime("completed").IsZero() {
 			return e.Next()
@@ -61,29 +61,26 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 
 		switch status {
 		case
-			llama_client.StatusCancelled,
-			llama_client.StatusError,
-			llama_client.StatusPending,
-			llama_client.StatusPartialSuccess:
+			string(llama_client.StatusCancelled),
+			string(llama_client.StatusError),
+			string(llama_client.StatusPending),
+			string(llama_client.StatusPartialSuccess):
 			return e.Next()
 		}
 
 		extraction, err := llama.GetJobResult(context.Background(), job.GetString("job_id"))
 		if err != nil {
 			e.App.Logger().Error("Failed to get extraction result: " + err.Error())
-			return nil
 		}
 
 		data, err := json.Marshal(extraction.Data)
 		if err != nil {
 			e.App.Logger().Error("Failed to marshal extraction result data: " + err.Error())
-			return nil
 		}
 
 		f, err := filesystem.NewFileFromBytes(data, job.Id+".json")
 		if err != nil {
 			e.App.Logger().Error("Failed to create file from json: " + err.Error())
-			return nil
 		}
 
 		extractionRecord := core.NewRecord(extractionsCollection)
@@ -92,12 +89,6 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		extractionRecord.Set("data", data)
 		extractionRecord.Set("statement", job.GetString("statement"))
 
-		if err := app.Save(extractionRecord); err != nil {
-			e.App.Logger().Error("Failed to save extraction record: " + err.Error())
-			return nil
-		}
-
-		job.Set("extraction", extractionRecord.Id)
 		job.Set("metadata", extraction.ExtractionMetadata)
 		job.Set("num_pages", extraction.ExtractionMetadata.Usage.NumPagesExtracted)
 		job.Set("document_tokens", extraction.ExtractionMetadata.Usage.NumDocumentTokens)
@@ -106,7 +97,10 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 
 		if err := app.Save(job); err != nil {
 			e.App.Logger().Error("Failed to save job record: " + err.Error())
-			return nil
+		}
+
+		if err := app.Save(extractionRecord); err != nil {
+			e.App.Logger().Error("Failed to save extraction record: " + err.Error())
 		}
 
 		return e.Next()

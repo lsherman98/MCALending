@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { TransactionsTypeOptions } from "@/lib/pocketbase-types";
@@ -264,25 +263,38 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
               onBlur={handleTableBlur}
               className="focus-visible:outline-none"
             >
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="font-semibold w-24">Date</TableHead>
-                    <TableHead className="font-semibold min-w-0 flex-1">Description</TableHead>
-                    <TableHead className="font-semibold w-28">Reference</TableHead>
-                    <TableHead className="font-semibold w-32">Category</TableHead>
-                    <TableHead className="text-right font-semibold w-24">Amount</TableHead>
-                  </TableRow>
-                </TableHeader>
-              </Table>
-              <div
-                ref={parentRef}
-                className={`overflow-auto ${
-                  selectedTransaction && isKeyboardMode ? "max-h-[calc(100vh-388px)]" : "max-h-[calc(100vh-254px)]"
-                }`}
-              >
-                <Table style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: "relative" }}>
-                  <TableBody>
+              <div className="border border-border rounded-md overflow-hidden">
+                <div className="bg-muted/50 border-b">
+                  <div className="flex">
+                    <div className="flex-shrink-0 w-27 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
+                      Date
+                    </div>
+                    <div className="flex-shrink-0 w-80 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
+                      Description
+                    </div>
+                    <div className="flex-shrink-0 w-26 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
+                      Reference
+                    </div>
+                    <div className="flex-shrink-0 w-28 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
+                      Category
+                    </div>
+                    <div className="flex-shrink-0 w-28 py-2 text-sm text-center font-semibold whitespace-nowrap overflow-hidden">
+                      Amount
+                    </div>
+                  </div>
+                </div>
+                <div
+                  ref={parentRef}
+                  className={`overflow-auto overflow-x-hidden ${
+                    selectedTransaction && isKeyboardMode ? "max-h-[calc(100vh-388px)]" : "max-h-[calc(100vh-254px)]"
+                  }`}
+                >
+                  <div
+                    style={{
+                      height: `${rowVirtualizer.getTotalSize()}px`,
+                      position: "relative",
+                    }}
+                  >
                     {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                       const transaction = transactions?.[virtualRow.index];
                       if (!transaction) return null;
@@ -291,15 +303,16 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                       const isSelected = isKeyboardMode && virtualRow.index === selectedRowIndex;
 
                       return (
-                        <TableRow
+                        <div
                           key={transaction.id}
                           ref={(el) => {
-                            rowRefs.current[virtualRow.index] = el;
+                            rowRefs.current[virtualRow.index] = el as any;
                           }}
                           className={`
+                                flex border-b hover:bg-muted/50 transition-colors
                                 ${colorStyle.rowBg} ${colorStyle.border} 
-                                ${isSelected ? "bg-secondary border-l-4 border-l-primary" : ""}
-                                cursor-pointer 
+                                ${isSelected ? "bg-secondary! border-l-4 border-l-primary" : ""}
+                                cursor-pointer
                               `}
                           onClick={() => {
                             setSelectedRowIndex(virtualRow.index);
@@ -311,66 +324,76 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                             left: 0,
                             width: "100%",
                             transform: `translateY(${virtualRow.start}px)`,
+                            height: "48px",
                           }}
                         >
-                          <TableCell className="font-mono text-sm py-3 w-24">
-                            {new Date(transaction.date).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
-                          </TableCell>
-                          <TableCell className="font-medium py-3 min-w-0">
-                            <div className="max-w-xs truncate" title={transaction.description}>
+                          <div
+                            className={`flex-shrink-0 w-26 px-3 py-3 border-r font-mono text-xs flex items-center whitespace-nowrap overflow-hidden ${
+                              isSelected ? "text-primary font-bold" : ""
+                            }`}
+                          >
+                            <span className="truncate">
+                              {new Date(transaction.date).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </span>
+                          </div>
+                          <div
+                            className={`flex-shrink-0 w-80 px-3 py-3 border-r flex items-center whitespace-nowrap overflow-hidden ${
+                              isSelected ? "text-primary font-bold" : "font-medium"
+                            }`}
+                          >
+                            <span className="text-sm truncate" title={transaction.description}>
                               {transaction.description}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-muted-foreground py-3 w-28">
-                            {transaction.trace_number || "—"}
-                          </TableCell>
-                          <TableCell className="py-3 w-32">
-                            <div className="flex items-center gap-2">
+                            </span>
+                          </div>
+                          <div
+                            className={`flex-shrink-0 w-26 px-3 py-3 border-r text-xs text-muted-foreground flex items-center whitespace-nowrap overflow-hidden ${
+                              isSelected ? "text-primary font-bold" : "font-medium"
+                            }`}
+                          >
+                            <span className="truncate">{transaction.trace_number || "—"}</span>
+                          </div>
+                          <div className="flex-shrink-0 w-28 px-3 py-3 border-r flex items-center whitespace-nowrap overflow-hidden">
+                            <div className="flex items-center gap-2 min-w-0">
                               <div
                                 className={`w-2 h-2 rounded-full flex-shrink-0 ${
                                   transactionColors[transaction.type || "none"].bg
                                 }`}
                               />
-                              {transaction.type === "business_expense" && (
-                                <span className="text-xs text-muted-foreground">Business Expense</span>
-                              )}
-                              {transaction.type === "loan_payment" && (
-                                <span className="text-xs text-muted-foreground">Loan Payment</span>
-                              )}
-                              {transaction.type === "funding" && (
-                                <span className="text-xs text-muted-foreground">Funding</span>
-                              )}
-                              {transaction.type === "transfer" && (
-                                <span className="text-xs text-muted-foreground">Transfer</span>
-                              )}
-                              {transaction.type === "revenue" && (
-                                <span className="text-xs text-muted-foreground">Revenue</span>
-                              )}
-                              {!transaction.type && (
-                                <span className="text-xs text-muted-foreground">Uncategorized</span>
-                              )}
+                              <span
+                                className={`text-xs text-muted-foreground truncate ${
+                                  isSelected ? "text-primary font-bold" : "font-medium"
+                                }`}
+                              >
+                                {transaction.type === "business_expense" && "Expense"}
+                                {transaction.type === "loan_payment" && "Payment"}
+                                {transaction.type === "funding" && "Funding"}
+                                {transaction.type === "transfer" && "Transfer"}
+                                {transaction.type === "revenue" && "Revenue"}
+                                {!transaction.type && "Uncategorized"}
+                              </span>
                             </div>
-                          </TableCell>
-                          <TableCell className="text-right font-mono py-3 w-24">
+                          </div>
+                          <div className="flex-shrink-0 w-28 px-3 py-3 text-xs flex items-center justify-start whitespace-nowrap overflow-hidden">
                             <span
-                              className={`font-semibold ${
+                              className={`font-bold truncate ${
                                 transaction.amount > 0
                                   ? transactionColors.revenue.text
                                   : transactionColors.business_expense.text
                               }`}
+                              title={`${transaction.amount > 0 ? "+" : ""}$${transaction.amount.toFixed(2)}`}
                             >
                               {transaction.amount > 0 ? "+" : ""}${transaction.amount.toFixed(2)}
                             </span>
-                          </TableCell>
-                        </TableRow>
+                          </div>
+                        </div>
                       );
                     })}
-                  </TableBody>
-                </Table>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="flex items-center justify-center">

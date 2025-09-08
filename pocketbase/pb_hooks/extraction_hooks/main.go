@@ -60,37 +60,41 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			return err
 		}
 
-		deal.Set("merchant", data.BusinessInformation.CompanyName)
-		deal.Set("address", data.BusinessInformation.CompanyAddress)
-		deal.Set("city", data.BusinessInformation.City)
-		deal.Set("state", data.BusinessInformation.State)
-		deal.Set("zip_code", data.BusinessInformation.ZipCode)
-		deal.Set("bank", data.BankInformation.BankName)
+		routine.FireAndForget(func() {
+			deal.Set("merchant", data.BusinessInformation.CompanyName)
+			deal.Set("address", data.BusinessInformation.CompanyAddress)
+			deal.Set("city", data.BusinessInformation.City)
+			deal.Set("state", data.BusinessInformation.State)
+			deal.Set("zip_code", data.BusinessInformation.ZipCode)
+			deal.Set("bank", data.BankInformation.BankName)
 
-		if err := e.App.Save(deal); err != nil {
-			e.App.Logger().Error("Failed to save deal record: " + err.Error())
-		}
-
-		statement_details := core.NewRecord(statementDetailsCollection)
-		statement_details.Set("statement", statement.Id)
-		statement_details.Set("deal", deal.Id)
-		statement_details.Set("date", data.BankInformation.StatementDate)
-		statement_details.Set("beginning_balance", data.AccountSummary.BeginningBalance)
-		statement_details.Set("total_deposits_credits", data.AccountSummary.TotalDepositsCredits)
-		statement_details.Set("total_checks_debits", data.AccountSummary.TotalChecksDebits)
-		statement_details.Set("service_charge", data.AccountSummary.ServiceCharge)
-		statement_details.Set("interest_paid", data.AccountSummary.InterestPaid)
-		statement_details.Set("ending_balance", data.AccountSummary.EndingBalance)
-		statement_details.Set("days_in_period", data.AccountSummary.DaysInPeriod)
-		statement_details.Set("total_overdraft_fee", data.FeeSummary.TotalOverdraftFee)
-		statement_details.Set("total_returned_items_fee", data.FeeSummary.TotalReturnedItemFees)
-
-		if err := e.App.Save(statement_details); err != nil {
-			e.App.Logger().Error("Failed to create statement_details record: " + err.Error())
-		}
+			if err := e.App.Save(deal); err != nil {
+				e.App.Logger().Error("Failed to save deal record: " + err.Error())
+			}
+		})
 
 		routine.FireAndForget(func() {
-			for _, checkPaid := range data.ChecksPaid {
+			statement_details := core.NewRecord(statementDetailsCollection)
+			statement_details.Set("statement", statement.Id)
+			statement_details.Set("deal", deal.Id)
+			statement_details.Set("date", data.BankInformation.StatementDate)
+			statement_details.Set("beginning_balance", data.AccountSummary.BeginningBalance)
+			statement_details.Set("total_deposits_credits", data.AccountSummary.TotalDepositsCredits)
+			statement_details.Set("total_checks_debits", data.AccountSummary.TotalChecksDebits)
+			statement_details.Set("service_charge", data.AccountSummary.ServiceCharge)
+			statement_details.Set("interest_paid", data.AccountSummary.InterestPaid)
+			statement_details.Set("ending_balance", data.AccountSummary.EndingBalance)
+			statement_details.Set("days_in_period", data.AccountSummary.DaysInPeriod)
+			statement_details.Set("total_overdraft_fee", data.FeeSummary.TotalOverdraftFee)
+			statement_details.Set("total_returned_items_fee", data.FeeSummary.TotalReturnedItemFees)
+
+			if err := e.App.Save(statement_details); err != nil {
+				e.App.Logger().Error("Failed to create statement_details record: " + err.Error())
+			}
+		})
+
+		for _, checkPaid := range data.ChecksPaid {
+			routine.FireAndForget(func() {
 				checkPaidRecord := core.NewRecord(checksPaidCollection)
 				checkPaidRecord.Set("date", checkPaid.Date)
 				checkPaidRecord.Set("check_number", checkPaid.CheckNumber)
@@ -102,11 +106,11 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 				if err := e.App.Save(checkPaidRecord); err != nil {
 					e.App.Logger().Error("Failed to create checks_paid record: " + err.Error())
 				}
-			}
-		})
+			})
+		}
 
-		routine.FireAndForget(func() {
-			for _, dailyBalance := range data.DailyBalanceSummary {
+		for _, dailyBalance := range data.DailyBalanceSummary {
+			routine.FireAndForget(func() {
 				dailyBalanceRecord := core.NewRecord(dailyBalanceCollection)
 				dailyBalanceRecord.Set("date", dailyBalance.Date)
 				dailyBalanceRecord.Set("balance", dailyBalance.Balance)
@@ -116,8 +120,8 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 				if err := e.App.Save(dailyBalanceRecord); err != nil {
 					e.App.Logger().Error("Failed to create daily_balance record: " + err.Error())
 				}
-			}
-		})
+			})
+		}
 
 		transactionsJSON, err := json.Marshal(data.Transactions)
 		if err != nil {
@@ -178,8 +182,8 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			e.App.Logger().Error("Failed to parse Gemini response: " + err.Error())
 		}
 
-		routine.FireAndForget(func() {
-			for i, transaction := range data.Transactions {
+		for i, transaction := range data.Transactions {
+			routine.FireAndForget(func() {
 				transactionRecord := core.NewRecord(transactionsCollection)
 				transactionRecord.Set("date", transaction.Date)
 				transactionRecord.Set("amount", transaction.Amount)
@@ -198,10 +202,11 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 				if err := e.App.Save(transactionRecord); err != nil {
 					e.App.Logger().Error("Failed to create transactions record: " + err.Error())
 				}
-			}
-		})
+			})
+		}
 
-		job.Set("status", "SUCCESS")
+		job.Set("status", llama_client.StatusSuccess)
+		job.Set("extraction", extraction.Id)
 		if err := e.App.Save(job); err != nil {
 			e.App.Logger().Error("Failed to save job record: " + err.Error())
 			return err

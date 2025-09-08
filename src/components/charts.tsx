@@ -10,20 +10,20 @@ export function Charts({ dealId }: { dealId: string }) {
   const { data: endingBalanceOverTime } = useGetEndingBalanceOverTime(dealId);
 
   const balanceChartData =
-    balanceOverTime?.items.map((record) => ({
+    balanceOverTime?.map((record) => ({
       date: record.date ? format(new Date(record.date), "MMM dd") : "",
       balance: record.beginning_balance || 0,
     })) || [];
 
   const checksDebitsChartData =
-    checksVsDebits?.items.map((record) => ({
+    checksVsDebits?.map((record) => ({
       date: record.date ? format(new Date(record.date), "MMM dd") : "",
       checks: Number(record.total_checks_amount) || 0,
       debits: record.total_checks_debits || 0,
     })) || [];
 
   const endingBalanceChartData =
-    endingBalanceOverTime?.items.map((record) => ({
+    endingBalanceOverTime?.map((record) => ({
       date: record.date ? format(new Date(record.date), "MMM dd") : "",
       balance: record.ending_balance || 0,
     })) || [];

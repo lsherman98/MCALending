@@ -106,10 +106,10 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type BalanceOverTimeRecord<Tdeal = unknown> = {
+export type BalanceOverTimeRecord = {
 	beginning_balance?: number
 	date?: IsoDateString
-	deal?: null | Tdeal
+	deal?: string
 	id: string
 }
 
@@ -125,9 +125,9 @@ export type ChecksPaidRecord = {
 	updated?: IsoDateString
 }
 
-export type ChecksVsDebitsRecord<Tdeal = unknown, Ttotal_checks_amount = unknown> = {
+export type ChecksVsDebitsRecord<Ttotal_checks_amount = unknown> = {
 	date?: IsoDateString
-	deal?: null | Tdeal
+	deal?: string
 	id: string
 	statement?: RecordIdString
 	total_checks_amount?: null | Ttotal_checks_amount
@@ -170,9 +170,9 @@ export type DealsRecord = {
 	zip_code?: string
 }
 
-export type EndingBalanceOverTimeRecord<Tdeal = unknown> = {
+export type EndingBalanceOverTimeRecord = {
 	date?: IsoDateString
-	deal?: null | Tdeal
+	deal?: string
 	ending_balance?: number
 	id: string
 }
@@ -187,8 +187,7 @@ export type ExtractionsRecord<Tdata = unknown> = {
 	updated?: IsoDateString
 }
 
-export type FundingAsPercentageOfRevenueRecord<Tdeal = unknown, Tfunding_as_percentage_of_revenue = unknown, Ttotal_financing = unknown, Ttotal_revenue = unknown> = {
-	deal?: null | Tdeal
+export type FundingAsPercentageOfRevenueRecord<Tfunding_as_percentage_of_revenue = unknown, Ttotal_financing = unknown, Ttotal_revenue = unknown> = {
 	funding_as_percentage_of_revenue?: null | Tfunding_as_percentage_of_revenue
 	id: string
 	total_financing?: null | Ttotal_financing
@@ -233,16 +232,14 @@ export type OrganizationsRecord = {
 	website?: string
 }
 
-export type PaymentsVsIncomeRecord<Tavg_monthly_income = unknown, Tavg_monthly_payment = unknown, Tdeal = unknown, Tpayment_to_income_percentage = unknown> = {
+export type PaymentsVsIncomeRecord<Tavg_monthly_income = unknown, Tavg_monthly_payment = unknown, Tpayment_to_income_percentage = unknown> = {
 	avg_monthly_income?: null | Tavg_monthly_income
 	avg_monthly_payment?: null | Tavg_monthly_payment
-	deal?: null | Tdeal
 	id: string
 	payment_to_income_percentage?: null | Tpayment_to_income_percentage
 }
 
-export type RealRevenueByDealRecord<Tdeal = unknown, Treal_revenue = unknown> = {
-	deal?: null | Tdeal
+export type RealRevenueByDealRecord<Treal_revenue = unknown> = {
 	id: string
 	real_revenue?: null | Treal_revenue
 }
@@ -319,19 +316,19 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type BalanceOverTimeResponse<Tdeal = unknown, Texpand = unknown> = Required<BalanceOverTimeRecord<Tdeal>> & BaseSystemFields<Texpand>
+export type BalanceOverTimeResponse<Texpand = unknown> = Required<BalanceOverTimeRecord> & BaseSystemFields<Texpand>
 export type ChecksPaidResponse<Texpand = unknown> = Required<ChecksPaidRecord> & BaseSystemFields<Texpand>
-export type ChecksVsDebitsResponse<Tdeal = unknown, Ttotal_checks_amount = unknown, Texpand = unknown> = Required<ChecksVsDebitsRecord<Tdeal, Ttotal_checks_amount>> & BaseSystemFields<Texpand>
+export type ChecksVsDebitsResponse<Ttotal_checks_amount = unknown, Texpand = unknown> = Required<ChecksVsDebitsRecord<Ttotal_checks_amount>> & BaseSystemFields<Texpand>
 export type CurrentDealResponse<Texpand = unknown> = Required<CurrentDealRecord> & BaseSystemFields<Texpand>
 export type DailyBalanceResponse<Texpand = unknown> = Required<DailyBalanceRecord> & BaseSystemFields<Texpand>
 export type DealsResponse<Texpand = unknown> = Required<DealsRecord> & BaseSystemFields<Texpand>
-export type EndingBalanceOverTimeResponse<Tdeal = unknown, Texpand = unknown> = Required<EndingBalanceOverTimeRecord<Tdeal>> & BaseSystemFields<Texpand>
+export type EndingBalanceOverTimeResponse<Texpand = unknown> = Required<EndingBalanceOverTimeRecord> & BaseSystemFields<Texpand>
 export type ExtractionsResponse<Tdata = unknown, Texpand = unknown> = Required<ExtractionsRecord<Tdata>> & BaseSystemFields<Texpand>
-export type FundingAsPercentageOfRevenueResponse<Tdeal = unknown, Tfunding_as_percentage_of_revenue = unknown, Ttotal_financing = unknown, Ttotal_revenue = unknown, Texpand = unknown> = Required<FundingAsPercentageOfRevenueRecord<Tdeal, Tfunding_as_percentage_of_revenue, Ttotal_financing, Ttotal_revenue>> & BaseSystemFields<Texpand>
+export type FundingAsPercentageOfRevenueResponse<Tfunding_as_percentage_of_revenue = unknown, Ttotal_financing = unknown, Ttotal_revenue = unknown, Texpand = unknown> = Required<FundingAsPercentageOfRevenueRecord<Tfunding_as_percentage_of_revenue, Ttotal_financing, Ttotal_revenue>> & BaseSystemFields<Texpand>
 export type JobsResponse<Tmetadata = unknown, Texpand = unknown> = Required<JobsRecord<Tmetadata>> & BaseSystemFields<Texpand>
 export type OrganizationsResponse<Texpand = unknown> = Required<OrganizationsRecord> & BaseSystemFields<Texpand>
-export type PaymentsVsIncomeResponse<Tavg_monthly_income = unknown, Tavg_monthly_payment = unknown, Tdeal = unknown, Tpayment_to_income_percentage = unknown, Texpand = unknown> = Required<PaymentsVsIncomeRecord<Tavg_monthly_income, Tavg_monthly_payment, Tdeal, Tpayment_to_income_percentage>> & BaseSystemFields<Texpand>
-export type RealRevenueByDealResponse<Tdeal = unknown, Treal_revenue = unknown, Texpand = unknown> = Required<RealRevenueByDealRecord<Tdeal, Treal_revenue>> & BaseSystemFields<Texpand>
+export type PaymentsVsIncomeResponse<Tavg_monthly_income = unknown, Tavg_monthly_payment = unknown, Tpayment_to_income_percentage = unknown, Texpand = unknown> = Required<PaymentsVsIncomeRecord<Tavg_monthly_income, Tavg_monthly_payment, Tpayment_to_income_percentage>> & BaseSystemFields<Texpand>
+export type RealRevenueByDealResponse<Treal_revenue = unknown, Texpand = unknown> = Required<RealRevenueByDealRecord<Treal_revenue>> & BaseSystemFields<Texpand>
 export type StatementDetailsResponse<Texpand = unknown> = Required<StatementDetailsRecord> & BaseSystemFields<Texpand>
 export type StatementsResponse<Texpand = unknown> = Required<StatementsRecord> & BaseSystemFields<Texpand>
 export type TransactionsResponse<Texpand = unknown> = Required<TransactionsRecord> & BaseSystemFields<Texpand>

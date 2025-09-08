@@ -1,5 +1,5 @@
-import { AnalyticsCards } from "@/components/analytics-cards";
 import { Charts } from "@/components/charts";
+import { Stats } from "@/components/stats";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/analytics/$dealId")({
@@ -15,7 +15,7 @@ function RouteComponent() {
   return (
     <div className="h-screen w-full overflow-hidden flex flex-col">
       <div className="flex-shrink-0">
-        <AnalyticsCards dealId={dealId} />
+        <Stats dealId={dealId} />
       </div>
       <div className="flex-1 min-h-0">
         <Charts dealId={dealId} />
