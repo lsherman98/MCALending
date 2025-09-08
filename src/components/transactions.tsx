@@ -12,27 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Label } from "./ui/label";
 import type { StatementsResponse } from "@/lib/pocketbase-types";
 import { Switch } from "./ui/switch";
-
-// interface Transaction {
-//   id: string;
-//   date: string;
-//   description: string;
-//   amount: number;
-//   category: string;
-//   type: "income" | "expense";
-//   account: string;
-//   isRecurring?: boolean;
-//   recurringGroup?: string;
-//   colorCategory?: "none" | "revenue" | "transfer" | "financing";
-// }
-
-// interface RecurringGroup {
-//   groupName: string;
-//   transactions: Transaction[];
-//   totalAmount: number;
-//   frequency: string;
-//   nextDue?: string;
-// }
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 const transactionColors = {
   revenue: {
@@ -94,11 +74,7 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
   const type = typeFilter === "all" ? undefined : typeFilter === "uncategorized" ? "uncategorized" : [typeFilter];
   const statementId = statement?.id;
 
-  const { data: transactions } = useGetTransactions(
-    dealId,
-    showStatementOnly ? statementId : undefined,
-    type
-  );
+  const { data: transactions } = useGetTransactions(dealId, showStatementOnly ? statementId : undefined, type);
   const updateTransactionMutation = useUpdateTransaction();
 
   const tableRef = useRef<HTMLDivElement>(null);
@@ -109,6 +85,15 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
   };
 
   const selectedTransaction = isKeyboardMode && transactions ? transactions[selectedRowIndex] : null;
+
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: transactions?.length ?? 0,
+    estimateSize: () => 48,
+    getScrollElement: () => parentRef.current,
+    overscan: 20,
+  });
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -291,29 +276,41 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                 </TableHeader>
               </Table>
               <div
+                ref={parentRef}
                 className={`overflow-auto ${
                   selectedTransaction && isKeyboardMode ? "max-h-[calc(100vh-388px)]" : "max-h-[calc(100vh-254px)]"
                 }`}
               >
-                <Table>
+                <Table style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: "relative" }}>
                   <TableBody>
-                    {transactions?.map((transaction, index) => {
+                    {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                      const transaction = transactions?.[virtualRow.index];
+                      if (!transaction) return null;
+
                       const colorStyle = transactionColors[transaction.type || "none"];
-                      const isSelected = isKeyboardMode && index === selectedRowIndex;
+                      const isSelected = isKeyboardMode && virtualRow.index === selectedRowIndex;
+
                       return (
                         <TableRow
-                          ref={(el) => {
-                            rowRefs.current[index] = el;
-                          }}
                           key={transaction.id}
+                          ref={(el) => {
+                            rowRefs.current[virtualRow.index] = el;
+                          }}
                           className={`
                                 ${colorStyle.rowBg} ${colorStyle.border} 
                                 ${isSelected ? "bg-secondary border-l-4 border-l-primary" : ""}
                                 cursor-pointer 
                               `}
                           onClick={() => {
-                            setSelectedRowIndex(index);
+                            setSelectedRowIndex(virtualRow.index);
                             setIsKeyboardMode(true);
+                          }}
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            transform: `translateY(${virtualRow.start}px)`,
                           }}
                         >
                           <TableCell className="font-mono text-sm py-3 w-24">
