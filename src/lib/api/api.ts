@@ -76,6 +76,7 @@ export async function getTransactions(dealId: string, statement?: string, type?:
 
     return await pb.collection(Collections.Transactions).getFullList({
         filter: filter,
+        sort: 'date',
     });
 }
 

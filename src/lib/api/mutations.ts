@@ -90,7 +90,7 @@ export function useUpdateTransaction() {
     })
 }
 
-export function useBulkUpdateTransaction() {
+export function useBulkUpdateTransactions() {
     const queryClient = useQueryClient();
 
     return useMutation({

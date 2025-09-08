@@ -13,6 +13,7 @@ import type { StatementsResponse } from "@/lib/pocketbase-types";
 import { Switch } from "./ui/switch";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useSidebar } from "./ui/sidebar";
+import { RecurringTransactions } from "./recurring-transactions";
 
 const transactionColors = {
   revenue: {
@@ -20,7 +21,7 @@ const transactionColors = {
     text: "text-green-600",
     keyboard: "bg-green-50",
     rowBg: "bg-green-50",
-    border: "border-l-4 border-green-500",
+    border: "border-l-6 border-l-green-500",
     rowText: "text-green-700",
   },
   transfer: {
@@ -28,7 +29,7 @@ const transactionColors = {
     text: "text-blue-600",
     keyboard: "bg-blue-50",
     rowBg: "bg-blue-50",
-    border: "border-l-4 border-blue-500",
+    border: "border-l-6 border-l-blue-500",
     rowText: "text-blue-700",
   },
   funding: {
@@ -36,7 +37,7 @@ const transactionColors = {
     text: "text-purple-600",
     keyboard: "bg-purple-50",
     rowBg: "bg-purple-50",
-    border: "border-l-4 border-purple-500",
+    border: "border-l-6 border-l-purple-500",
     rowText: "text-purple-700",
   },
   loan_payment: {
@@ -44,7 +45,7 @@ const transactionColors = {
     text: "text-yellow-600",
     keyboard: "bg-yellow-50",
     rowBg: "bg-yellow-50 ",
-    border: "border-l-4 border-yellow-500",
+    border: "border-l-6 border-l-yellow-500",
     rowText: "text-yellow-700",
   },
   business_expense: {
@@ -52,7 +53,7 @@ const transactionColors = {
     text: "text-red-600",
     keyboard: "bg-red-50",
     rowBg: "bg-red-50 ",
-    border: "border-l-4 border-red-500",
+    border: "border-l-6 border-l-red-500",
     rowText: "text-red-700",
   },
   none: {
@@ -60,7 +61,7 @@ const transactionColors = {
     text: "text-gray-600",
     keyboard: "",
     rowBg: "",
-    border: "",
+    border: "border-l-6 border-l-gray-500",
     rowText: "",
   },
 };
@@ -70,6 +71,7 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
   const [isKeyboardMode, setIsKeyboardMode] = useState<boolean>(false);
   const [showStatementOnly, setShowStatementOnly] = useState(false);
   const [typeFilter, setTypeFilter] = useState<TransactionsTypeOptions | "all" | "uncategorized">("all");
+  const [activeTab, setActiveTab] = useState("transactions");
 
   const type = typeFilter === "all" ? undefined : typeFilter === "uncategorized" ? "uncategorized" : [typeFilter];
   const statementId = statement?.id;
@@ -171,6 +173,22 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
     rowRefs.current = rowRefs.current.slice(0, transactions?.length ?? 0);
   }, [transactions]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      rowVirtualizer.measure();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [rowVirtualizer]);
+
+  useEffect(() => {
+    if (activeTab === "transactions") {
+      const timer = setTimeout(() => {
+        rowVirtualizer.measure();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [activeTab, rowVirtualizer]);
+
   const handleTableFocus = () => {
     setIsKeyboardMode(true);
   };
@@ -186,7 +204,7 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
   return (
     <div className="flex flex-col gap-2 h-full">
       <div className="flex-1 min-h-0">
-        <Tabs defaultValue="transactions" className="h-full w-full flex flex-col">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full w-full flex flex-col">
           <div className="flex justify-between items-center">
             <TabsList>
               <TabsTrigger value="transactions" className="flex items-center gap-2">
@@ -268,16 +286,20 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
               <div className="border border-border rounded-md overflow-hidden">
                 <div className="bg-muted/50 border-b">
                   <div className="flex">
-                    <div className="flex-shrink-0 w-27 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
+                    <div className="flex-shrink-0 w-27.5 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
                       Date
                     </div>
-                    <div className={`flex-shrink-0 ${open ? "w-80" : "w-120"} px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden`}>
+                    <div
+                      className={`flex-shrink-0 ${
+                        open ? "w-80" : "w-120"
+                      } px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden`}
+                    >
                       Description
                     </div>
                     <div className="flex-shrink-0 w-26 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
                       Reference
                     </div>
-                    <div className="flex-shrink-0 w-28 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
+                    <div className="flex-shrink-0 w-32 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
                       Category
                     </div>
                     <div className="flex-shrink-0 w-28 py-2 text-sm text-center font-semibold whitespace-nowrap overflow-hidden">
@@ -311,9 +333,9 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                             rowRefs.current[virtualRow.index] = el as any;
                           }}
                           className={`
-                                flex border-b hover:bg-muted/50 transition-colors
-                                ${colorStyle.rowBg} ${colorStyle.border} 
-                                ${isSelected ? "bg-secondary! border-l-4 border-l-primary" : ""}
+                                flex border-b hover:bg-blue-50 transition-colors
+                                ${colorStyle.border} 
+                                ${isSelected ? "bg-blue-50" : ""}
                                 cursor-pointer
                               `}
                           onClick={() => {
@@ -358,7 +380,7 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                           >
                             <span className="truncate">{transaction.trace_number || "—"}</span>
                           </div>
-                          <div className="flex-shrink-0 w-28 px-3 py-3 border-r flex items-center whitespace-nowrap overflow-hidden">
+                          <div className="flex-shrink-0 w-32 px-3 py-3 border-r flex items-center whitespace-nowrap overflow-hidden">
                             <div className="flex items-center gap-2 min-w-0">
                               <div
                                 className={`w-2 h-2 rounded-full flex-shrink-0 ${
@@ -462,16 +484,39 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
               </Card>
             )}
           </TabsContent>
-          <TabsContent value="recurring">
-            <Card className="h-full flex items-center justify-center">
-              <CardContent className="h-full text-center p-8">
-                <div className="text-muted-foreground">
-                  <DollarSign className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-medium mb-2">Recurring Transactions</h3>
-                  <p className="text-sm">This feature is coming soon.</p>
+          <TabsContent value="recurring" className={`mt-2 ${!open ? "min-w-[934px]" : "min-w-[774px]"}`}>
+            <div className="flex items-center justify-between pr-2 gap-2">
+              <div className="flex items-center gap-1">
+                <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.revenue.keyboard}`}>
+                  <Kbd>1</Kbd>
+                  <div className={`w-1.5 h-1.5 ${transactionColors.revenue.bg} rounded-full`}></div>
+                  <span className="text-xs text-muted-foreground">Revenue</span>
                 </div>
-              </CardContent>
-            </Card>
+                <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.transfer.keyboard}`}>
+                  <Kbd>2</Kbd>
+                  <div className={`w-1.5 h-1.5 ${transactionColors.transfer.bg} rounded-full`}></div>
+                  <span className="text-xs text-muted-foreground">Transfer</span>
+                </div>
+                <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.funding.keyboard}`}>
+                  <Kbd>3</Kbd>
+                  <div className={`w-1.5 h-1.5 ${transactionColors.funding.bg} rounded-full`}></div>
+                  <span className="text-xs text-muted-foreground">Funding</span>
+                </div>
+                <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.loan_payment.keyboard}`}>
+                  <Kbd>4</Kbd>
+                  <div className={`w-1.5 h-1.5 ${transactionColors.loan_payment.bg} rounded-full`}></div>
+                  <span className="text-xs text-muted-foreground">Loan Payment</span>
+                </div>
+                <div
+                  className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.business_expense.keyboard}`}
+                >
+                  <Kbd>5</Kbd>
+                  <div className={`w-1.5 h-1.5 ${transactionColors.business_expense.bg} rounded-full`}></div>
+                  <span className="text-xs text-muted-foreground">Business Expense</span>
+                </div>
+              </div>
+            </div>
+            {transactions ? <RecurringTransactions transactions={transactions} /> : "loading..."}
           </TabsContent>
         </Tabs>
       </div>
