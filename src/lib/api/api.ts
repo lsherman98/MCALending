@@ -119,19 +119,19 @@ export async function getRealRevenue(deal: string) {
 
 export async function getBalanceOverTime(deal: string) {
     return await pb.collection(Collections.BalanceOverTime).getFullList({
-        filter: `deal=${deal}`
+        filter: `deal="${deal}"`
     });
 }
 
 export async function getChecksVsDebits(deal: string) {
     return await pb.collection(Collections.ChecksVsDebits).getFullList({
-        filter: `deal=${deal}`
+        filter: `deal="${deal}"`
     });
 }
 
 export async function getEndingBalanceOverTime(deal: string) {
     return await pb.collection(Collections.EndingBalanceOverTime).getFullList({
-        filter: `deal=${deal}`
+        filter: `deal="${deal}"`
     });
 }
 
