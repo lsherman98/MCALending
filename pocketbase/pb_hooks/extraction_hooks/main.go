@@ -122,7 +122,6 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 		transactionsJSON, err := json.Marshal(data.Transactions)
 		if err != nil {
 			e.App.Logger().Error("Failed to marshal transactions: " + err.Error())
-			return err
 		}
 
 		transactionsJSONString := "```json\n" + string(transactionsJSON) + "\n```"
@@ -172,13 +171,11 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 		)
 		if err != nil {
 			e.App.Logger().Error("Gemini transaction categorization failed: " + err.Error())
-			return err
 		}
 
 		var transactionsWithTypes TransactionTypeList
 		if err := json.Unmarshal([]byte(result.Text()), &transactionsWithTypes); err != nil {
 			e.App.Logger().Error("Failed to parse Gemini response: " + err.Error())
-			return err
 		}
 
 		routine.FireAndForget(func() {

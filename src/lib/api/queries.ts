@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getBalanceOverTime, getChecksVsDebits, getCurrentDeal, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getJobs, getPaymentsVsIncome, getRealRevenue, getRecentDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTransactions } from "./api";
-import type { TransactionsTypeOptions } from "../pocketbase-types";
+import { type JobsResponse, type TransactionsTypeOptions } from "../pocketbase-types";
 import { useCurrentDealStore } from "../stores/current-deal-store";
 
 // DEALS
@@ -55,6 +55,8 @@ export function useGetStatementUrl(id: string) {
 
 // TRANSACTIONS
 export function useGetTransactions(dealId: string, statement?: string, type?: TransactionsTypeOptions[] | "uncategorized") {
+    const queryClient = useQueryClient();
+
     return useQuery({
         queryKey: ["transactions", dealId, statement, type],
         queryFn: () => getTransactions(dealId, statement, type),
@@ -62,10 +64,14 @@ export function useGetTransactions(dealId: string, statement?: string, type?: Tr
         refetchOnMount: true,
         refetchOnWindowFocus: false,
         refetchInterval: (query) => {
-            if (query.state.data?.length === 0) {
-                return 5000
+            const jobs = queryClient.getQueryData<JobsResponse[]>(["jobs"]);
+            if (jobs?.some((job) => job.status === "CLASSIFY")) {
+                return 2000;
             }
-            return false
+            if (query.state.data?.length === 0) {
+                return 5000;
+            }
+            return false;
         }
     });
 }
