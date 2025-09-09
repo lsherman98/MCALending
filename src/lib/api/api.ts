@@ -1,5 +1,5 @@
 import { pb } from "../pocketbase";
-import { Collections, TransactionsTypeOptions, type CurrentDealResponse, type DealsRecord, type JobsResponse, type TransactionsRecord } from "../pocketbase-types";
+import { Collections, TransactionsTypeOptions, type CurrentDealResponse, type DealsRecord, type DealsResponse, type JobsResponse, type TransactionsRecord, type TransactionsResponse } from "../pocketbase-types";
 import type { ExpandDeal, ExpandStatement, UploadStatementData } from "../types";
 import { getUserId } from "../utils";
 
@@ -29,6 +29,11 @@ export async function updateDeal(id: string, data: Partial<DealsRecord>) {
 
 export async function deleteDeal(id: string) {
     return await pb.collection(Collections.Deals).delete(id);
+}
+
+export const searchDeals = async (query: string) => {
+    if (!getUserId()) return
+    return await pb.send<DealsResponse[]>(`/api/collections/deals/records/full-text-search?search=${query}`, { method: 'GET' });
 }
 
 // STATEMENTS
@@ -62,22 +67,25 @@ export async function getStatementUrl(id: string) {
 
 
 // TRANSACTIONS
-export async function getTransactions(dealId: string, statement?: string, type?: TransactionsTypeOptions[] | "uncategorized") {
+export async function getTransactions(dealId: string, statement?: string, type?: TransactionsTypeOptions[] | "uncategorized", from?: string, to?: string, hideCredits?: boolean, hideDebits?: boolean, sortField?: string, sortDir?: 'asc' | 'desc') {
     let filter = `deal = "${dealId}"`;
+    let sort = '';
 
-    if (statement) {
-        filter += ` && statement = "${statement}"`;
-    }
+    if (statement) filter += ` && statement = "${statement}"`;
+    if (type === "uncategorized") filter += ` && (type = "")`;
+    else if (type && type.length > 0) filter += ` && type ?= "${type.join('","')}"`;
+    if (from) filter += ` && date >= "${from}"`;
+    if (to) filter += ` && date <= "${to}"`;
+    if (hideCredits) filter += ` && amount < 0`;
+    if (hideDebits) filter += ` && amount > 0`;
 
-    if (type === "uncategorized") {
-        filter += ` && (type = "")`;
-    } else if (type && type.length > 0) {
-        filter += ` && type ?= "${type.join('","')}"`;
+    if (sortField) {
+        sort = (sortDir === 'asc' ? '' : '-') + sortField;
     }
 
     return await pb.collection(Collections.Transactions).getFullList({
         filter: filter,
-        sort: 'date',
+        sort: sort || 'date',
     });
 }
 
@@ -91,6 +99,11 @@ export async function bulkUpdateTransaction(ids: string[], data: Partial<Transac
         batch.collection(Collections.Transactions).update(id, { ...data, type: data.type || "" });
     });
     return await batch.send();
+}
+
+export const searchTransactions = async (query: string) => {
+    if (!getUserId()) return
+    return await pb.send<TransactionsResponse[]>(`/api/collections/transactions/records/full-text-search?search=${query}`, { method: 'GET' });
 }
 
 //CURRENT DEAL

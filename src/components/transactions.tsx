@@ -3,17 +3,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { TransactionsTypeOptions } from "@/lib/pocketbase-types";
-import { useGetTransactions } from "@/lib/api/queries";
+import { useGetTransactions, useSearchTransactions } from "@/lib/api/queries";
 import { useUpdateTransaction } from "@/lib/api/mutations";
-import { DollarSign, FileText, X } from "lucide-react";
+import { DollarSign, FileText, X, Settings, RotateCcw, Search } from "lucide-react";
 import { Kbd } from "./kbd";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Label } from "./ui/label";
 import type { StatementsResponse } from "@/lib/pocketbase-types";
 import { Switch } from "./ui/switch";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useSidebar } from "./ui/sidebar";
 import { RecurringTransactions } from "./recurring-transactions";
+import { DatePickerWithRange } from "./date-range-picker";
+import type { DateRange } from "react-day-picker";
+import { addDays, format } from "date-fns";
+import { Input } from "./ui/input";
 
 const transactionColors = {
   revenue: {
@@ -69,19 +74,47 @@ const transactionColors = {
 export default function Transactions({ dealId, statement }: { dealId: string; statement?: StatementsResponse }) {
   const [selectedRowIndex, setSelectedRowIndex] = useState<number>(0);
   const [isKeyboardMode, setIsKeyboardMode] = useState<boolean>(false);
-  const [showStatementOnly, setShowStatementOnly] = useState(false);
+  const [filterByStatement, setFilterByStatement] = useState(false);
+  const [hideCredits, setHideCredits] = useState(false);
+  const [hideDebits, setHideDebits] = useState(false);
   const [typeFilter, setTypeFilter] = useState<TransactionsTypeOptions | "all" | "uncategorized">("all");
+  const [sortField, setSortField] = useState<string | undefined>(undefined);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: undefined,
+    to: undefined,
+  });
   const [activeTab, setActiveTab] = useState("transactions");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const type = typeFilter === "all" ? undefined : typeFilter === "uncategorized" ? "uncategorized" : [typeFilter];
   const statementId = statement?.id;
 
-  const { data: transactions } = useGetTransactions(dealId, showStatementOnly ? statementId : undefined, type);
+  const from = date?.from;
+  const to = date?.to;
+  const toEndOfDay = to ? new Date(to.getTime() + 86399999) : undefined;
+  const fromDate = from ? format(from, "yyyy-MM-dd HH:mm:ss") : undefined;
+  const toDate = toEndOfDay ? format(toEndOfDay, "yyyy-MM-dd HH:mm:ss") : undefined;
+
+  const { data: transactionsData } = useGetTransactions(
+    dealId,
+    filterByStatement ? statementId : undefined,
+    type,
+    fromDate,
+    toDate,
+    hideCredits,
+    hideDebits,
+    sortField,
+    sortDir
+  );
   const updateTransactionMutation = useUpdateTransaction();
+  const { data: searchResults } = useSearchTransactions(searchQuery);
   const { open } = useSidebar();
 
   const tableRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
+
+  const transactions = searchQuery ? searchResults || [] : transactionsData || [];
 
   const updateTransactionColor = (id: string, type?: TransactionsTypeOptions) => {
     updateTransactionMutation.mutate({ id, data: { type } });
@@ -201,81 +234,139 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
     }, 100);
   };
 
+  const resetFilters = () => {
+    setTypeFilter("all");
+    setFilterByStatement(false);
+    setHideCredits(false);
+    setHideDebits(false);
+    setSortField(undefined);
+    setSortDir("asc");
+    setDate({ from: undefined, to: undefined });
+  };
+
   return (
     <div className="flex flex-col gap-2 h-full">
       <div className="flex-1 min-h-0">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full w-full flex flex-col">
+        <div className="flex items-center gap-3 pr-2">
+          <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as any)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Transactions</SelectItem>
+              <SelectItem value={"uncategorized"}>Uncategorized</SelectItem>
+              <SelectItem value={TransactionsTypeOptions.revenue}>Revenue</SelectItem>
+              <SelectItem value={TransactionsTypeOptions.transfer}>Transfer</SelectItem>
+              <SelectItem value={TransactionsTypeOptions.funding}>Funding</SelectItem>
+              <SelectItem value={TransactionsTypeOptions.loan_payment}>Loan Payment</SelectItem>
+              <SelectItem value={TransactionsTypeOptions.business_expense}>Business Expense</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="p-2 flex items-center justify-center">
+            <div className="relative w-96">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search transactions..."
+                className="w-full pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+          <DatePickerWithRange date={date} setDate={setDate} />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56">
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="statement-only" className="text-sm">
+                      Filter by statement
+                    </Label>
+                    <Switch
+                      id="statement-only"
+                      checked={filterByStatement}
+                      onCheckedChange={setFilterByStatement}
+                      disabled={!statement}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="hide-credits" className="text-sm">
+                      Hide credits
+                    </Label>
+                    <Switch
+                      id="hide-credits"
+                      checked={hideCredits}
+                      onCheckedChange={setHideCredits}
+                      disabled={!statement}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="hide-debits" className="text-sm">
+                      Hide debits
+                    </Label>
+                    <Switch
+                      id="hide-debits"
+                      checked={hideDebits}
+                      onCheckedChange={setHideDebits}
+                      disabled={!statement}
+                    />
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+          <Button variant={"outline"} size="icon" onClick={resetFilters}>
+            <RotateCcw />
+          </Button>
+        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full w-full flex flex-col mt-2">
           <div className="flex justify-between items-center">
             <TabsList>
-              <TabsTrigger value="transactions" className="flex items-center gap-2">
+              <TabsTrigger value="transactions" className="flex text-xs items-center gap-2">
                 <FileText />
-                All Transactions
+                Transactions
               </TabsTrigger>
-              <TabsTrigger value="recurring" className="flex items-center gap-2">
+              <TabsTrigger value="recurring" className="flex text-xs items-center gap-2">
                 <DollarSign />
                 Recurring
               </TabsTrigger>
             </TabsList>
-            <div className="flex items-center gap-4 pr-2">
-              <div className="flex items-center gap-2">
-                <Switch
-                  id="statement-only"
-                  checked={showStatementOnly}
-                  onCheckedChange={setShowStatementOnly}
-                  disabled={!statement}
-                />
-                <Label htmlFor="statement-only" className="text-xs">
-                  Statement Only
-                </Label>
+            <div className="flex items-center gap-1">
+              <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.revenue.keyboard}`}>
+                <Kbd>1</Kbd>
+                <div className={`w-1.5 h-1.5 ${transactionColors.revenue.bg} rounded-full`}></div>
+                <span className="text-xs text-muted-foreground">Revenue</span>
               </div>
-              <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as any)}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Transactions</SelectItem>
-                  <SelectItem value={"uncategorized"}>Uncategorized</SelectItem>
-                  <SelectItem value={TransactionsTypeOptions.revenue}>Revenue</SelectItem>
-                  <SelectItem value={TransactionsTypeOptions.transfer}>Transfer</SelectItem>
-                  <SelectItem value={TransactionsTypeOptions.funding}>Funding</SelectItem>
-                  <SelectItem value={TransactionsTypeOptions.loan_payment}>Loan Payment</SelectItem>
-                  <SelectItem value={TransactionsTypeOptions.business_expense}>Business Expense</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.transfer.keyboard}`}>
+                <Kbd>2</Kbd>
+                <div className={`w-1.5 h-1.5 ${transactionColors.transfer.bg} rounded-full`}></div>
+                <span className="text-xs text-muted-foreground">Transfer</span>
+              </div>
+              <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.funding.keyboard}`}>
+                <Kbd>3</Kbd>
+                <div className={`w-1.5 h-1.5 ${transactionColors.funding.bg} rounded-full`}></div>
+                <span className="text-xs text-muted-foreground">Funding</span>
+              </div>
+              <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.loan_payment.keyboard}`}>
+                <Kbd>4</Kbd>
+                <div className={`w-1.5 h-1.5 ${transactionColors.loan_payment.bg} rounded-full`}></div>
+                <span className="text-xs text-muted-foreground">Payment</span>
+              </div>
+              <div
+                className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.business_expense.keyboard}`}
+              >
+                <Kbd>5</Kbd>
+                <div className={`w-1.5 h-1.5 ${transactionColors.business_expense.bg} rounded-full`}></div>
+                <span className="text-xs text-muted-foreground">Expense</span>
+              </div>
             </div>
           </div>
-          <TabsContent value="transactions" className="space-y-2 mt-2">
-            <div className="flex items-center justify-between pr-2 gap-2">
-              <div className="flex items-center gap-1">
-                <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.revenue.keyboard}`}>
-                  <Kbd>1</Kbd>
-                  <div className={`w-1.5 h-1.5 ${transactionColors.revenue.bg} rounded-full`}></div>
-                  <span className="text-xs text-muted-foreground">Revenue</span>
-                </div>
-                <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.transfer.keyboard}`}>
-                  <Kbd>2</Kbd>
-                  <div className={`w-1.5 h-1.5 ${transactionColors.transfer.bg} rounded-full`}></div>
-                  <span className="text-xs text-muted-foreground">Transfer</span>
-                </div>
-                <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.funding.keyboard}`}>
-                  <Kbd>3</Kbd>
-                  <div className={`w-1.5 h-1.5 ${transactionColors.funding.bg} rounded-full`}></div>
-                  <span className="text-xs text-muted-foreground">Funding</span>
-                </div>
-                <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.loan_payment.keyboard}`}>
-                  <Kbd>4</Kbd>
-                  <div className={`w-1.5 h-1.5 ${transactionColors.loan_payment.bg} rounded-full`}></div>
-                  <span className="text-xs text-muted-foreground">Loan Payment</span>
-                </div>
-                <div
-                  className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.business_expense.keyboard}`}
-                >
-                  <Kbd>5</Kbd>
-                  <div className={`w-1.5 h-1.5 ${transactionColors.business_expense.bg} rounded-full`}></div>
-                  <span className="text-xs text-muted-foreground">Business Expense</span>
-                </div>
-              </div>
-            </div>
+          <TabsContent value="transactions" className="space-y-2">
             <div
               ref={tableRef}
               tabIndex={0}
@@ -286,8 +377,19 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
               <div className="border border-border rounded-md overflow-hidden">
                 <div className="bg-muted/50 border-b">
                   <div className="flex">
-                    <div className="flex-shrink-0 w-27.5 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
+                    <div
+                      className="flex-shrink-0 w-27.5 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden cursor-pointer hover:bg-muted/70 flex items-center gap-1"
+                      onClick={() => {
+                        if (sortField === "date") {
+                          setSortDir(sortDir === "asc" ? "desc" : "asc");
+                        } else {
+                          setSortField("date");
+                          setSortDir("asc");
+                        }
+                      }}
+                    >
                       Date
+                      {sortField === "date" && <span className="text-xs">{sortDir === "asc" ? "↑" : "↓"}</span>}
                     </div>
                     <div
                       className={`flex-shrink-0 ${
@@ -299,18 +401,40 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                     <div className="flex-shrink-0 w-26 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
                       Reference
                     </div>
-                    <div className="flex-shrink-0 w-32 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
+                    <div
+                      className="flex-shrink-0 w-32 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden cursor-pointer hover:bg-muted/70 flex items-center gap-1"
+                      onClick={() => {
+                        if (sortField === "type") {
+                          setSortDir(sortDir === "asc" ? "desc" : "asc");
+                        } else {
+                          setSortField("type");
+                          setSortDir("asc");
+                        }
+                      }}
+                    >
                       Category
+                      {sortField === "type" && <span className="text-xs">{sortDir === "asc" ? "↑" : "↓"}</span>}
                     </div>
-                    <div className="flex-shrink-0 w-28 py-2 text-sm text-center font-semibold whitespace-nowrap overflow-hidden">
+                    <div
+                      className="flex-shrink-0 w-28 py-2 text-sm text-center font-semibold whitespace-nowrap overflow-hidden cursor-pointer hover:bg-muted/70 flex items-center justify-center gap-1"
+                      onClick={() => {
+                        if (sortField === "amount") {
+                          setSortDir(sortDir === "asc" ? "desc" : "asc");
+                        } else {
+                          setSortField("amount");
+                          setSortDir("asc");
+                        }
+                      }}
+                    >
                       Amount
+                      {sortField === "amount" && <span className="text-xs">{sortDir === "asc" ? "↑" : "↓"}</span>}
                     </div>
                   </div>
                 </div>
                 <div
                   ref={parentRef}
                   className={`overflow-auto overflow-x-hidden ${
-                    selectedTransaction && isKeyboardMode ? "max-h-[calc(100vh-388px)]" : "max-h-[calc(100vh-254px)]"
+                    selectedTransaction && isKeyboardMode ? "max-h-[calc(100vh-402px)]" : "max-h-[calc(100vh-268px)]"
                   }`}
                 >
                   <div
@@ -405,13 +529,15 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                           <div className="flex-shrink-0 w-28 px-3 py-3 text-xs flex items-center justify-start whitespace-nowrap overflow-hidden">
                             <span
                               className={`font-bold truncate ${
-                                transaction.amount > 0
-                                  ? transactionColors.revenue.text
-                                  : transactionColors.business_expense.text
+                              Number(transaction.amount) > 0
+                                ? transactionColors.revenue.text
+                                : transactionColors.business_expense.text
                               }`}
-                              title={`${transaction.amount > 0 ? "+" : ""}$${transaction.amount.toFixed(2)}`}
+                              title={`${Number(transaction.amount) > 0 ? "+" : ""}$${Number(transaction.amount).toFixed(
+                              2
+                              )}`}
                             >
-                              {transaction.amount > 0 ? "+" : ""}${transaction.amount.toFixed(2)}
+                              {Number(transaction.amount) > 0 ? "+" : ""}${Number(transaction.amount).toFixed(2)}
                             </span>
                           </div>
                         </div>
@@ -507,14 +633,14 @@ export default function Transactions({ dealId, statement }: { dealId: string; st
                 <div className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.loan_payment.keyboard}`}>
                   <Kbd>4</Kbd>
                   <div className={`w-1.5 h-1.5 ${transactionColors.loan_payment.bg} rounded-full`}></div>
-                  <span className="text-xs text-muted-foreground">Loan Payment</span>
+                  <span className="text-xs text-muted-foreground">Payment</span>
                 </div>
                 <div
                   className={`flex items-center gap-2 px-2 py-1 rounded ${transactionColors.business_expense.keyboard}`}
                 >
                   <Kbd>5</Kbd>
                   <div className={`w-1.5 h-1.5 ${transactionColors.business_expense.bg} rounded-full`}></div>
-                  <span className="text-xs text-muted-foreground">Business Expense</span>
+                  <span className="text-xs text-muted-foreground">Expense</span>
                 </div>
               </div>
             </div>

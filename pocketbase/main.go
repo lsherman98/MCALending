@@ -16,6 +16,7 @@ import (
 	// _ "github.com/lsherman98/mca-platform/pocketbase/migrations"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/current_deal_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/extraction_hooks"
+	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/full_text_search"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/job_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/statement_hooks"
 	"google.golang.org/genai"
@@ -58,6 +59,10 @@ func main() {
 
 	err = current_deal_hooks.Init(app)
 	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := full_text_search.Init(app, "transactions", "deals"); err != nil {
 		log.Fatal(err)
 	}
 

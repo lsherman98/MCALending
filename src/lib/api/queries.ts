@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getBalanceOverTime, getChecksVsDebits, getCurrentDeal, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getJobs, getPaymentsVsIncome, getRealRevenue, getRecentDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTransactions } from "./api";
+import { getBalanceOverTime, getChecksVsDebits, getCurrentDeal, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getJobs, getPaymentsVsIncome, getRealRevenue, getRecentDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTransactions, searchDeals, searchTransactions } from "./api";
 import { type JobsResponse, type TransactionsTypeOptions } from "../pocketbase-types";
 import { useCurrentDealStore } from "../stores/current-deal-store";
 
@@ -25,6 +25,14 @@ export function useGetDealById(id?: string) {
         queryKey: ["deal", id],
         queryFn: () => getDealById(id),
         placeholderData: keepPreviousData
+    });
+}
+
+export function useSearchDeals(query: string) {
+    return useQuery({
+        queryKey: ['searchDeals', query],
+        queryFn: () => searchDeals(query),
+        enabled: !!query,
     });
 }
 
@@ -54,12 +62,12 @@ export function useGetStatementUrl(id: string) {
 }
 
 // TRANSACTIONS
-export function useGetTransactions(dealId: string, statement?: string, type?: TransactionsTypeOptions[] | "uncategorized") {
+export function useGetTransactions(dealId: string, statement?: string, type?: TransactionsTypeOptions[] | "uncategorized", from?: string, to?: string, hideCredits?: boolean, hideDebits?: boolean, sortField?: string, sortDir?: 'asc' | 'desc') {
     const queryClient = useQueryClient();
 
     return useQuery({
-        queryKey: ["transactions", dealId, statement, type],
-        queryFn: () => getTransactions(dealId, statement, type),
+        queryKey: ["transactions", dealId, statement, type, from, to, hideCredits, hideDebits, sortField, sortDir],
+        queryFn: () => getTransactions(dealId, statement, type, from, to, hideCredits, hideDebits, sortField, sortDir),
         placeholderData: keepPreviousData,
         refetchOnMount: true,
         refetchOnWindowFocus: false,
@@ -73,6 +81,14 @@ export function useGetTransactions(dealId: string, statement?: string, type?: Tr
             }
             return false;
         }
+    });
+}
+
+export function useSearchTransactions(query: string) {
+    return useQuery({
+        queryKey: ['searchTransactions', query],
+        queryFn: () => searchTransactions(query),
+        enabled: !!query,
     });
 }
 
