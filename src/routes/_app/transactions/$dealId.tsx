@@ -1,5 +1,5 @@
 import { PDFViewer } from "@/components/pdf-viewer";
-import Transactions from "@/components/transactions";
+import Transactions from "@/components/transactions/transactions";
 import { useGetStatementById, useGetStatementsByDealId, useGetStatementUrl } from "@/lib/api/queries";
 import type { StatementsResponse } from "@/lib/pocketbase-types";
 import { createFileRoute } from "@tanstack/react-router";

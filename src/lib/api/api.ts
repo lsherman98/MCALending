@@ -67,13 +67,12 @@ export async function getStatementUrl(id: string) {
 
 
 // TRANSACTIONS
-export async function getTransactions(dealId: string, statement?: string, type?: TransactionsTypeOptions[] | "uncategorized", from?: string, to?: string, hideCredits?: boolean, hideDebits?: boolean, sortField?: string, sortDir?: 'asc' | 'desc') {
+export async function getTransactions(dealId: string, statement?: string, type?: TransactionsTypeOptions[], from?: string, to?: string, hideCredits?: boolean, hideDebits?: boolean, sortField?: string, sortDir?: 'asc' | 'desc') {
     let filter = `deal = "${dealId}"`;
     let sort = '';
 
+    if (type && type.length > 0) filter += ` && type ?= "${type.join('","')}"`;
     if (statement) filter += ` && statement = "${statement}"`;
-    if (type === "uncategorized") filter += ` && (type = "")`;
-    else if (type && type.length > 0) filter += ` && type ?= "${type.join('","')}"`;
     if (from) filter += ` && date >= "${from}"`;
     if (to) filter += ` && date <= "${to}"`;
     if (hideCredits) filter += ` && amount < 0`;
@@ -90,7 +89,11 @@ export async function getTransactions(dealId: string, statement?: string, type?:
 }
 
 export async function updateTransaction(id: string, data: Partial<TransactionsRecord>) {
-    return await pb.collection(Collections.Transactions).update(id, { ...data, type: data.type || "" });
+    return await pb.collection(Collections.Transactions).update(id, data);
+}
+
+export async function deleteTransaction(id: string) {
+    return await pb.collection(Collections.Transactions).delete(id);
 }
 
 export async function bulkUpdateTransaction(ids: string[], data: Partial<TransactionsRecord>) {
@@ -153,11 +156,11 @@ export async function getEndingBalanceOverTime(deal: string) {
 // JOBS 
 export async function getJobs() {
     const now = new Date();
-    const lastWeek = new Date(now.setDate(now.getDate() - 7));
-    const lastWeekISO = lastWeek.toISOString();
+    const lastHour = new Date(now.getTime() - 60 * 60 * 1000);
+    const lastHourISO = lastHour.toISOString();
 
-    return await pb.collection(Collections.Jobs).getFullList<JobsResponse<ExpandStatement>>({
-        filter: `status = "PENDING" || status = "CLASSIFY" || (status = "SUCCESS" && created > "${lastWeekISO}")`,
-        expand: "statement"
+    return await pb.collection(Collections.Jobs).getFullList<JobsResponse<ExpandStatement & ExpandDeal>>({
+        filter: `status = "PENDING" || status = "CLASSIFY" || (status = "SUCCESS" && created > "${lastHourISO}")`,
+        expand: "statement,deal"
     });
 }

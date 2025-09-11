@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { DealsRecord, TransactionsRecord } from "../pocketbase-types";
-import { bulkUpdateTransaction, createDeal, deleteDeal, deleteStatement, updateDeal, updateTransaction, uploadStatement } from "./api";
+import { bulkUpdateTransaction, createDeal, deleteDeal, deleteStatement, deleteTransaction, updateDeal, updateTransaction, uploadStatement } from "./api";
 import { handleError } from "../utils";
 import type { UploadStatementData } from "../types";
 
@@ -83,6 +83,18 @@ export function useUpdateTransaction() {
 
     return useMutation({
         mutationFn: ({ id, data }: { id: string, data: Partial<TransactionsRecord> }) => updateTransaction(id, data),
+        onError: handleError,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+        }
+    })
+}
+
+export function useDeleteTransaction() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: string) => deleteTransaction(id),
         onError: handleError,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["transactions"] });

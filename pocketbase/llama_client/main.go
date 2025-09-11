@@ -57,177 +57,99 @@ func New(app *pocketbase.PocketBase) (*LlamaClient, error) {
 }
 
 func (c *LlamaClient) Upload(ctx context.Context, data UploadRequest) (*UploadResponse, error) {
-	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, "files/upload_from_url"))
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse endpoint URL: %w", err)
-	}
-
 	params := url.Values{}
 	params.Add("project_id", c.ProjectID)
 	params.Add("organization_id", c.OrganizationID)
-	endpoint.RawQuery = params.Encode()
 
-	payload, err := json.Marshal(data)
+	var response UploadResponse
+	err := c.do(ctx, "PUT", "files/upload_from_url", params, data, &response)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal request payload: %w", err)
+		return nil, err
 	}
-
-	req, err := http.NewRequestWithContext(ctx, "PUT", endpoint.String(), bytes.NewBuffer(payload))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Bearer "+c.APIKey)
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
-	}
-
-	var apiResponse UploadResponse
-	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
-		return nil, fmt.Errorf("failed to decode response body: %w", err)
-	}
-
-	return &apiResponse, nil
+	return &response, nil
 }
 
 func (c *LlamaClient) RunJob(ctx context.Context, data JobRequest) (*JobResponse, error) {
-	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, "extraction/jobs"))
+	var response JobResponse
+	err := c.do(ctx, "POST", "extraction/jobs", nil, data, &response)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse endpoint URL: %w", err)
+		return nil, err
 	}
-
-	payload, err := json.Marshal(data)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal request payload: %w", err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", endpoint.String(), bytes.NewBuffer(payload))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Bearer "+c.APIKey)
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
-	}
-
-	var apiResponse JobResponse
-	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
-		return nil, fmt.Errorf("failed to decode response body: %w", err)
-	}
-
-	return &apiResponse, nil
+	return &response, nil
 }
 
 func (c *LlamaClient) GetJob(ctx context.Context, jobID string) (*JobResponse, error) {
-	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, "extraction/jobs", jobID))
+	var response JobResponse
+	err := c.do(ctx, "GET", path.Join("extraction/jobs", jobID), nil, nil, &response)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse endpoint URL: %w", err)
+		return nil, err
 	}
-
-	req, err := http.NewRequestWithContext(ctx, "GET", endpoint.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Bearer "+c.APIKey)
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
-	}
-
-	var apiResponse JobResponse
-	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
-		return nil, fmt.Errorf("failed to decode response body: %w", err)
-	}
-
-	return &apiResponse, nil
+	return &response, nil
 }
 
 func (c *LlamaClient) GetJobResult(ctx context.Context, jobID string) (*JobResultResponse, error) {
-	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, "extraction/jobs", jobID, "result"))
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse endpoint URL: %w", err)
-	}
-
 	params := url.Values{}
 	params.Add("project_id", c.ProjectID)
 	params.Add("organization_id", c.OrganizationID)
-	endpoint.RawQuery = params.Encode()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", endpoint.String(), nil)
+	var response JobResultResponse
+	err := c.do(ctx, "GET", path.Join("extraction/jobs", jobID, "result"), params, nil, &response)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, err
 	}
-
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Bearer "+c.APIKey)
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
-	}
-
-	var apiResponse JobResultResponse
-	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
-		return nil, fmt.Errorf("failed to decode response body: %w", err)
-	}
-
-	return &apiResponse, nil
+	return &response, nil
 }
 
 func (c *LlamaClient) DeleteExtractionRun(ctx context.Context, runID string) error {
-	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, "extraction/runs", runID))
+	params := url.Values{}
+	params.Add("project_id", c.ProjectID)
+	params.Add("organization_id", c.OrganizationID)
+
+	return c.do(ctx, "DELETE", path.Join("extraction/runs", runID), params, nil, nil)
+}
+
+func (c *LlamaClient) GetRunByJobID(ctx context.Context, jobID string) (*RunResponse, error) {
+	params := url.Values{}
+	params.Add("project_id", c.ProjectID)
+	params.Add("organization_id", c.OrganizationID)
+
+	var response RunResponse
+	err := c.do(ctx, "GET", path.Join("extraction/runs/by-job", jobID), params, nil, &response)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *LlamaClient) do(ctx context.Context, method, endpointPath string, queryParams url.Values, reqBody, resBody interface{}) error {
+	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, endpointPath))
 	if err != nil {
 		return fmt.Errorf("failed to parse endpoint URL: %w", err)
 	}
 
-	params := url.Values{}
-	params.Add("project_id", c.ProjectID)
-	params.Add("organization_id", c.OrganizationID)
-	endpoint.RawQuery = params.Encode()
+	if queryParams != nil {
+		endpoint.RawQuery = queryParams.Encode()
+	}
 
-	req, err := http.NewRequestWithContext(ctx, "DELETE", endpoint.String(), nil)
+	var payload io.Reader
+	if reqBody != nil {
+		bodyBytes, err := json.Marshal(reqBody)
+		if err != nil {
+			return fmt.Errorf("failed to marshal request payload: %w", err)
+		}
+		payload = bytes.NewBuffer(bodyBytes)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, endpoint.String(), payload)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Authorization", "Bearer "+c.APIKey)
+	if reqBody != nil {
+		req.Header.Add("Content-Type", "application/json")
+	}
 
 	resp, err := c.client.Do(req)
 	if err != nil {
@@ -240,43 +162,11 @@ func (c *LlamaClient) DeleteExtractionRun(ctx context.Context, runID string) err
 		return fmt.Errorf("API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
 	}
 
+	if resBody != nil && resp.StatusCode != http.StatusNoContent {
+		if err := json.NewDecoder(resp.Body).Decode(resBody); err != nil {
+			return fmt.Errorf("failed to decode response body: %w", err)
+		}
+	}
+
 	return nil
-}
-
-func (c *LlamaClient) GetRunByJobID(ctx context.Context, jobID string) (*RunResponse, error) {
-	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, "extraction/runs/by-job", jobID))
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse endpoint URL: %w", err)
-	}
-
-	params := url.Values{}
-	params.Add("project_id", c.ProjectID)
-	params.Add("organization_id", c.OrganizationID)
-	endpoint.RawQuery = params.Encode()
-
-	req, err := http.NewRequestWithContext(ctx, "GET", endpoint.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Bearer "+c.APIKey)
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
-	}
-
-	var apiResponse RunResponse
-	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
-		return nil, fmt.Errorf("failed to decode response body: %w", err)
-	}
-
-	return &apiResponse, nil
 }

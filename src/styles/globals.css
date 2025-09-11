@@ -55,6 +55,25 @@
   --color-code-number: var(--code-number);
   --color-selection: var(--selection);
   --color-selection-foreground: var(--selection-foreground);
+
+  --color-revenue: var(--color-green-500);
+  --color-revenue-text: var(--color-green-600);
+  --color-revenue-bg: var(--color-green-50);
+  --color-transfer: var(--color-blue-500);
+  --color-transfer-text: var(--color-blue-600);
+  --color-transfer-bg: var(--color-blue-50);
+  --color-funding: var(--color-purple-500);
+  --color-funding-text: var(--color-purple-600);
+  --color-funding-bg: var(--color-purple-50);
+  --color-payment: var(--color-yellow-500);
+  --color-payment-text: var(--color-yellow-600);
+  --color-payment-bg: var(--color-yellow-50);
+  --color-expense: var(--color-red-500);
+  --color-expense-text: var(--color-red-600);
+  --color-expense-bg: var(--color-red-50);
+  --color-none: var(--color-gray-300);
+  --color-none-text: var(--color-gray-600);
+  --color-none-bg: var(--color-gray-50);
 }
 
 :root {
@@ -325,11 +344,7 @@
       width: 2px;
       height: 100%;
       content: "";
-      background-color: color-mix(
-        in oklab,
-        var(--muted-foreground) 50%,
-        transparent
-      );
+      background-color: color-mix(in oklab, var(--muted-foreground) 50%, transparent);
     }
   }
 

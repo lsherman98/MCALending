@@ -35,7 +35,6 @@ function RouteComponent() {
 
   const handleMenuAction = (action: string, deal: DealsResponse, event: React.MouseEvent) => {
     event.stopPropagation();
-
     switch (action) {
       case "transactions":
         navigate({ to: `/deals/transactions/${deal.id}` });
@@ -60,9 +59,7 @@ function RouteComponent() {
       {
         onSuccess: (data) => {
           setCurrentDeal(data);
-          navigate({
-            to: `/deals/${data.id}`,
-          });
+          navigate({ to: `/deals/${data.id}` });
         },
       }
     );
@@ -80,7 +77,7 @@ function RouteComponent() {
           <TableRow>
             <TableHead className="min-w-[100px] max-w-[100px]">Id</TableHead>
             <TableHead className="min-w-[150px] max-w-[150px]">Title</TableHead>
-            <TableHead className="min-w-[150px] max-w-[150px]">Merchant</TableHead>
+            <TableHead className="min-w-[250px] max-w-[250px]">Merchant</TableHead>
             <TableHead className="min-w-[150px] max-w-[150px]">Industry</TableHead>
             <TableHead className="min-w-[150px] max-w-[150px]">Bank</TableHead>
             <TableHead className="min-w-[150px] max-w-[150px]">Credit Score</TableHead>
@@ -97,7 +94,7 @@ function RouteComponent() {
               <TableRow key={deal.id} className="cursor-pointer" onClick={() => handleDealClick(deal)}>
                 <TableCell className="min-w-[100px] max-w-[100px]">{deal.id}</TableCell>
                 <TableCell className="min-w-[150px] max-w-[150px]">{deal.title}</TableCell>
-                <TableCell className="min-w-[150px] max-w-[150px]">{deal.merchant}</TableCell>
+                <TableCell className="min-w-[250px] max-w-[250px]">{deal.merchant}</TableCell>
                 <TableCell className="min-w-[150px] max-w-[150px]">{deal.industry}</TableCell>
                 <TableCell className="min-w-[150px] max-w-[150px]">{deal.bank}</TableCell>
                 <TableCell className="min-w-[150px] max-w-[150px]">{deal.credit_score}</TableCell>

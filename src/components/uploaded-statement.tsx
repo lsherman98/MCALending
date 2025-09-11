@@ -11,14 +11,11 @@ import { useGetStatementUrl } from "@/lib/api/queries";
 export function UploadedStatement({ statement }: { statement: StatementsResponse }) {
   const deleteStatementMutation = useDeleteStatement();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   const { data: pdfFile } = useGetStatementUrl(statement?.id || "");
 
   return (
     <div className="flex items-center pl-2 py-2 justify-between border-b">
-      <div className="flex flex-col">
-        <div className="font-medium text-sm">{statement.filename}</div>
-      </div>
+      <div className="font-medium text-sm">{statement.filename}</div>
       <div className="flex items-center justify-end gap-2 pr-2">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -26,7 +23,7 @@ export function UploadedStatement({ statement }: { statement: StatementsResponse
               <Eye />
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-h-[95vh] min-w-[50vw] overflow-hidden">
+          <DialogContent className="max-h-[95vh] min-w-[50vw] overflow-hidden ">
             <DialogHeader className="p-6 pb-4 border-b">
               <DialogTitle>{statement.filename}</DialogTitle>
             </DialogHeader>

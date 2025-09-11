@@ -1,8 +1,8 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 import type { PropsWithChildren } from "react";
+import { AppHeader } from "./header/app-header";
 
 export default function Layout({ children }: PropsWithChildren) {
   return (
@@ -18,9 +18,9 @@ export default function Layout({ children }: PropsWithChildren) {
       }
       defaultOpen={true}
     >
-      <AppSidebar variant="inset"/>
+      <AppSidebar variant="inset" />
       <SidebarInset className="overflow-hidden">
-        <SiteHeader />
+        <AppHeader />
         <div className="flex flex-1 p-4">{children}</div>
       </SidebarInset>
     </SidebarProvider>

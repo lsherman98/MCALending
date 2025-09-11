@@ -16,9 +16,9 @@ export function UploadedFile({
   const getStatusIcon = () => {
     switch (status) {
       case "uploading":
-        return <LoaderCircle className="text-blue-500 animate-spin" />;
+        return <LoaderCircle className="animate-spin" />;
       case "success":
-        return <CheckCircleIcon className="text-green-500" />;
+        return <CheckCircleIcon />;
       default:
         return null;
     }
@@ -29,7 +29,7 @@ export function UploadedFile({
       <div className="flex flex-col">
         <div className="font-medium text-sm">{file.name}</div>
         <div className="text-xs">{formatFileSize(file.size)}</div>
-        {status === "error" && error && <div className="text-xs text-red-500 mt-1">{error}</div>}
+        {status === "error" && error && <div className="text-xs text-destructive mt-1">{error}</div>}
       </div>
       <div className="flex items-center justify-end">
         {status === "error" || status === "pending" ? (

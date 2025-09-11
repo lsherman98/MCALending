@@ -161,6 +161,7 @@ export type DealsRecord = {
 	founded?: IsoDateString
 	id: string
 	industry?: string
+	iso?: string
 	merchant?: string
 	organization?: RecordIdString
 	state?: string
@@ -265,6 +266,7 @@ export type StatementDetailsRecord = {
 export type StatementsRecord = {
 	created?: IsoDateString
 	deal: RecordIdString
+	details?: RecordIdString
 	file: string
 	filename: string
 	id: string
@@ -276,8 +278,9 @@ export enum TransactionsTypeOptions {
 	"revenue" = "revenue",
 	"transfer" = "transfer",
 	"funding" = "funding",
-	"loan_payment" = "loan_payment",
-	"business_expense" = "business_expense",
+	"none" = "none",
+	"payment" = "payment",
+	"expense" = "expense",
 }
 export type TransactionsRecord = {
 	amount?: number
@@ -288,7 +291,7 @@ export type TransactionsRecord = {
 	id: string
 	statement: RecordIdString
 	trace_number?: number
-	type?: TransactionsTypeOptions
+	type: TransactionsTypeOptions
 	updated?: IsoDateString
 }
 

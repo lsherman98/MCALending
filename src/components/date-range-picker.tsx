@@ -7,7 +7,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar1 } from "lucide-react";
 import { type DateRange } from "react-day-picker";
 
-export function DatePickerWithRange({ className, date, setDate }: React.HTMLAttributes<HTMLDivElement> & {
+export function DatePickerWithRange({
+  className,
+  date,
+  setDate,
+}: React.HTMLAttributes<HTMLDivElement> & {
   date?: DateRange;
   setDate: (date?: DateRange) => void;
 }) {
@@ -18,9 +22,9 @@ export function DatePickerWithRange({ className, date, setDate }: React.HTMLAttr
           <Button
             id="date"
             variant={"outline"}
-            className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
+            className={cn("justify-start text-xs text-left font-normal", !date && "text-muted-foreground")}
           >
-            <Calendar1 className="mr-2 h-4 w-4" />
+            <Calendar1 className="mr-1 h-4 w-4" />
             {date?.from ? (
               date.to ? (
                 <>

@@ -37,7 +37,7 @@ func buildS3Url(collectionId, recordId, filename string) string {
 
 func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 	dev := os.Getenv("DEV")
-	
+
 	app.OnRecordCreateRequest("statements").BindFunc(func(e *core.RecordRequestEvent) error {
 		if err := e.Next(); err != nil {
 			return err
@@ -93,13 +93,7 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 			}
 
 			jobRecord := core.NewRecord(jobsCollection)
-			jobRecord.Set("job_id", job.ID)
-			jobRecord.Set("run_id", run.ID)
-			jobRecord.Set("status", job.Status)
-			jobRecord.Set("agent_id", agentId)
-			jobRecord.Set("deal", statement.GetString("deal"))
-			jobRecord.Set("statement", statement.Id)
-
+			SetJobFields(jobRecord, job.ID, run.ID, agentId, statement.GetString("deal"), statement.Id, job.Status)
 			if err := app.Save(jobRecord); err != nil {
 				e.App.Logger().Error("Failed to save job record: " + err.Error())
 			}

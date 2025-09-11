@@ -84,16 +84,8 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		}
 
 		extractionRecord := core.NewRecord(extractionsCollection)
-		extractionRecord.Set("job", job.Id)
-		extractionRecord.Set("file", f)
-		extractionRecord.Set("data", data)
-		extractionRecord.Set("statement", job.GetString("statement"))
-
-		job.Set("metadata", extraction.ExtractionMetadata)
-		job.Set("num_pages", extraction.ExtractionMetadata.Usage.NumPagesExtracted)
-		job.Set("document_tokens", extraction.ExtractionMetadata.Usage.NumDocumentTokens)
-		job.Set("output_tokens", extraction.ExtractionMetadata.Usage.NumOutputTokens)
-		job.Set("completed", time.Now().UTC())
+		SetExtractionRecordFields(extractionRecord, job, f, data)
+		SetJobRecordFields(job, extraction)
 
 		if err := app.Save(job); err != nil {
 			e.App.Logger().Error("Failed to save job record: " + err.Error())

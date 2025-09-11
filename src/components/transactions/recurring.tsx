@@ -5,36 +5,10 @@ import { Label } from "@/components/ui/label";
 import type { TransactionsResponse } from "@/lib/pocketbase-types";
 import { TransactionsTypeOptions } from "@/lib/pocketbase-types";
 import { useBulkUpdateTransactions } from "@/lib/api/mutations";
-import { differenceInDays } from "date-fns";
-import { Badge } from "./ui/badge";
+import { differenceInDays, format } from "date-fns";
+import { Badge } from "../ui/badge";
 import { AlertTriangle } from "lucide-react";
-
-const transactionColors = {
-  revenue: {
-    bg: "bg-green-500",
-    text: "text-green-600",
-  },
-  transfer: {
-    bg: "bg-blue-500",
-    text: "text-blue-600",
-  },
-  funding: {
-    bg: "bg-purple-500",
-    text: "text-purple-600",
-  },
-  loan_payment: {
-    bg: "bg-yellow-500",
-    text: "text-yellow-600",
-  },
-  business_expense: {
-    bg: "bg-red-500",
-    text: "text-red-600",
-  },
-  none: {
-    bg: "bg-gray-300",
-    text: "text-gray-600",
-  },
-};
+import { TZDate } from "react-day-picker";
 
 const getRecurrencePattern = (dates: Date[]): string | null => {
   if (dates.length < 3) return null;
@@ -47,7 +21,7 @@ const getRecurrencePattern = (dates: Date[]): string | null => {
 
   const isRecurring = (interval: number, tolerance: number) => {
     const consistentDiffs = diffs.filter((d) => Math.abs(d - interval) <= tolerance);
-    return consistentDiffs.length / diffs.length >= 0.7; // at least 70% match
+    return consistentDiffs.length / diffs.length >= 0.7;
   };
 
   if (isRecurring(7, 1)) return "Weekly";
@@ -63,7 +37,7 @@ const patternBadgeColors: { [key: string]: string } = {
   Monthly: "border-transparent bg-purple-100 text-purple-800",
 };
 
-export function RecurringTransactions({ transactions }: { transactions?: TransactionsResponse[] }) {
+export function Recurring({ transactions }: { transactions?: TransactionsResponse[] }) {
   const bulkUpdateTransactionMutation = useBulkUpdateTransactions();
 
   const recurringGroups = useMemo(() => {
@@ -94,13 +68,10 @@ export function RecurringTransactions({ transactions }: { transactions?: Transac
     });
   }, [transactions]);
 
-  const handleGroupTypeUpdate = (
-    transactionsToUpdate: TransactionsResponse[],
-    type: TransactionsTypeOptions | "none"
-  ) => {
+  const handleGroupTypeUpdate = (transactions: TransactionsResponse[], type: TransactionsTypeOptions) => {
     bulkUpdateTransactionMutation.mutate({
-      ids: transactionsToUpdate.map((t) => t.id),
-      data: { type: type === "none" ? undefined : type },
+      ids: transactions.map((t) => t.id),
+      data: { type },
     });
   };
 
@@ -115,9 +86,7 @@ export function RecurringTransactions({ transactions }: { transactions?: Transac
                   <div className="flex items-center gap-2 min-w-0">
                     {hasUniformType && sharedType ? (
                       <div className="flex items-center gap-2">
-                        <div
-                          className={`w-2 h-2 rounded-full flex-shrink-0 ${transactionColors[sharedType || "none"].bg}`}
-                        />
+                        <div className={`w-2 h-2 rounded-full flex-shrink-0 bg-${sharedType}`} />
                       </div>
                     ) : (
                       <div className="flex items-center gap-1">
@@ -143,7 +112,7 @@ export function RecurringTransactions({ transactions }: { transactions?: Transac
                     <Label>Set type for all:</Label>
                     <Select
                       onValueChange={(value) =>
-                        handleGroupTypeUpdate(groupTransactions, value as TransactionsTypeOptions | "none")
+                        handleGroupTypeUpdate(groupTransactions, value as TransactionsTypeOptions)
                       }
                     >
                       <SelectTrigger className="w-[200px]">
@@ -153,9 +122,9 @@ export function RecurringTransactions({ transactions }: { transactions?: Transac
                         <SelectItem value={TransactionsTypeOptions.revenue}>Revenue</SelectItem>
                         <SelectItem value={TransactionsTypeOptions.transfer}>Transfer</SelectItem>
                         <SelectItem value={TransactionsTypeOptions.funding}>Funding</SelectItem>
-                        <SelectItem value={TransactionsTypeOptions.loan_payment}>Loan Payment</SelectItem>
-                        <SelectItem value={TransactionsTypeOptions.business_expense}>Business Expense</SelectItem>
-                        <SelectItem value="none">Uncategorized</SelectItem>
+                        <SelectItem value={TransactionsTypeOptions.payment}>Loan Payment</SelectItem>
+                        <SelectItem value={TransactionsTypeOptions.expense}>Business Expense</SelectItem>
+                        <SelectItem value={TransactionsTypeOptions.none}>Uncategorized</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -168,21 +137,10 @@ export function RecurringTransactions({ transactions }: { transactions?: Transac
                     <div className="max-h-60 overflow-y-auto">
                       {groupTransactions.map((transaction) => (
                         <div key={transaction.id} className="flex border-b p-2 text-sm items-center">
-                          <div className="w-1/4">
-                            {new Date(transaction.date).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                              timeZone: "UTC",
-                            })}
-                          </div>
+                          <div className="w-1/4">{format(new TZDate(transaction.date, "UTC"), "MMM dd, yyyy")}</div>
                           <div className="w-1/4 capitalize">
                             <div className="flex items-center gap-2">
-                              <div
-                                className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                                  transactionColors[transaction.type || "none"].bg
-                                }`}
-                              />
+                              <div className={`w-2 h-2 rounded-full flex-shrink-0 bg-${transaction.type}`} />
                               <span className="capitalize text-sm">
                                 {transaction.type?.replace(/_/g, " ") || "Uncategorized"}
                               </span>

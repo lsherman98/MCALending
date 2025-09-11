@@ -73,7 +73,7 @@ export function FileUpload({
     <Dropzone {...dropzone}>
       <DropZoneArea
         className={`h-full w-full p-2 ${
-          uploads.length === 0 && !statements.length ? "border-2 border-dashed border-gray-300" : "border-2 border-gray-300"
+          uploads.length === 0 && !statements.length ? "border-2 border-dashed" : "border-2"
         } ${disabled ? "pointer-events-none opacity-50" : ""}`}
       >
         {uploads.length === 0 && statements.length === 0 && (
@@ -128,7 +128,6 @@ export function FileUpload({
                 <Button
                   onClick={handleUpload}
                   disabled={uploads.filter((u) => u.status === "pending").length === 0}
-                  className="bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all disabled:opacity-50"
                 >
                   Start Upload
                 </Button>

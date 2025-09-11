@@ -73,47 +73,47 @@ type JobResultResponse struct {
 type ExtractionMetadata struct {
 	FieldMetadata map[string]any `json:"field_metadata"`
 	Usage         struct {
-		NumDocumentTokens int `json:"num_document_tokens"`
-		NumOutputTokens   int `json:"num_output_tokens"`
-		NumPagesExtracted int `json:"num_pages_extracted"`
+		DocumentTokens int `json:"num_document_tokens"`
+		OutputTokens   int `json:"num_output_tokens"`
+		PagesExtracted int `json:"num_pages_extracted"`
 	} `json:"usage"`
 }
 
 type Statement struct {
-	AccountSummary      AccountSummary      `json:"account_summary"`
-	BankInformation     BankInformation     `json:"bank_information"`
-	BusinessInformation BusinessInformation `json:"business_information"`
-	ChecksPaid          []CheckPaid         `json:"checks_paid"`
-	DailyBalanceSummary []DailyBalance      `json:"daily_balance_summary"`
-	FeeSummary          FeeSummary          `json:"fee_summary"`
-	Transactions        []Transaction       `json:"transactions"`
+	Account      AccountSummary      `json:"account_summary"`
+	Bank         BankInformation     `json:"bank_information"`
+	Business     BusinessInformation `json:"business_information"`
+	Checks       []CheckPaid         `json:"checks_paid"`
+	DailyBalance []DailyBalance      `json:"daily_balance_summary"`
+	Fees         FeeSummary          `json:"fee_summary"`
+	Transactions []Transaction       `json:"transactions"`
 }
 
 type AccountSummary struct {
-	BeginningBalance     float64 `json:"beginning_balance"`
-	DaysInPeriod         string  `json:"days_in_period"`
-	EndingBalance        float64 `json:"ending_balance"`
-	InterestPaid         float64 `json:"interest_paid"`
-	ServiceCharge        float64 `json:"service_charge"`
-	TotalChecksDebits    float64 `json:"total_checks_debits"`
-	TotalDepositsCredits float64 `json:"total_deposits_credits"`
+	BeginningBalance float64 `json:"beginning_balance"`
+	DaysInPeriod     string  `json:"days_in_period"`
+	EndingBalance    float64 `json:"ending_balance"`
+	InterestPaid     float64 `json:"interest_paid"`
+	ServiceCharge    float64 `json:"service_charge"`
+	ChecksDebits     float64 `json:"total_checks_debits"`
+	DepositsCredits  float64 `json:"total_deposits_credits"`
 }
 
 type BankInformation struct {
 	AccountEnding  string `json:"account_ending"`
-	BankName       string `json:"bank_name"`
+	Name           string `json:"bank_name"`
 	PrimaryAccount string `json:"primary_account"`
 	StatementDate  string `json:"statement_date"`
 }
 
 type BusinessInformation struct {
-	AccountNumber  string `json:"account_number"`
-	AccountTitle   string `json:"account_title"`
-	CompanyAddress string `json:"address"`
-	City           string `json:"city"`
-	State          string `json:"state"`
-	ZipCode        string `json:"zip_code"`
-	CompanyName    string `json:"company_name"`
+	AccountNumber string `json:"account_number"`
+	AccountTitle  string `json:"account_title"`
+	Address       string `json:"address"`
+	City          string `json:"city"`
+	State         string `json:"state"`
+	ZipCode       string `json:"zip_code"`
+	Name          string `json:"company_name"`
 }
 
 type CheckPaid struct {
@@ -129,8 +129,8 @@ type DailyBalance struct {
 }
 
 type FeeSummary struct {
-	TotalOverdraftFee     float64 `json:"total_overdraft_fee"`
-	TotalReturnedItemFees float64 `json:"total_returned_item_fees"`
+	OverdraftFee     float64 `json:"total_overdraft_fee"`
+	ReturnedItemFees float64 `json:"total_returned_item_fees"`
 }
 
 type Transaction struct {

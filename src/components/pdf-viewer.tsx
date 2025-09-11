@@ -91,18 +91,18 @@ export function PDFViewer({
 
   return (
     <div className="relative h-full">
-      {showFileViewer && (
+      {showFileViewer && !showFileBrowser && (
         <Button
           variant="outline"
           size="sm"
           onClick={() => setShowFileBrowser(!showFileBrowser)}
-          className="absolute top-2 left-2 z-40 bg-white shadow-sm"
+          className="absolute top-2 left-2 z-40 shadow-sm"
         >
           <List />
         </Button>
       )}
       {showFileBrowser && (
-        <div className="absolute top-0 left-0 w-80 h-full bg-white dark:bg-gray-800 border-r border-border z-50 shadow-lg">
+        <div className="absolute top-0 left-0 w-80 h-full border-r border-border z-10 bg-background shadow-lg">
           <div className="p-4 h-full flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-sm">Statements</h3>
@@ -168,8 +168,8 @@ export function PDFViewer({
         </div>
       )}
       {numPages > 0 && (
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-40">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-border px-4 py-2 flex items-center gap-2 w-full justify-center">
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-background">
+          <div className="rounded-lg shadow-lg border border-border px-4 py-2 flex items-center gap-2 w-full justify-center">
             <div className="flex items-center gap-2 px-2">
               <span className="text-sm font-medium min-w-[3ch] text-center">{currentPage}</span>
               <span className="text-sm text-muted-foreground">/</span>

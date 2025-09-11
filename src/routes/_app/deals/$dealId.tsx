@@ -1,4 +1,4 @@
-import { CreateDealForm, createDealFormSchema } from "@/components/create-deal-form";
+import { createDealFormSchema, DealForm } from "@/components/deal/deal-form";
 import { FileUpload } from "@/components/file-upload";
 import { Button } from "@/components/ui/button";
 import { useUpdateDeal, useUploadStatement } from "@/lib/api/mutations";
@@ -43,6 +43,7 @@ function RouteComponent() {
         industry: data.industry,
         merchant: data.merchant,
         title: data.title,
+        iso: data.iso,
       },
     });
   };
@@ -93,9 +94,9 @@ function RouteComponent() {
         />
       </div>
       <div className="flex-[2] px-2 flex flex-col justify-center">
-        <div className="mt-24">
-          {!isFetched && <CreateDealForm handleUpdateDeal={handleUpdateDeal} disabled={formDisabled} deal={deal} />}
-          {isFetched && <CreateDealForm handleUpdateDeal={handleUpdateDeal} disabled={formDisabled} deal={deal} />}
+        <div className="mt-30 px-24">
+          {!isFetched && <DealForm handleUpdateDeal={handleUpdateDeal} disabled={formDisabled} deal={deal} />}
+          {isFetched && <DealForm handleUpdateDeal={handleUpdateDeal} disabled={formDisabled} deal={deal} />}
         </div>
         <div className="flex-grow"></div>
         <div className="flex w-full justify-end mb-4">

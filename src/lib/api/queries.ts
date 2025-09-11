@@ -62,7 +62,7 @@ export function useGetStatementUrl(id: string) {
 }
 
 // TRANSACTIONS
-export function useGetTransactions(dealId: string, statement?: string, type?: TransactionsTypeOptions[] | "uncategorized", from?: string, to?: string, hideCredits?: boolean, hideDebits?: boolean, sortField?: string, sortDir?: 'asc' | 'desc') {
+export function useGetTransactions(dealId: string, statement?: string, type?: TransactionsTypeOptions[], from?: string, to?: string, hideCredits?: boolean, hideDebits?: boolean, sortField?: string, sortDir?: 'asc' | 'desc') {
     const queryClient = useQueryClient();
 
     return useQuery({
