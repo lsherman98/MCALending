@@ -123,35 +123,53 @@ export async function updateCurrentDeal(currentDealId: string, dealId: string) {
 }
 
 // ANALYTICS
-export async function getFundingAsPercentageOfRevenue(deal: string) {
-    return await pb.collection(Collections.FundingAsPercentageOfRevenue).getOne(deal);
+export async function getAvgDailyBalance(deal: string) {
+    return await pb.collection(Collections.AvgDailyBalance).getFullList({
+        filter: `deal="${deal}"`,
+        sort: "month"
+    });
 }
 
-export async function getPaymentsVsIncome(deal: string) {
-    return await pb.collection(Collections.PaymentsVsIncome).getOne(deal);
-}
-
-export async function getRealRevenue(deal: string) {
-    return await pb.collection(Collections.RealRevenueByDeal).getOne(deal);
+export async function getDailyBalance(deal: string) {
+    return await pb.collection(Collections.DailyBalance).getFullList({
+        filter: `deal="${deal}"`,
+        sort: "date"
+    });
 }
 
 export async function getBalanceOverTime(deal: string) {
     return await pb.collection(Collections.BalanceOverTime).getFullList({
-        filter: `deal="${deal}"`
+        filter: `deal="${deal}"`,
+        sort: "date"
     });
 }
 
-export async function getChecksVsDebits(deal: string) {
-    return await pb.collection(Collections.ChecksVsDebits).getFullList({
-        filter: `deal="${deal}"`
+export async function getTotalCreditsAndDebits(deal: string) {
+    return await pb.collection(Collections.CreditsAndDebits).getFullList({
+        filter: `deal="${deal}"`,
+        sort: "date"
     });
 }
 
-export async function getEndingBalanceOverTime(deal: string) {
-    return await pb.collection(Collections.EndingBalanceOverTime).getFullList({
-        filter: `deal="${deal}"`
+export async function getGroupedTransactions(deal: string, type: TransactionsTypeOptions.funding | TransactionsTypeOptions.payment) {
+    return await pb.collection(Collections.GroupedTransactions).getFullList({
+        filter: `deal="${deal}" && type="${type}"`
     });
 }
+
+export async function getTransactionTotals(deal: string) {
+    return await pb.collection(Collections.TotalsByMonth).getFullList({
+        filter: `deal="${deal}"`,
+        sort: "date"
+    });
+}
+
+export async function getFirstTransactionDate(deal: string, type: TransactionsTypeOptions.payment | TransactionsTypeOptions.funding) {
+    return await pb.collection(Collections.Transactions).getFirstListItem(`deal="${deal}" && type="${type}"`, {
+        sort: 'date'
+    });
+}
+
 
 // JOBS 
 export async function getJobs() {

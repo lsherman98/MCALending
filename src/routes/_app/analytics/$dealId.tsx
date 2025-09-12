@@ -13,13 +13,9 @@ function RouteComponent() {
   const { dealId } = Route.useParams();
 
   return (
-    <div className="h-screen w-full overflow-hidden flex flex-col">
-      <div className="flex-shrink-0">
-        <Stats dealId={dealId} />
-      </div>
-      <div className="flex-1 min-h-0">
-        <Charts dealId={dealId} />
-      </div>
+    <div className="w-full flex gap-2 flex-col">
+      <Stats dealId={dealId} />
+      {/* <Charts dealId={dealId} /> */}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getBalanceOverTime, getChecksVsDebits, getCurrentDeal, getDealById, getDeals, getEndingBalanceOverTime, getFundingAsPercentageOfRevenue, getJobs, getPaymentsVsIncome, getRealRevenue, getRecentDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTransactions, searchDeals, searchTransactions } from "./api";
-import { type JobsResponse, type TransactionsTypeOptions } from "../pocketbase-types";
+import { getAvgDailyBalance, getBalanceOverTime, getCurrentDeal, getDailyBalance, getDealById, getDeals, getFirstTransactionDate, getGroupedTransactions, getJobs, getRecentDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTotalCreditsAndDebits, getTransactions, getTransactionTotals, searchDeals, searchTransactions } from "./api";
+import { TransactionsTypeOptions, type JobsResponse } from "../pocketbase-types";
 import { useCurrentDealStore } from "../stores/current-deal-store";
 
 // DEALS
@@ -73,12 +73,8 @@ export function useGetTransactions(dealId: string, statement?: string, type?: Tr
         refetchOnWindowFocus: false,
         refetchInterval: (query) => {
             const jobs = queryClient.getQueryData<JobsResponse[]>(["jobs"]);
-            if (jobs?.some((job) => job.status === "CLASSIFY")) {
-                return 2000;
-            }
-            if (query.state.data?.length === 0) {
-                return 5000;
-            }
+            if (jobs?.some((job) => job.status === "CLASSIFY")) return 2000;
+            if (query.state.data?.length === 0) return 5000;
             return false;
         }
     });
@@ -93,26 +89,18 @@ export function useSearchTransactions(query: string) {
 }
 
 //ANALYTICS
-export function useGetFundingAsPercentageOfRevenue(dealId: string) {
+export function useGetAvgDailyBalance(dealId: string) {
     return useQuery({
-        queryKey: ["fundingAsPercentageOfRevenue", dealId],
-        queryFn: () => getFundingAsPercentageOfRevenue(dealId),
+        queryKey: ["avgDailyBalance", dealId],
+        queryFn: () => getAvgDailyBalance(dealId),
         placeholderData: keepPreviousData
     });
 }
 
-export function useGetPaymentsVsIncome(dealId: string) {
+export function useGetDailyBalance(dealId: string) {
     return useQuery({
-        queryKey: ["paymentsVsIncome", dealId],
-        queryFn: () => getPaymentsVsIncome(dealId),
-        placeholderData: keepPreviousData
-    });
-}
-
-export function useGetRealRevenue(dealId: string) {
-    return useQuery({
-        queryKey: ["realRevenue", dealId],
-        queryFn: () => getRealRevenue(dealId),
+        queryKey: ["dailyBalance", dealId],
+        queryFn: () => getDailyBalance(dealId),
         placeholderData: keepPreviousData
     });
 }
@@ -125,18 +113,50 @@ export function useGetBalanceOverTime(dealId: string) {
     });
 }
 
-export function useGetChecksVsDebits(dealId: string) {
+export function useGetTotalCreditsAndDebits(dealId: string) {
     return useQuery({
-        queryKey: ["checksVsDebits", dealId],
-        queryFn: () => getChecksVsDebits(dealId),
+        queryKey: ["totalCreditsAndDebits", dealId],
+        queryFn: () => getTotalCreditsAndDebits(dealId),
         placeholderData: keepPreviousData
     });
 }
 
-export function useGetEndingBalanceOverTime(dealId: string) {
+export function useGetGroupedFundingTransactions(dealId: string) {
     return useQuery({
-        queryKey: ["endingBalanceOverTime", dealId],
-        queryFn: () => getEndingBalanceOverTime(dealId),
+        queryKey: ["groupedFundingTransactions", dealId],
+        queryFn: () => getGroupedTransactions(dealId, TransactionsTypeOptions.funding),
+        placeholderData: keepPreviousData
+    });
+}
+
+export function useGetGroupedPaymentTransactions(dealId: string) {
+    return useQuery({
+        queryKey: ["groupedPaymentTransactions", dealId],
+        queryFn: () => getGroupedTransactions(dealId, TransactionsTypeOptions.payment),
+        placeholderData: keepPreviousData
+    });
+}
+
+export function useGetTransactionTotals(dealId: string) {
+    return useQuery({
+        queryKey: ["transactionTotals", dealId],
+        queryFn: () => getTransactionTotals(dealId),
+        placeholderData: keepPreviousData
+    });
+}
+
+export function useGetFirstFundingDate(dealId: string) {
+    return useQuery({
+        queryKey: ["firstFundingDate", dealId],
+        queryFn: () => getFirstTransactionDate(dealId, TransactionsTypeOptions.funding),
+        placeholderData: keepPreviousData
+    });
+}
+
+export function useGetFirstPaymentDate(dealId: string) {
+    return useQuery({
+        queryKey: ["firstPaymentDate", dealId],
+        queryFn: () => getFirstTransactionDate(dealId, TransactionsTypeOptions.payment),
         placeholderData: keepPreviousData
     });
 }

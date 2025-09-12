@@ -95,8 +95,8 @@ type AccountSummary struct {
 	EndingBalance    float64 `json:"ending_balance"`
 	InterestPaid     float64 `json:"interest_paid"`
 	ServiceCharge    float64 `json:"service_charge"`
-	ChecksDebits     float64 `json:"total_checks_debits"`
-	DepositsCredits  float64 `json:"total_deposits_credits"`
+	Debits           float64 `json:"total_checks_debits"`
+	Credits          float64 `json:"total_deposits_credits"`
 }
 
 type BankInformation struct {

@@ -11,21 +11,20 @@ export enum Collections {
 	Mfas = "_mfas",
 	Otps = "_otps",
 	Superusers = "_superusers",
+	AvgDailyBalance = "avg_daily_balance",
 	BalanceOverTime = "balance_over_time",
 	ChecksPaid = "checks_paid",
-	ChecksVsDebits = "checks_vs_debits",
+	CreditsAndDebits = "credits_and_debits",
 	CurrentDeal = "current_deal",
 	DailyBalance = "daily_balance",
 	Deals = "deals",
-	EndingBalanceOverTime = "ending_balance_over_time",
 	Extractions = "extractions",
-	FundingAsPercentageOfRevenue = "funding_as_percentage_of_revenue",
+	GroupedTransactions = "grouped_transactions",
 	Jobs = "jobs",
 	Organizations = "organizations",
-	PaymentsVsIncome = "payments_vs_income",
-	RealRevenueByDeal = "real_revenue_by_deal",
 	StatementDetails = "statement_details",
 	Statements = "statements",
+	TotalsByMonth = "totals_by_month",
 	Transactions = "transactions",
 	Users = "users",
 }
@@ -106,10 +105,18 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
+export type AvgDailyBalanceRecord = {
+	balance?: number
+	deal?: string
+	id: string
+	month?: string
+}
+
 export type BalanceOverTimeRecord = {
 	beginning_balance?: number
 	date?: IsoDateString
 	deal?: string
+	ending_balance?: number
 	id: string
 }
 
@@ -125,13 +132,13 @@ export type ChecksPaidRecord = {
 	updated?: IsoDateString
 }
 
-export type ChecksVsDebitsRecord<Ttotal_checks_amount = unknown> = {
+export type CreditsAndDebitsRecord = {
+	credits?: number
 	date?: IsoDateString
 	deal?: string
+	debits?: number
 	id: string
 	statement?: RecordIdString
-	total_checks_amount?: null | Ttotal_checks_amount
-	total_checks_debits?: number
 }
 
 export type CurrentDealRecord = {
@@ -171,13 +178,6 @@ export type DealsRecord = {
 	zip_code?: string
 }
 
-export type EndingBalanceOverTimeRecord = {
-	date?: IsoDateString
-	deal?: string
-	ending_balance?: number
-	id: string
-}
-
 export type ExtractionsRecord<Tdata = unknown> = {
 	created?: IsoDateString
 	data?: null | Tdata
@@ -188,11 +188,22 @@ export type ExtractionsRecord<Tdata = unknown> = {
 	updated?: IsoDateString
 }
 
-export type FundingAsPercentageOfRevenueRecord<Tfunding_as_percentage_of_revenue = unknown, Ttotal_financing = unknown, Ttotal_revenue = unknown> = {
-	funding_as_percentage_of_revenue?: null | Tfunding_as_percentage_of_revenue
+export enum GroupedTransactionsTypeOptions {
+	"revenue" = "revenue",
+	"transfer" = "transfer",
+	"funding" = "funding",
+	"none" = "none",
+	"payment" = "payment",
+	"expense" = "expense",
+}
+export type GroupedTransactionsRecord<Tdates = unknown, Tgdescription = unknown> = {
+	count?: number
+	dates?: null | Tdates
+	deal: RecordIdString
+	gdescription?: null | Tgdescription
 	id: string
-	total_financing?: null | Ttotal_financing
-	total_revenue?: null | Ttotal_revenue
+	total?: number
+	type: GroupedTransactionsTypeOptions
 }
 
 export enum JobsStatusOptions {
@@ -233,33 +244,21 @@ export type OrganizationsRecord = {
 	website?: string
 }
 
-export type PaymentsVsIncomeRecord<Tavg_monthly_income = unknown, Tavg_monthly_payment = unknown, Tpayment_to_income_percentage = unknown> = {
-	avg_monthly_income?: null | Tavg_monthly_income
-	avg_monthly_payment?: null | Tavg_monthly_payment
-	id: string
-	payment_to_income_percentage?: null | Tpayment_to_income_percentage
-}
-
-export type RealRevenueByDealRecord<Treal_revenue = unknown> = {
-	id: string
-	real_revenue?: null | Treal_revenue
-}
-
 export type StatementDetailsRecord = {
 	beginning_balance?: number
 	created?: IsoDateString
+	credits?: number
 	date?: IsoDateString
 	days_in_period?: number
 	deal?: RecordIdString
+	debits?: number
 	ending_balance?: number
 	id: string
 	interest_paid?: number
+	overdraft_fee?: number
+	returned_item_fees?: number
 	service_charge?: number
 	statement?: RecordIdString
-	total_checks_debits?: number
-	total_deposits_credits?: number
-	total_overdraft_fee?: number
-	total_returned_item_fees?: number
 	updated?: IsoDateString
 }
 
@@ -272,6 +271,17 @@ export type StatementsRecord = {
 	id: string
 	llama_index_file_id?: string
 	updated?: IsoDateString
+}
+
+export type TotalsByMonthRecord<Tdate = unknown> = {
+	date?: null | Tdate
+	deal?: string
+	expenses?: number
+	funding?: number
+	id: string
+	payments?: number
+	revenue?: number
+	transfers?: number
 }
 
 export enum TransactionsTypeOptions {
@@ -319,21 +329,20 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
+export type AvgDailyBalanceResponse<Texpand = unknown> = Required<AvgDailyBalanceRecord> & BaseSystemFields<Texpand>
 export type BalanceOverTimeResponse<Texpand = unknown> = Required<BalanceOverTimeRecord> & BaseSystemFields<Texpand>
 export type ChecksPaidResponse<Texpand = unknown> = Required<ChecksPaidRecord> & BaseSystemFields<Texpand>
-export type ChecksVsDebitsResponse<Ttotal_checks_amount = unknown, Texpand = unknown> = Required<ChecksVsDebitsRecord<Ttotal_checks_amount>> & BaseSystemFields<Texpand>
+export type CreditsAndDebitsResponse<Texpand = unknown> = Required<CreditsAndDebitsRecord> & BaseSystemFields<Texpand>
 export type CurrentDealResponse<Texpand = unknown> = Required<CurrentDealRecord> & BaseSystemFields<Texpand>
 export type DailyBalanceResponse<Texpand = unknown> = Required<DailyBalanceRecord> & BaseSystemFields<Texpand>
 export type DealsResponse<Texpand = unknown> = Required<DealsRecord> & BaseSystemFields<Texpand>
-export type EndingBalanceOverTimeResponse<Texpand = unknown> = Required<EndingBalanceOverTimeRecord> & BaseSystemFields<Texpand>
 export type ExtractionsResponse<Tdata = unknown, Texpand = unknown> = Required<ExtractionsRecord<Tdata>> & BaseSystemFields<Texpand>
-export type FundingAsPercentageOfRevenueResponse<Tfunding_as_percentage_of_revenue = unknown, Ttotal_financing = unknown, Ttotal_revenue = unknown, Texpand = unknown> = Required<FundingAsPercentageOfRevenueRecord<Tfunding_as_percentage_of_revenue, Ttotal_financing, Ttotal_revenue>> & BaseSystemFields<Texpand>
+export type GroupedTransactionsResponse<Tdates = unknown, Tgdescription = unknown, Texpand = unknown> = Required<GroupedTransactionsRecord<Tdates, Tgdescription>> & BaseSystemFields<Texpand>
 export type JobsResponse<Tmetadata = unknown, Texpand = unknown> = Required<JobsRecord<Tmetadata>> & BaseSystemFields<Texpand>
 export type OrganizationsResponse<Texpand = unknown> = Required<OrganizationsRecord> & BaseSystemFields<Texpand>
-export type PaymentsVsIncomeResponse<Tavg_monthly_income = unknown, Tavg_monthly_payment = unknown, Tpayment_to_income_percentage = unknown, Texpand = unknown> = Required<PaymentsVsIncomeRecord<Tavg_monthly_income, Tavg_monthly_payment, Tpayment_to_income_percentage>> & BaseSystemFields<Texpand>
-export type RealRevenueByDealResponse<Treal_revenue = unknown, Texpand = unknown> = Required<RealRevenueByDealRecord<Treal_revenue>> & BaseSystemFields<Texpand>
 export type StatementDetailsResponse<Texpand = unknown> = Required<StatementDetailsRecord> & BaseSystemFields<Texpand>
 export type StatementsResponse<Texpand = unknown> = Required<StatementsRecord> & BaseSystemFields<Texpand>
+export type TotalsByMonthResponse<Tdate = unknown, Texpand = unknown> = Required<TotalsByMonthRecord<Tdate>> & BaseSystemFields<Texpand>
 export type TransactionsResponse<Texpand = unknown> = Required<TransactionsRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
@@ -345,21 +354,20 @@ export type CollectionRecords = {
 	_mfas: MfasRecord
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
+	avg_daily_balance: AvgDailyBalanceRecord
 	balance_over_time: BalanceOverTimeRecord
 	checks_paid: ChecksPaidRecord
-	checks_vs_debits: ChecksVsDebitsRecord
+	credits_and_debits: CreditsAndDebitsRecord
 	current_deal: CurrentDealRecord
 	daily_balance: DailyBalanceRecord
 	deals: DealsRecord
-	ending_balance_over_time: EndingBalanceOverTimeRecord
 	extractions: ExtractionsRecord
-	funding_as_percentage_of_revenue: FundingAsPercentageOfRevenueRecord
+	grouped_transactions: GroupedTransactionsRecord
 	jobs: JobsRecord
 	organizations: OrganizationsRecord
-	payments_vs_income: PaymentsVsIncomeRecord
-	real_revenue_by_deal: RealRevenueByDealRecord
 	statement_details: StatementDetailsRecord
 	statements: StatementsRecord
+	totals_by_month: TotalsByMonthRecord
 	transactions: TransactionsRecord
 	users: UsersRecord
 }
@@ -370,21 +378,20 @@ export type CollectionResponses = {
 	_mfas: MfasResponse
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
+	avg_daily_balance: AvgDailyBalanceResponse
 	balance_over_time: BalanceOverTimeResponse
 	checks_paid: ChecksPaidResponse
-	checks_vs_debits: ChecksVsDebitsResponse
+	credits_and_debits: CreditsAndDebitsResponse
 	current_deal: CurrentDealResponse
 	daily_balance: DailyBalanceResponse
 	deals: DealsResponse
-	ending_balance_over_time: EndingBalanceOverTimeResponse
 	extractions: ExtractionsResponse
-	funding_as_percentage_of_revenue: FundingAsPercentageOfRevenueResponse
+	grouped_transactions: GroupedTransactionsResponse
 	jobs: JobsResponse
 	organizations: OrganizationsResponse
-	payments_vs_income: PaymentsVsIncomeResponse
-	real_revenue_by_deal: RealRevenueByDealResponse
 	statement_details: StatementDetailsResponse
 	statements: StatementsResponse
+	totals_by_month: TotalsByMonthResponse
 	transactions: TransactionsResponse
 	users: UsersResponse
 }
@@ -398,21 +405,20 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_mfas'): RecordService<MfasResponse>
 	collection(idOrName: '_otps'): RecordService<OtpsResponse>
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
+	collection(idOrName: 'avg_daily_balance'): RecordService<AvgDailyBalanceResponse>
 	collection(idOrName: 'balance_over_time'): RecordService<BalanceOverTimeResponse>
 	collection(idOrName: 'checks_paid'): RecordService<ChecksPaidResponse>
-	collection(idOrName: 'checks_vs_debits'): RecordService<ChecksVsDebitsResponse>
+	collection(idOrName: 'credits_and_debits'): RecordService<CreditsAndDebitsResponse>
 	collection(idOrName: 'current_deal'): RecordService<CurrentDealResponse>
 	collection(idOrName: 'daily_balance'): RecordService<DailyBalanceResponse>
 	collection(idOrName: 'deals'): RecordService<DealsResponse>
-	collection(idOrName: 'ending_balance_over_time'): RecordService<EndingBalanceOverTimeResponse>
 	collection(idOrName: 'extractions'): RecordService<ExtractionsResponse>
-	collection(idOrName: 'funding_as_percentage_of_revenue'): RecordService<FundingAsPercentageOfRevenueResponse>
+	collection(idOrName: 'grouped_transactions'): RecordService<GroupedTransactionsResponse>
 	collection(idOrName: 'jobs'): RecordService<JobsResponse>
 	collection(idOrName: 'organizations'): RecordService<OrganizationsResponse>
-	collection(idOrName: 'payments_vs_income'): RecordService<PaymentsVsIncomeResponse>
-	collection(idOrName: 'real_revenue_by_deal'): RecordService<RealRevenueByDealResponse>
 	collection(idOrName: 'statement_details'): RecordService<StatementDetailsResponse>
 	collection(idOrName: 'statements'): RecordService<StatementsResponse>
+	collection(idOrName: 'totals_by_month'): RecordService<TotalsByMonthResponse>
 	collection(idOrName: 'transactions'): RecordService<TransactionsResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>
 }

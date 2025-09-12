@@ -32,3 +32,18 @@ export const formatFileSize = (size: number) => {
   if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
   return `${(size / (1024 * 1024)).toFixed(2)} MB`;
 };
+
+export const formatCurrency = (value: string | number | undefined) => {
+  if (!value) return "$0.00";
+  const numValue = typeof value === "string" ? parseFloat(value) : value;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(numValue);
+};
+
+export const formatPercentage = (value: string | number | undefined) => {
+  if (!value) return "0%";
+  const numValue = typeof value === "string" ? parseFloat(value) : value;
+  return `${numValue.toFixed(2)}%`;
+};

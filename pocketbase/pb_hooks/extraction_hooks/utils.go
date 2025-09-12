@@ -20,14 +20,14 @@ func SetStatementDetailsRecordFields(data llama_client.Statement, statement_deta
 	statement_details.Set("deal", deal.Id)
 	statement_details.Set("date", data.Bank.StatementDate)
 	statement_details.Set("beginning_balance", data.Account.BeginningBalance)
-	statement_details.Set("total_deposits_credits", data.Account.DepositsCredits)
-	statement_details.Set("total_checks_debits", data.Account.ChecksDebits)
+	statement_details.Set("credits", data.Account.Credits)
+	statement_details.Set("debits", data.Account.Debits)
 	statement_details.Set("service_charge", data.Account.ServiceCharge)
 	statement_details.Set("interest_paid", data.Account.InterestPaid)
 	statement_details.Set("ending_balance", data.Account.EndingBalance)
 	statement_details.Set("days_in_period", data.Account.DaysInPeriod)
-	statement_details.Set("total_overdraft_fee", data.Fees.OverdraftFee)
-	statement_details.Set("total_returned_items_fee", data.Fees.ReturnedItemFees)
+	statement_details.Set("overdraft_fee", data.Fees.OverdraftFee)
+	statement_details.Set("returned_items_fees", data.Fees.ReturnedItemFees)
 }
 
 func SetCheckPaidRecordFields(data llama_client.CheckPaid, checkPaidRecord *core.Record, statement, deal *core.Record) {
