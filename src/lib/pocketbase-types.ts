@@ -196,11 +196,11 @@ export enum GroupedTransactionsTypeOptions {
 	"payment" = "payment",
 	"expense" = "expense",
 }
-export type GroupedTransactionsRecord<Tdates = unknown, Tgdescription = unknown> = {
+export type GroupedTransactionsRecord = {
 	count?: number
-	dates?: null | Tdates
+	dates?: string
 	deal: RecordIdString
-	gdescription?: null | Tgdescription
+	gdescription?: string
 	id: string
 	total?: number
 	type: GroupedTransactionsTypeOptions
@@ -337,7 +337,7 @@ export type CurrentDealResponse<Texpand = unknown> = Required<CurrentDealRecord>
 export type DailyBalanceResponse<Texpand = unknown> = Required<DailyBalanceRecord> & BaseSystemFields<Texpand>
 export type DealsResponse<Texpand = unknown> = Required<DealsRecord> & BaseSystemFields<Texpand>
 export type ExtractionsResponse<Tdata = unknown, Texpand = unknown> = Required<ExtractionsRecord<Tdata>> & BaseSystemFields<Texpand>
-export type GroupedTransactionsResponse<Tdates = unknown, Tgdescription = unknown, Texpand = unknown> = Required<GroupedTransactionsRecord<Tdates, Tgdescription>> & BaseSystemFields<Texpand>
+export type GroupedTransactionsResponse<Texpand = unknown> = Required<GroupedTransactionsRecord> & BaseSystemFields<Texpand>
 export type JobsResponse<Tmetadata = unknown, Texpand = unknown> = Required<JobsRecord<Tmetadata>> & BaseSystemFields<Texpand>
 export type OrganizationsResponse<Texpand = unknown> = Required<OrganizationsRecord> & BaseSystemFields<Texpand>
 export type StatementDetailsResponse<Texpand = unknown> = Required<StatementDetailsRecord> & BaseSystemFields<Texpand>

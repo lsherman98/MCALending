@@ -9,6 +9,7 @@ import {
   useGetTotalCreditsAndDebits,
   useGetTransactionTotals,
 } from "@/lib/api/queries";
+import { convertGroupsToPayments, mergeTransactionGroups } from "@/lib/utils";
 
 export function useAnalytics({ dealId }: { dealId: string }) {
   const { data: avgDailyBalance } = useGetAvgDailyBalance(dealId);
@@ -38,5 +39,8 @@ export function useAnalytics({ dealId }: { dealId: string }) {
   const firstFundingDate = firstFunding?.date || null;
   const firstPaymentDate = firstPayment?.date || null;
 
-  
+  const mergedPaymentGroups = mergeTransactionGroups(groupedPaymentTransactions);
+  const paymentFrequency = convertGroupsToPayments(mergedPaymentGroups);
+
+  return {};
 }
