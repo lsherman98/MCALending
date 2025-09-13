@@ -105,11 +105,11 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type AvgDailyBalanceRecord = {
+export type AvgDailyBalanceRecord<Tmonth = unknown> = {
 	balance?: number
 	deal?: string
 	id: string
-	month?: string
+	month?: null | Tmonth
 }
 
 export type BalanceOverTimeRecord = {
@@ -329,7 +329,7 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type AvgDailyBalanceResponse<Texpand = unknown> = Required<AvgDailyBalanceRecord> & BaseSystemFields<Texpand>
+export type AvgDailyBalanceResponse<Tmonth = unknown, Texpand = unknown> = Required<AvgDailyBalanceRecord<Tmonth>> & BaseSystemFields<Texpand>
 export type BalanceOverTimeResponse<Texpand = unknown> = Required<BalanceOverTimeRecord> & BaseSystemFields<Texpand>
 export type ChecksPaidResponse<Texpand = unknown> = Required<ChecksPaidRecord> & BaseSystemFields<Texpand>
 export type CreditsAndDebitsResponse<Texpand = unknown> = Required<CreditsAndDebitsRecord> & BaseSystemFields<Texpand>

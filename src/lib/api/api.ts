@@ -130,6 +130,12 @@ export async function getAvgDailyBalance(deal: string) {
     });
 }
 
+export async function getStatementDetails(deal: string) {
+    return await pb.collection(Collections.StatementDetails).getFullList({
+        filter: `deal="${deal}"`,
+    });
+}
+
 export async function getDailyBalance(deal: string) {
     return await pb.collection(Collections.DailyBalance).getFullList({
         filter: `deal="${deal}"`,
@@ -144,7 +150,7 @@ export async function getBalanceOverTime(deal: string) {
     });
 }
 
-export async function getTotalCreditsAndDebits(deal: string) {
+export async function getCreditsAndDebits(deal: string) {
     return await pb.collection(Collections.CreditsAndDebits).getFullList({
         filter: `deal="${deal}"`,
         sort: "date"

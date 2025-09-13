@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAvgDailyBalance, getBalanceOverTime, getCurrentDeal, getDailyBalance, getDealById, getDeals, getFirstTransactionDate, getGroupedTransactions, getJobs, getRecentDeals, getStatementById, getStatementsByDealId, getStatementUrl, getTotalCreditsAndDebits, getTransactions, getTransactionTotals, searchDeals, searchTransactions } from "./api";
+import { getAvgDailyBalance, getBalanceOverTime, getCreditsAndDebits, getCurrentDeal, getDailyBalance, getDealById, getDeals, getFirstTransactionDate, getGroupedTransactions, getJobs, getRecentDeals, getStatementById, getStatementDetails, getStatementsByDealId, getStatementUrl, getTransactions, getTransactionTotals, searchDeals, searchTransactions } from "./api";
 import { TransactionsTypeOptions, type JobsResponse } from "../pocketbase-types";
 import { useCurrentDealStore } from "../stores/current-deal-store";
 
@@ -113,10 +113,10 @@ export function useGetBalanceOverTime(dealId: string) {
     });
 }
 
-export function useGetTotalCreditsAndDebits(dealId: string) {
+export function useGetCreditsAndDebits(dealId: string) {
     return useQuery({
         queryKey: ["totalCreditsAndDebits", dealId],
-        queryFn: () => getTotalCreditsAndDebits(dealId),
+        queryFn: () => getCreditsAndDebits(dealId),
         placeholderData: keepPreviousData
     });
 }
@@ -157,6 +157,14 @@ export function useGetFirstPaymentDate(dealId: string) {
     return useQuery({
         queryKey: ["firstPaymentDate", dealId],
         queryFn: () => getFirstTransactionDate(dealId, TransactionsTypeOptions.payment),
+        placeholderData: keepPreviousData
+    });
+}
+
+export function useGetStatementDetails(dealId: string) {
+    return useQuery({
+        queryKey: ["statementDetails", dealId],
+        queryFn: () => getStatementDetails(dealId),
         placeholderData: keepPreviousData
     });
 }

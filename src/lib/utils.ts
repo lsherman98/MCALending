@@ -2,7 +2,6 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { pb } from "./pocketbase";
 import { toast } from "sonner";
-import type { useGetGroupedPaymentTransactions } from "./api/queries";
 import type { GroupedTransactionsResponse } from "./pocketbase-types";
 
 export function cn(...inputs: ClassValue[]) {
@@ -129,10 +128,11 @@ export const convertGroupsToPayments = (groups: GroupedTransactionsResponse[]) =
       description: group.gdescription,
       frequency: calculatePaymentFrequency(group.dates),
       amount: (group.total || 0) / (group.count || 1),
-      paymentCount: group.count || 0,
+      total: group.total || 0,
+      count: group.count || 0,
       dates: group.dates,
-      firstPayment: dates[0] || null,
-      lastPayment: dates[dates.length - 1] || null,
+      first: dates[0] || null,
+      latest: dates[dates.length - 1] || null,
     };
   });
 };
