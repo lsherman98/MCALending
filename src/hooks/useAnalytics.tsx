@@ -6,7 +6,6 @@ import {
   useGetFirstPaymentDate,
   useGetGroupedFundingTransactions,
   useGetGroupedPaymentTransactions,
-  useGetStatementDetails,
   useGetTransactionTotals,
 } from "@/lib/api/queries";
 import { convertGroupsToPayments, mergeTransactionGroups } from "@/lib/utils";
@@ -20,7 +19,6 @@ export function useAnalytics(dealId: string) {
   const { data: transactionTotals } = useGetTransactionTotals(dealId);
   const { data: firstFunding } = useGetFirstFundingDate(dealId);
   const { data: firstPayment } = useGetFirstPaymentDate(dealId);
-  const { data: statementDetails } = useGetStatementDetails(dealId);
 
   const numberOfMonths = transactionTotals?.length || 0;
 
@@ -51,18 +49,9 @@ export function useAnalytics(dealId: string) {
   const totalCreditsAndDebits = creditsAndDebitsData || [];
 
   const netCashFlow = totalRevenue - totalExpenses - totalPayments;
-  const avgDailyBalance = dailyBalance.reduce((sum, b) => sum + b.balance, 0) / dailyBalance.length;
   const negativeBalanceDays = dailyBalance.filter((b) => b.balance < 0).length;
   const totalPaymentTransactions = groupedPaymentTransactions?.reduce((sum, g) => sum + g.count, 0) || 0;
   const averagePaymentSize = totalPayments / totalPaymentTransactions;
-  const totalFundingTransactions = groupedFundingTransactions?.reduce((sum, g) => sum + g.count, 0) || 0;
-  const averageFundingSize = totalFunding / totalFundingTransactions;
-  const fundingToPaymentTime =
-    firstFundingDate && firstPaymentDate
-      ? new Date(firstPaymentDate).getTime() - new Date(firstFundingDate).getTime()
-      : 0;
-  const fundingToPaymentDays = Math.ceil(fundingToPaymentTime / (1000 * 60 * 60 * 24));
-  const totalOverdraftFees = statementDetails?.reduce((sum, d) => sum + (d.overdraft_fee || 0), 0) || 0;
 
   return {
     totalFunding,
@@ -85,11 +74,7 @@ export function useAnalytics(dealId: string) {
     balanceByMonth,
     totalCreditsAndDebits,
     netCashFlow,
-    avgDailyBalance,
     negativeBalanceDays,
     averagePaymentSize,
-    averageFundingSize,
-    fundingToPaymentDays,
-    totalOverdraftFees,
   };
 }

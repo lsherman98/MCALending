@@ -130,12 +130,6 @@ export async function getAvgDailyBalance(deal: string) {
     });
 }
 
-export async function getStatementDetails(deal: string) {
-    return await pb.collection(Collections.StatementDetails).getFullList({
-        filter: `deal="${deal}"`,
-    });
-}
-
 export async function getDailyBalance(deal: string) {
     return await pb.collection(Collections.DailyBalance).getFullList({
         filter: `deal="${deal}"`,

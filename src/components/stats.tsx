@@ -18,12 +18,6 @@ export function Stats({ dealId }: { dealId: string }) {
     firstFundingDate,
     firstPaymentDate,
     netCashFlow,
-    avgDailyBalance,
-    negativeBalanceDays,
-    averagePaymentSize,
-    averageFundingSize,
-    fundingToPaymentDays,
-    totalOverdraftFees,
   } = useAnalytics(dealId);
 
   const getColor = (value: number) => {
@@ -106,42 +100,6 @@ export function Stats({ dealId }: { dealId: string }) {
         <CardHeader className="whitespace-nowrap">
           <CardDescription>Net Cash Flow</CardDescription>
           <CardTitle className={getColor(netCashFlow)}>{formatCurrency(netCashFlow)}</CardTitle>
-        </CardHeader>
-      </Card>
-      <Card className="shadow-sm min-w-[200px] py-2">
-        <CardHeader className="whitespace-nowrap">
-          <CardDescription>Avg. Daily Balance</CardDescription>
-          <CardTitle className={getColor(avgDailyBalance)}>{formatCurrency(avgDailyBalance)}</CardTitle>
-        </CardHeader>
-      </Card>
-      <Card className="shadow-sm min-w-[200px] py-2">
-        <CardHeader className="whitespace-nowrap">
-          <CardDescription>Negative Balance Days</CardDescription>
-          <CardTitle className={getColor(negativeBalanceDays * -1)}>{negativeBalanceDays}</CardTitle>
-        </CardHeader>
-      </Card>
-      <Card className="shadow-sm min-w-[200px] py-2">
-        <CardHeader className="whitespace-nowrap">
-          <CardDescription>Avg. Payment Size</CardDescription>
-          <CardTitle className={getColor(averagePaymentSize)}>{formatCurrency(averagePaymentSize)}</CardTitle>
-        </CardHeader>
-      </Card>
-      <Card className="shadow-sm min-w-[200px] py-2">
-        <CardHeader className="whitespace-nowrap">
-          <CardDescription>Avg. Funding Size</CardDescription>
-          <CardTitle className={getColor(averageFundingSize)}>{formatCurrency(averageFundingSize)}</CardTitle>
-        </CardHeader>
-      </Card>
-      <Card className="shadow-sm min-w-[200px] py-2">
-        <CardHeader className="whitespace-nowrap">
-          <CardDescription>Funding to Payment</CardDescription>
-          <CardTitle className={getColor(fundingToPaymentDays)}>{fundingToPaymentDays} days</CardTitle>
-        </CardHeader>
-      </Card>
-      <Card className="shadow-sm min-w-[200px] py-2">
-        <CardHeader className="whitespace-nowrap">
-          <CardDescription>Overdraft Fees</CardDescription>
-          <CardTitle className={getColor(totalOverdraftFees * -1)}>{formatCurrency(totalOverdraftFees)}</CardTitle>
         </CardHeader>
       </Card>
     </div>

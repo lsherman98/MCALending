@@ -18,6 +18,7 @@ import {
   YAxis,
 } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
+import { formatCurrency } from "@/lib/utils";
 
 const chartConfig = {
   balance: {
@@ -92,8 +93,6 @@ export function Charts({ dealId }: { dealId: string }) {
     { category: "revenue", amount: Math.abs(totalRevenue), fill: "var(--color-revenue-text)" },
     { category: "transfers", amount: Math.abs(totalTransfers), fill: "var(--color-transfer)" },
   ].filter((item) => item.amount > 0);
-
-  const totalAmount = chartData.reduce((sum, item) => sum + item.amount, 0);
 
   const lineChartTotals = React.useMemo(
     () => ({
@@ -417,12 +416,12 @@ export function Charts({ dealId }: { dealId: string }) {
                     const categoryKey = data.payload.category as keyof typeof chartConfig;
                     const label = chartConfig[categoryKey]?.label || categoryKey;
                     return (
-                        <div className="rounded-lg border bg-background p-2 shadow-sm text-left">
+                      <div className="rounded-lg border bg-background p-2 shadow-sm text-left">
                         <div className="flex items-center gap-2">
                           <span className="text-xs">{label}</span>
                         </div>
                         <p className="text-xs text-muted-foreground">${Number(data.value).toLocaleString()}</p>
-                        </div>
+                      </div>
                     );
                   }}
                 />
@@ -437,6 +436,72 @@ export function Charts({ dealId }: { dealId: string }) {
                 </Pie>
               </PieChart>
             </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <Card className="w-full">
+          <CardHeader className="flex items-center gap-2 space-y-0 border-b">
+            <div className="grid flex-1 gap-1">
+              <CardTitle className="text-base">Payment Frequency Analysis</CardTitle>
+              <CardDescription className="text-xs">Recurring payment patterns and amounts</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="p-3 pt-4">
+            <div className="space-y-3 max-h-[300px] overflow-y-auto">
+              {paymentFrequency?.length ? (
+                paymentFrequency.map((payment, index) => {
+                  return (
+                    <div key={index} className="flex justify-between items-center p-2 border rounded-md">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{payment.description || "Unknown"}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {payment.count} transactions • {payment.frequency}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold">{formatCurrency(payment.total)}</p>
+                        <p className="text-xs text-muted-foreground">{formatCurrency(payment.amount)} avg</p>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">No payment data available</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="w-full">
+          <CardHeader className="flex items-center gap-2 space-y-0 border-b">
+            <div className="grid flex-1 gap-1">
+              <CardTitle className="text-base">Funding Frequency Analysis</CardTitle>
+              <CardDescription className="text-xs">Recurring funding patterns and amounts</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="p-3 pt-4">
+            <div className="space-y-3 max-h-[300px] overflow-y-auto">
+              {fundingFrequency?.length ? (
+                fundingFrequency.map((funding, index) => {
+                  return (
+                    <div key={index} className="flex justify-between items-center p-2 border rounded-md">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{funding.description || "Unknown"}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {funding.count} transactions • {funding.frequency}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold">{formatCurrency(funding.total)}</p>
+                        <p className="text-xs text-muted-foreground">{formatCurrency(funding.amount)} avg</p>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">No funding data available</p>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
