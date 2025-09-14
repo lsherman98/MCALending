@@ -1,5 +1,5 @@
-import { Charts } from "@/components/charts";
-import { Stats } from "@/components/stats";
+import { Charts } from "@/components/analytics/charts";
+import { Stats } from "@/components/analytics/stats";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/analytics/$dealId")({

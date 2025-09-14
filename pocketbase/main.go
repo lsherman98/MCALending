@@ -13,7 +13,7 @@ import (
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 
 	"github.com/lsherman98/mca-platform/pocketbase/llama_client"
-	// _ "github.com/lsherman98/mca-platform/pocketbase/migrations"
+	_ "github.com/lsherman98/mca-platform/pocketbase/migrations"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/current_deal_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/extraction_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/full_text_search"

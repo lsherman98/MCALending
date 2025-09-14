@@ -176,9 +176,11 @@ export async function getJobs() {
     const now = new Date();
     const lastHour = new Date(now.getTime() - 60 * 60 * 1000);
     const lastHourISO = lastHour.toISOString();
+    const parts = lastHourISO.split('T');
+    const date = parts[0] + " " + parts[1]
 
     return await pb.collection(Collections.Jobs).getFullList<JobsResponse<ExpandStatement & ExpandDeal>>({
-        filter: `status = "PENDING" || status = "CLASSIFY" || (status = "SUCCESS" && created > "${lastHourISO}")`,
+        filter: `status = "PENDING" || status = "CLASSIFY" || (status = "SUCCESS" && created > "${date}")`,
         expand: "statement,deal"
     });
 }
