@@ -19,6 +19,7 @@ import (
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/full_text_search"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/job_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/statement_hooks"
+	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/webhooks"
 	"google.golang.org/genai"
 )
 
@@ -63,6 +64,10 @@ func main() {
 	}
 
 	if err := full_text_search.Init(app, "transactions", "deals"); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := webhooks.Init(app); err != nil {
 		log.Fatal(err)
 	}
 

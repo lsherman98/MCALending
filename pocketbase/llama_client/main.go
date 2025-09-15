@@ -31,20 +31,26 @@ type LlamaClient struct {
 func New(app *pocketbase.PocketBase) (*LlamaClient, error) {
 	baseURL, err := url.Parse(defaultBaseURL)
 	if err != nil {
+		app.Logger().Error("LlamaIndex: failed to parse default base URL", "error", err)
 		return nil, err
 	}
 
 	apiKey := os.Getenv("LLAMA_INDEX_API_KEY")
 	if apiKey == "" {
+		app.Logger().Error("LLAMA_INDEX_API_KEY environment variable is required")
 		return nil, errors.New("LLAMA_INDEX_API_KEY environment variable is required")
 	}
 
 	projectID := os.Getenv("LLAMA_INDEX_PROJECT_ID")
 	if projectID == "" {
+		app.Logger().Error("LLAMA_INDEX_PROJECT_ID environment variable is required")
 		return nil, errors.New("LLAMA_INDEX_PROJECT_ID environment variable is required")
 	}
 
 	organizationId := os.Getenv("LLAMA_INDEX_ORGANIZATION_ID")
+	if organizationId == "" {
+		app.Logger().Warn("LLAMA_INDEX_ORGANIZATION_ID environment variable is not set; proceeding without it")
+	}
 
 	return &LlamaClient{
 		client:         http.DefaultClient,
@@ -64,6 +70,7 @@ func (c *LlamaClient) Upload(ctx context.Context, data UploadRequest) (*UploadRe
 	var response UploadResponse
 	err := c.do(ctx, "PUT", "files/upload_from_url", params, data, &response)
 	if err != nil {
+		c.App.Logger().Error("LlamaIndex: upload failed:", "error", err)
 		return nil, err
 	}
 	return &response, nil
@@ -73,6 +80,7 @@ func (c *LlamaClient) RunJob(ctx context.Context, data JobRequest) (*JobResponse
 	var response JobResponse
 	err := c.do(ctx, "POST", "extraction/jobs", nil, data, &response)
 	if err != nil {
+		c.App.Logger().Error("LlamaIndex: run job failed:", "error", err)
 		return nil, err
 	}
 	return &response, nil
@@ -82,6 +90,7 @@ func (c *LlamaClient) GetJob(ctx context.Context, jobID string) (*JobResponse, e
 	var response JobResponse
 	err := c.do(ctx, "GET", path.Join("extraction/jobs", jobID), nil, nil, &response)
 	if err != nil {
+		c.App.Logger().Error("LlamaIndex: get job failed:", "error", err)
 		return nil, err
 	}
 	return &response, nil
@@ -95,6 +104,7 @@ func (c *LlamaClient) GetJobResult(ctx context.Context, jobID string) (*JobResul
 	var response JobResultResponse
 	err := c.do(ctx, "GET", path.Join("extraction/jobs", jobID, "result"), params, nil, &response)
 	if err != nil {
+		c.App.Logger().Error("LlamaIndex: get job result failed:", "error", err)
 		return nil, err
 	}
 	return &response, nil
@@ -116,6 +126,7 @@ func (c *LlamaClient) GetRunByJobID(ctx context.Context, jobID string) (*RunResp
 	var response RunResponse
 	err := c.do(ctx, "GET", path.Join("extraction/runs/by-job", jobID), params, nil, &response)
 	if err != nil {
+		c.App.Logger().Error("LlamaIndex: get run by job ID failed:", "error", err)
 		return nil, err
 	}
 	return &response, nil
@@ -124,7 +135,8 @@ func (c *LlamaClient) GetRunByJobID(ctx context.Context, jobID string) (*RunResp
 func (c *LlamaClient) do(ctx context.Context, method, endpointPath string, queryParams url.Values, reqBody, resBody interface{}) error {
 	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, endpointPath))
 	if err != nil {
-		return fmt.Errorf("failed to parse endpoint URL: %w", err)
+		c.App.Logger().Error("LlamaIndex:: failed to parse endpoint URL", "error", err)
+		return err
 	}
 
 	if queryParams != nil {
@@ -135,14 +147,16 @@ func (c *LlamaClient) do(ctx context.Context, method, endpointPath string, query
 	if reqBody != nil {
 		bodyBytes, err := json.Marshal(reqBody)
 		if err != nil {
-			return fmt.Errorf("failed to marshal request payload: %w", err)
+			c.App.Logger().Error("LlamaIndex: failed to marshal request payload", "error", err)
+			return err
 		}
 		payload = bytes.NewBuffer(bodyBytes)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, method, endpoint.String(), payload)
 	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
+		c.App.Logger().Error("LlamaIndex: failed to create HTTP request", "error", err)
+		return err
 	}
 
 	req.Header.Add("Accept", "application/json")
@@ -153,18 +167,20 @@ func (c *LlamaClient) do(ctx context.Context, method, endpointPath string, query
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to execute request: %w", err)
+		c.App.Logger().Error("LlamaIndex: failed to execute request", "error", err)
+		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
 		bodyBytes, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
+		return fmt.Errorf("LlamaIndex: API request failed with status: %s, body: %s", resp.Status, string(bodyBytes))
 	}
 
 	if resBody != nil && resp.StatusCode != http.StatusNoContent {
 		if err := json.NewDecoder(resp.Body).Decode(resBody); err != nil {
-			return fmt.Errorf("failed to decode response body: %w", err)
+			c.App.Logger().Error("LlamaIndex: failed to decode response body", "error", err)
+			return err
 		}
 	}
 

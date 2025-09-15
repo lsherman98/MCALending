@@ -8,10 +8,9 @@ import (
 	"github.com/pocketbase/pocketbase/tools/filesystem"
 )
 
-func SetExtractionRecordFields(extractionRecord, job *core.Record, file *filesystem.File, data []byte) {
+func SetExtractionRecordFields(extractionRecord, job *core.Record, file *filesystem.File) {
 	extractionRecord.Set("job", job.Id)
-	extractionRecord.Set("file", file)
-	extractionRecord.Set("data", data)
+	extractionRecord.Set("data", file)
 	extractionRecord.Set("statement", job.GetString("statement"))
 }
 

@@ -1,8 +1,10 @@
 package extraction_hooks
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 
 	"github.com/lsherman98/mca-platform/pocketbase/llama_client"
 	"github.com/pocketbase/pocketbase"
@@ -15,55 +17,77 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 	app.OnRecordAfterCreateSuccess("extractions").BindFunc(func(e *core.RecordEvent) error {
 		extraction := e.Record
 
+		fileKey := extraction.BaseFilesPath() + "/" + extraction.GetString("data")
+
+		fsys, err := e.App.NewFilesystem()
+		if err != nil {
+			e.App.Logger().Error("Extraction: failed to initialize filesystem: " + err.Error())
+			return err
+		}
+		defer fsys.Close()
+
+		r, err := fsys.GetReader(fileKey)
+		if err != nil {
+			e.App.Logger().Error("Extraction: failed to get file reader: " + err.Error())
+			return err
+		}
+		defer r.Close()
+
+		content := new(bytes.Buffer)
+		_, err = io.Copy(content, r)
+		if err != nil {
+			e.App.Logger().Error("Extraction: failed to read file content: " + err.Error())
+			return err
+		}
+
 		var data llama_client.Statement
-		extraction.UnmarshalJSONField("data", &data)
+		if err := json.Unmarshal(content.Bytes(), &data); err != nil {
+			e.App.Logger().Error("Extraction: failed to unmarshal JSON: " + err.Error())
+			return err
+		}
 
 		statementDetailsCollection, err := e.App.FindCollectionByNameOrId("statement_details")
 		if err != nil {
-			e.App.Logger().Error("Failed to find statement_details collection: " + err.Error())
 			return err
 		}
 
 		checksPaidCollection, err := e.App.FindCollectionByNameOrId("checks_paid")
 		if err != nil {
-			e.App.Logger().Error("Failed to find checks_paid collection: " + err.Error())
 			return err
 		}
 
 		dailyBalanceCollection, err := e.App.FindCollectionByNameOrId("daily_balance")
 		if err != nil {
-			e.App.Logger().Error("Failed to find daily_balance collection: " + err.Error())
 			return err
 		}
 
 		transactionsCollection, err := e.App.FindCollectionByNameOrId("transactions")
 		if err != nil {
-			e.App.Logger().Error("Failed to find transactions collection: " + err.Error())
 			return err
 		}
 
 		statement, err := e.App.FindRecordById("statements", extraction.GetString("statement"))
 		if err != nil {
-			e.App.Logger().Error("Failed to find statement record: " + err.Error())
+			e.App.Logger().Error("Extraction: failed to find statement record: " + err.Error())
 			return err
 		}
 
 		job, err := e.App.FindRecordById("jobs", extraction.GetString("job"))
 		if err != nil {
-			e.App.Logger().Error("Failed to find job record: " + err.Error())
+			e.App.Logger().Error("Extraction: failed to find job record: " + err.Error())
 			return err
 		}
 
 		deal, err := e.App.FindRecordById("deals", statement.GetString("deal"))
 		if err != nil {
-			e.App.Logger().Error("Failed to find deal record: " + err.Error())
+			e.App.Logger().Error("Extraction: failed to find deal record: " + err.Error())
 			return err
 		}
 
 		routine.FireAndForget(func() {
 			SetDealRecordFields(data, deal)
 			if err := e.App.Save(deal); err != nil {
-				e.App.Logger().Error("Failed to save deal record: " + err.Error())
+				e.App.Logger().Error("Extraction: failed to save deal record: " + err.Error())
 			}
 		})
 
@@ -71,12 +95,12 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			statement_details := core.NewRecord(statementDetailsCollection)
 			SetStatementDetailsRecordFields(data, statement_details, statement, deal)
 			if err := e.App.Save(statement_details); err != nil {
-				e.App.Logger().Error("Failed to create statement_details record: " + err.Error())
+				e.App.Logger().Error("Extraction: failed to create statement_details record: " + err.Error())
 			}
 
 			statement.Set("details", statement_details.Id)
 			if err := e.App.Save(statement); err != nil {
-				e.App.Logger().Error("Failed to update statement record: " + err.Error())
+				e.App.Logger().Error("Extraction: failed to update statement record: " + err.Error())
 			}
 		})
 
@@ -85,7 +109,7 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 				checkPaidRecord := core.NewRecord(checksPaidCollection)
 				SetCheckPaidRecordFields(checkPaid, checkPaidRecord, statement, deal)
 				if err := e.App.Save(checkPaidRecord); err != nil {
-					e.App.Logger().Error("Failed to create checks_paid record: " + err.Error())
+					e.App.Logger().Error("Extraction: failed to create checks_paid record: " + err.Error())
 				}
 			})
 		}
@@ -95,7 +119,7 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 				dailyBalanceRecord := core.NewRecord(dailyBalanceCollection)
 				SetDailyBalanceRecordFields(dailyBalance, dailyBalanceRecord, statement, deal)
 				if err := e.App.Save(dailyBalanceRecord); err != nil {
-					e.App.Logger().Error("Failed to create daily_balance record: " + err.Error())
+					e.App.Logger().Error("Extraction: failed to create daily_balance record: " + err.Error())
 				}
 			})
 		}
@@ -124,19 +148,18 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			config,
 		)
 		if err != nil {
-			e.App.Logger().Error("Gemini transaction categorization failed: " + err.Error())
+			e.App.Logger().Error("Extraction: Gemini transaction categorization failed: " + err.Error())
 		}
 
 		var transactionsWithTypes TransactionTypeList
 		if err := json.Unmarshal([]byte(result.Text()), &transactionsWithTypes); err != nil {
-			e.App.Logger().Error("Failed to parse Gemini response: " + err.Error())
+			e.App.Logger().Error("Extraction: failed to parse Gemini response: " + err.Error())
 		}
 
 		for i, transaction := range data.Transactions {
 			routine.FireAndForget(func() {
 				transactionRecord := core.NewRecord(transactionsCollection)
 				SetTransactionRecordFields(transaction, transactionRecord, statement, deal)
-				
 
 				if i < len(transactionsWithTypes.Transactions) {
 					transactionType := transactionsWithTypes.Transactions[i].Type
@@ -146,7 +169,7 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 				}
 
 				if err := e.App.Save(transactionRecord); err != nil {
-					e.App.Logger().Error("Failed to create transactions record: " + err.Error())
+					e.App.Logger().Error("Extraction: failed to create transactions record: " + err.Error())
 				}
 			})
 		}
@@ -154,7 +177,7 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 		job.Set("status", llama_client.StatusSuccess)
 		job.Set("extraction", extraction.Id)
 		if err := e.App.Save(job); err != nil {
-			e.App.Logger().Error("Failed to save job record: " + err.Error())
+			e.App.Logger().Error("Extraction: failed to save job record: " + err.Error())
 			return err
 		}
 

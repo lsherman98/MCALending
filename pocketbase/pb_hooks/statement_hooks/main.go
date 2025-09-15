@@ -53,7 +53,7 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		routine.FireAndForget(func() {
 			token, err := e.Auth.NewFileToken()
 			if err != nil {
-				e.App.Logger().Error("Failed to create file token: " + err.Error())
+				e.App.Logger().Error("Statement: failed to create file token: " + err.Error())
 				return
 			}
 
@@ -69,33 +69,40 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 				URL:  url,
 			})
 			if err != nil {
-				e.App.Logger().Error("Failed to upload file to LlamaIndex: " + err.Error())
+				e.App.Logger().Error("Statement: failed to upload file to LlamaIndex: " + err.Error())
 			}
 
 			statement.Set("llama_index_file_id", upload.ID)
 
-			if err := app.Save(statement); err != nil {
-				e.App.Logger().Error("Failed to save statement record: " + err.Error())
+			if err := e.App.Save(statement); err != nil {
+				e.App.Logger().Error("Statement: failed to save statement record: " + err.Error())
 			}
 
 			job, err := llama.RunJob(context.Background(), llama_client.JobRequest{
 				FileID:            upload.ID,
 				ExtractionAgentID: agentId,
+				WebhookConfigurations: []llama_client.WebhookConfiguration{
+					{
+						WebhookURL:          "https://mca.levisherman.xyz/webhooks/llamaindex",
+						WebhookEvents:       []string{"extract.success", "extract.error", "extract.partial_success", "extract.cancelled"},
+						WebhookOutputFormat: "json",
+					},
+				},
 			})
 			if err != nil {
-				e.App.Logger().Error("Failed to run extraction job: " + err.Error())
+				e.App.Logger().Error("Statement: failed to run extraction job: " + err.Error())
 			}
 
 			run, err := llama.GetRunByJobID(context.Background(), job.ID)
 			if err != nil {
-				e.App.Logger().Error("Failed to get run information: " + err.Error())
+				e.App.Logger().Error("Statement: failed to get run information: " + err.Error())
 				return
 			}
 
 			jobRecord := core.NewRecord(jobsCollection)
 			SetJobFields(jobRecord, job.ID, run.ID, agentId, statement.GetString("deal"), statement.Id, job.Status)
-			if err := app.Save(jobRecord); err != nil {
-				e.App.Logger().Error("Failed to save job record: " + err.Error())
+			if err := e.App.Save(jobRecord); err != nil {
+				e.App.Logger().Error("Statement: failed to save job record: " + err.Error())
 			}
 		})
 

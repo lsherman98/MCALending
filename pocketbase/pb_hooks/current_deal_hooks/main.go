@@ -23,6 +23,7 @@ func Init(app *pocketbase.PocketBase) error {
 		if len(e.Records) == 0 {
 			filterQuery := e.Request.URL.Query()["filter"]
 			if len(filterQuery) == 0 {
+				e.App.Logger().Info("Current Deal: no filter provided")
 				return e.Next()
 			}
 
@@ -30,6 +31,7 @@ func Init(app *pocketbase.PocketBase) error {
 			filterParts := strings.Split(userFilter, "=")
 
 			if len(filterParts) < 2 {
+				e.App.Logger().Info("Current Deal: invalid filter format", "filter", userFilter)
 				return e.Next()
 			}
 
@@ -39,6 +41,7 @@ func Init(app *pocketbase.PocketBase) error {
 
 			deal, err := e.App.FindFirstRecordByFilter(dealsCollection, fmt.Sprintf("user='%s'", user))
 			if err != nil {
+				e.App.Logger().Info("Current Deal: no deal found for user", "user", user)
 				return e.Next()
 			}
 
@@ -47,6 +50,7 @@ func Init(app *pocketbase.PocketBase) error {
 			currentDealRecord.Set("deal", deal.Id)
 
 			if err := e.App.Save(currentDealRecord); err != nil {
+				e.App.Logger().Error("Current Deal: failed to create current deal record", "error", err)
 				return e.Next()
 			}
 		}
