@@ -3,6 +3,8 @@ package job_hooks
 import (
 	"context"
 	"encoding/json"
+	"os"
+	"time"
 
 	"github.com/lsherman98/mca-platform/pocketbase/llama_client"
 	"github.com/pocketbase/pocketbase"
@@ -11,6 +13,42 @@ import (
 )
 
 func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
+	app.OnRecordAfterCreateSuccess("jobs").BindFunc(func(e *core.RecordEvent) error {
+		if os.Getenv("DEV") == "false" {
+			return e.Next()
+		}
+
+		jobRecord := e.Record
+		completed := false
+		job := &llama_client.JobResponse{}
+		time.Sleep(10 * time.Second)
+		for !completed {
+			res, err := llama.GetJob(context.Background(), jobRecord.GetString("job_id"))
+			if err != nil {
+				e.App.Logger().Error("Failed to get job status: " + err.Error())
+			}
+
+			job = res
+			switch job.Status {
+			case
+				llama_client.StatusSuccess,
+				llama_client.StatusCancelled,
+				llama_client.StatusError,
+				llama_client.StatusPartialSuccess:
+				completed = true
+			}
+			time.Sleep(5 * time.Second)
+		}
+
+		jobRecord.Set("status", "CLASSIFY")
+		if err := app.Save(jobRecord); err != nil {
+			e.App.Logger().Error("Failed to save job record: " + err.Error())
+			return nil
+		}
+
+		return e.Next()
+	})
+
 	app.OnRecordAfterUpdateSuccess("jobs").BindFunc(func(e *core.RecordEvent) error {
 		job := e.Record
 		status := job.GetString("status")

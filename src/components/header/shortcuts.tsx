@@ -18,7 +18,7 @@ export function Shortcuts({ pathname, currentDealId }: { pathname: string; curre
   };
 
   return (
-    <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-1">
+    <div className="ml-auto mr-auto flex items-center gap-1">
       <Button
         variant={pathname === `/deals/${currentDealId}` ? "default" : "outline"}
         size="sm"
