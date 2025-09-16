@@ -187,14 +187,14 @@ export async function getJobs() {
 
 //PLAID
 export async function createLinkToken() {
-    return await pb.send<{ link_token: string }>('/plaid/create-link-token', {
+    return await pb.send<{ link_token: string }>('/api/plaid/create-link-token', {
         method: 'POST',
         body: JSON.stringify({ user: getUserId() })
     });
 }
 
 export async function setAccessToken(public_token: string) {
-    return await pb.send<{ access_token: string; item_id: string }>('/plaid/set-access-token', {
+    return await pb.send<{ access_token: string; item_id: string }>('/api/plaid/set-access-token', {
         method: 'POST',
         body: JSON.stringify({ public_token, user: getUserId() }),
     });

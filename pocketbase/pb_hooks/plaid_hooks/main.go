@@ -13,7 +13,7 @@ import (
 
 func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
-		se.Router.POST("/plaid/create-link-token", func(e *core.RequestEvent) error {
+		se.Router.POST("/api/plaid/create-link-token", func(e *core.RequestEvent) error {
 			var body CreateLinkTokenRequest
 			err := e.BindBody(&body)
 			if err != nil {
@@ -46,7 +46,7 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 			})
 		})
 
-		se.Router.POST("/plaid/set-access-token", func(e *core.RequestEvent) error {
+		se.Router.POST("/api/plaid/set-access-token", func(e *core.RequestEvent) error {
 			var body SetAccessTokenRequest
 			err := e.BindBody(&body)
 			if err != nil {
@@ -89,15 +89,13 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 			})
 		})
 
-		se.Router.POST("/plaid/webhook", func(e *core.RequestEvent) error {
+		se.Router.POST("/api/plaid/webhook", func(e *core.RequestEvent) error {
 			var body WebhookRequest
 			err := e.BindBody(&body)
 			if err != nil {
 				e.App.Logger().Error("Failed to read body: " + err.Error())
 				return err
 			}
-
-			e.App.Logger().Info(fmt.Sprintf("Received webhook: %+v", body))
 
 			accessTokenRecord, err := e.App.FindFirstRecordByData("plaid_tokens", "item_id", body.ItemID)
 			if err != nil {
@@ -160,7 +158,7 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 				}
 			}
 
-			return nil
+			return e.JSON(http.StatusOK, map[string]any{"status": "ok"})
 		})
 
 		return se.Next()
