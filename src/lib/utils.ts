@@ -97,17 +97,17 @@ export const mergeTransactionGroups = (groupedTransactions?: GroupedTransactions
   return groupedTransactions?.reduce((merged, current) => {
     const existingGroup = merged.find((group) =>
       areDescriptionsSimilar(
-        group.gdescription,
-        current.gdescription
+        group.gdescription as string,
+        current.gdescription as string
       )
     );
 
     if (existingGroup) {
-      existingGroup.total = (existingGroup.total || 0) + (current.total || 0);
+      existingGroup.total = (existingGroup.total as number || 0) + (current.total as number || 0);
       existingGroup.count = (existingGroup.count || 0) + (current.count || 0);
 
-      const existingDates = existingGroup.dates.split(",");
-      const currentDates = current.dates.split(",");
+      const existingDates = (existingGroup.dates as string).split(",");
+      const currentDates = (current.dates as string).split(",");
       existingGroup.dates = [...existingDates, ...currentDates].join(",");
     } else {
       merged.push({ ...current });
@@ -119,15 +119,15 @@ export const mergeTransactionGroups = (groupedTransactions?: GroupedTransactions
 
 export const convertGroupsToPayments = (groups: GroupedTransactionsResponse[]) => {
   return groups.map((group) => {
-    const dates = group.dates
+    const dates = (group.dates as string)
       .split(",")
       .map((d) => new Date(d.trim()))
       .sort();
 
     return {
       description: group.gdescription,
-      frequency: calculatePaymentFrequency(group.dates),
-      amount: (group.total || 0) / (group.count || 1),
+      frequency: calculatePaymentFrequency(group.dates as string),
+      amount: (group.total as number || 0) / (group.count || 1),
       total: group.total || 0,
       count: group.count || 0,
       dates: group.dates,

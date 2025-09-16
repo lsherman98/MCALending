@@ -452,13 +452,13 @@ export function Charts({ dealId }: { dealId: string }) {
                   return (
                     <div key={index} className="flex justify-between items-center p-2 border rounded-md">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{payment.description || "Unknown"}</p>
+                        <p className="text-sm font-medium truncate">{payment.description as string || "Unknown"}</p>
                         <p className="text-xs text-muted-foreground">
                           {payment.count} transactions • {payment.frequency}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold">{formatCurrency(payment.total)}</p>
+                        <p className="text-sm font-bold">{formatCurrency(payment.total as string)}</p>
                         <p className="text-xs text-muted-foreground">{formatCurrency(payment.amount)} avg</p>
                       </div>
                     </div>
@@ -484,13 +484,13 @@ export function Charts({ dealId }: { dealId: string }) {
                   return (
                     <div key={index} className="flex justify-between items-center p-2 border rounded-md">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{funding.description || "Unknown"}</p>
+                        <p className="text-sm font-medium truncate">{funding.description as string || "Unknown"}</p>
                         <p className="text-xs text-muted-foreground">
                           {funding.count} transactions • {funding.frequency}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold">{formatCurrency(funding.total)}</p>
+                        <p className="text-sm font-bold">{formatCurrency(funding.total as string)}</p>
                         <p className="text-xs text-muted-foreground">{formatCurrency(funding.amount)} avg</p>
                       </div>
                     </div>

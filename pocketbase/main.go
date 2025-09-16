@@ -18,8 +18,10 @@ import (
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/extraction_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/full_text_search"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/job_hooks"
+	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/plaid_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/statement_hooks"
 	"github.com/lsherman98/mca-platform/pocketbase/pb_hooks/webhooks"
+	"github.com/lsherman98/mca-platform/pocketbase/plaid_client"
 	"google.golang.org/genai"
 )
 
@@ -31,6 +33,11 @@ func main() {
 	}
 
 	llama, err := llama_client.New(app)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	plaid, err := plaid_client.New(app)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,6 +71,10 @@ func main() {
 	}
 
 	if err := full_text_search.Init(app, "transactions", "deals"); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := plaid_hooks.Init(app, plaid); err != nil {
 		log.Fatal(err)
 	}
 

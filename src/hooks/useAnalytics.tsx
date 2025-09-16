@@ -22,12 +22,11 @@ export function useAnalytics(dealId: string) {
 
   const numberOfMonths = transactionTotals?.length || 0;
 
-  const totalFunding = transactionTotals?.reduce((sum, t) => sum + t.funding, 0) || 0;
-  const totalPayments = transactionTotals?.reduce((sum, t) => sum + t.payments, 0) || 0;
-  const totalRevenue = transactionTotals?.reduce((sum, t) => sum + t.revenue, 0) || 0;
-  const totalExpenses = transactionTotals?.reduce((sum, t) => sum + t.expenses, 0) || 0;
-  const totalTransfers = transactionTotals?.reduce((sum, t) => sum + t.transfers, 0) || 0;
-
+  const totalFunding = transactionTotals?.reduce((sum, t) => sum + (t.funding as number), 0) || 0;
+  const totalPayments = transactionTotals?.reduce((sum, t) => sum + (t.payments as number), 0) || 0;
+  const totalRevenue = transactionTotals?.reduce((sum, t) => sum + (t.revenue as number), 0) || 0;
+  const totalExpenses = transactionTotals?.reduce((sum, t) => sum + (t.expenses as number), 0) || 0;
+  const totalTransfers = transactionTotals?.reduce((sum, t) => sum + (t.transfers as number), 0) || 0;
   const averageMonthlyRevenue = totalRevenue / numberOfMonths;
   const averageMonthlyFunding = totalFunding / numberOfMonths;
   const averageMonthlyPayments = totalPayments / numberOfMonths;

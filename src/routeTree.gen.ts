@@ -14,6 +14,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppTransactionsIndexRouteImport } from './routes/_app/transactions/index'
+import { Route as AppPlaidIndexRouteImport } from './routes/_app/plaid/index'
 import { Route as AppDealsIndexRouteImport } from './routes/_app/deals/index'
 import { Route as AppAnalyticsIndexRouteImport } from './routes/_app/analytics/index'
 import { Route as AppTransactionsDealIdRouteImport } from './routes/_app/transactions/$dealId'
@@ -40,6 +41,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppTransactionsIndexRoute = AppTransactionsIndexRouteImport.update({
   id: '/transactions/',
   path: '/transactions/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlaidIndexRoute = AppPlaidIndexRouteImport.update({
+  id: '/plaid/',
+  path: '/plaid/',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDealsIndexRoute = AppDealsIndexRouteImport.update({
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/transactions/$dealId': typeof AppTransactionsDealIdRoute
   '/analytics': typeof AppAnalyticsIndexRoute
   '/deals': typeof AppDealsIndexRoute
+  '/plaid': typeof AppPlaidIndexRoute
   '/transactions': typeof AppTransactionsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/transactions/$dealId': typeof AppTransactionsDealIdRoute
   '/analytics': typeof AppAnalyticsIndexRoute
   '/deals': typeof AppDealsIndexRoute
+  '/plaid': typeof AppPlaidIndexRoute
   '/transactions': typeof AppTransactionsIndexRoute
 }
 export interface FileRoutesById {
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/_app/transactions/$dealId': typeof AppTransactionsDealIdRoute
   '/_app/analytics/': typeof AppAnalyticsIndexRoute
   '/_app/deals/': typeof AppDealsIndexRoute
+  '/_app/plaid/': typeof AppPlaidIndexRoute
   '/_app/transactions/': typeof AppTransactionsIndexRoute
 }
 export interface FileRouteTypes {
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/transactions/$dealId'
     | '/analytics'
     | '/deals'
+    | '/plaid'
     | '/transactions'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/transactions/$dealId'
     | '/analytics'
     | '/deals'
+    | '/plaid'
     | '/transactions'
   id:
     | '__root__'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/_app/transactions/$dealId'
     | '/_app/analytics/'
     | '/_app/deals/'
+    | '/_app/plaid/'
     | '/_app/transactions/'
   fileRoutesById: FileRoutesById
 }
@@ -178,6 +190,13 @@ declare module '@tanstack/react-router' {
       path: '/transactions'
       fullPath: '/transactions'
       preLoaderRoute: typeof AppTransactionsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/plaid/': {
+      id: '/_app/plaid/'
+      path: '/plaid'
+      fullPath: '/plaid'
+      preLoaderRoute: typeof AppPlaidIndexRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/deals/': {
@@ -233,6 +252,7 @@ interface AppRouteChildren {
   AppTransactionsDealIdRoute: typeof AppTransactionsDealIdRoute
   AppAnalyticsIndexRoute: typeof AppAnalyticsIndexRoute
   AppDealsIndexRoute: typeof AppDealsIndexRoute
+  AppPlaidIndexRoute: typeof AppPlaidIndexRoute
   AppTransactionsIndexRoute: typeof AppTransactionsIndexRoute
 }
 
@@ -244,6 +264,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppTransactionsDealIdRoute: AppTransactionsDealIdRoute,
   AppAnalyticsIndexRoute: AppAnalyticsIndexRoute,
   AppDealsIndexRoute: AppDealsIndexRoute,
+  AppPlaidIndexRoute: AppPlaidIndexRoute,
   AppTransactionsIndexRoute: AppTransactionsIndexRoute,
 }
 

@@ -22,11 +22,13 @@ export enum Collections {
 	GroupedTransactions = "grouped_transactions",
 	Jobs = "jobs",
 	Organizations = "organizations",
+	PlaidTokens = "plaid_tokens",
 	StatementDetails = "statement_details",
 	Statements = "statements",
 	TotalsByMonth = "totals_by_month",
 	Transactions = "transactions",
 	Users = "users",
+	WebhookEvents = "webhook_events",
 }
 
 // Alias types for improved usability
@@ -105,11 +107,11 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type AvgDailyBalanceRecord<Tmonth = unknown> = {
-	balance?: number
+export type AvgDailyBalanceRecord<Taverage_daily_ending_balance = unknown> = {
+	average_daily_ending_balance?: null | Taverage_daily_ending_balance
 	deal?: string
 	id: string
-	month?: null | Tmonth
+	month?: string
 }
 
 export type BalanceOverTimeRecord = {
@@ -132,8 +134,8 @@ export type ChecksPaidRecord = {
 	updated?: IsoDateString
 }
 
-export type CreditsAndDebitsRecord = {
-	credits?: number
+export type CreditsAndDebitsRecord<Tcredits = unknown> = {
+	credits?: null | Tcredits
 	date?: IsoDateString
 	deal?: string
 	debits?: number
@@ -178,10 +180,9 @@ export type DealsRecord = {
 	zip_code?: string
 }
 
-export type ExtractionsRecord<Tdata = unknown> = {
+export type ExtractionsRecord = {
 	created?: IsoDateString
-	data?: null | Tdata
-	file: string
+	data: string
 	id: string
 	job: RecordIdString
 	statement?: RecordIdString
@@ -196,13 +197,13 @@ export enum GroupedTransactionsTypeOptions {
 	"payment" = "payment",
 	"expense" = "expense",
 }
-export type GroupedTransactionsRecord = {
+export type GroupedTransactionsRecord<Tdates = unknown, Tgdescription = unknown, Ttotal = unknown> = {
 	count?: number
-	dates?: string
+	dates?: null | Tdates
 	deal: RecordIdString
-	gdescription?: string
+	gdescription?: null | Tgdescription
 	id: string
-	total?: number
+	total?: null | Ttotal
 	type: GroupedTransactionsTypeOptions
 }
 
@@ -244,6 +245,15 @@ export type OrganizationsRecord = {
 	website?: string
 }
 
+export type PlaidTokensRecord = {
+	access_token?: string
+	created?: IsoDateString
+	id: string
+	item_id?: string
+	updated?: IsoDateString
+	user?: RecordIdString
+}
+
 export type StatementDetailsRecord = {
 	beginning_balance?: number
 	created?: IsoDateString
@@ -273,15 +283,15 @@ export type StatementsRecord = {
 	updated?: IsoDateString
 }
 
-export type TotalsByMonthRecord<Tdate = unknown> = {
+export type TotalsByMonthRecord<Tdate = unknown, Texpenses = unknown, Tfunding = unknown, Tpayments = unknown, Trevenue = unknown, Ttransfers = unknown> = {
 	date?: null | Tdate
 	deal?: string
-	expenses?: number
-	funding?: number
+	expenses?: null | Texpenses
+	funding?: null | Tfunding
 	id: string
-	payments?: number
-	revenue?: number
-	transfers?: number
+	payments?: null | Tpayments
+	revenue?: null | Trevenue
+	transfers?: null | Ttransfers
 }
 
 export enum TransactionsTypeOptions {
@@ -323,28 +333,40 @@ export type UsersRecord = {
 	verified?: boolean
 }
 
+export type WebhookEventsRecord = {
+	created?: IsoDateString
+	event_id?: string
+	id: string
+	job_id?: string
+	run_id?: string
+	type?: string
+	updated?: IsoDateString
+}
+
 // Response types include system fields and match responses from the PocketBase API
 export type AuthoriginsResponse<Texpand = unknown> = Required<AuthoriginsRecord> & BaseSystemFields<Texpand>
 export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRecord> & BaseSystemFields<Texpand>
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type AvgDailyBalanceResponse<Tmonth = unknown, Texpand = unknown> = Required<AvgDailyBalanceRecord<Tmonth>> & BaseSystemFields<Texpand>
+export type AvgDailyBalanceResponse<Taverage_daily_ending_balance = unknown, Texpand = unknown> = Required<AvgDailyBalanceRecord<Taverage_daily_ending_balance>> & BaseSystemFields<Texpand>
 export type BalanceOverTimeResponse<Texpand = unknown> = Required<BalanceOverTimeRecord> & BaseSystemFields<Texpand>
 export type ChecksPaidResponse<Texpand = unknown> = Required<ChecksPaidRecord> & BaseSystemFields<Texpand>
-export type CreditsAndDebitsResponse<Texpand = unknown> = Required<CreditsAndDebitsRecord> & BaseSystemFields<Texpand>
+export type CreditsAndDebitsResponse<Tcredits = unknown, Texpand = unknown> = Required<CreditsAndDebitsRecord<Tcredits>> & BaseSystemFields<Texpand>
 export type CurrentDealResponse<Texpand = unknown> = Required<CurrentDealRecord> & BaseSystemFields<Texpand>
 export type DailyBalanceResponse<Texpand = unknown> = Required<DailyBalanceRecord> & BaseSystemFields<Texpand>
 export type DealsResponse<Texpand = unknown> = Required<DealsRecord> & BaseSystemFields<Texpand>
-export type ExtractionsResponse<Tdata = unknown, Texpand = unknown> = Required<ExtractionsRecord<Tdata>> & BaseSystemFields<Texpand>
-export type GroupedTransactionsResponse<Texpand = unknown> = Required<GroupedTransactionsRecord> & BaseSystemFields<Texpand>
+export type ExtractionsResponse<Texpand = unknown> = Required<ExtractionsRecord> & BaseSystemFields<Texpand>
+export type GroupedTransactionsResponse<Tdates = unknown, Tgdescription = unknown, Ttotal = unknown, Texpand = unknown> = Required<GroupedTransactionsRecord<Tdates, Tgdescription, Ttotal>> & BaseSystemFields<Texpand>
 export type JobsResponse<Tmetadata = unknown, Texpand = unknown> = Required<JobsRecord<Tmetadata>> & BaseSystemFields<Texpand>
 export type OrganizationsResponse<Texpand = unknown> = Required<OrganizationsRecord> & BaseSystemFields<Texpand>
+export type PlaidTokensResponse<Texpand = unknown> = Required<PlaidTokensRecord> & BaseSystemFields<Texpand>
 export type StatementDetailsResponse<Texpand = unknown> = Required<StatementDetailsRecord> & BaseSystemFields<Texpand>
 export type StatementsResponse<Texpand = unknown> = Required<StatementsRecord> & BaseSystemFields<Texpand>
-export type TotalsByMonthResponse<Tdate = unknown, Texpand = unknown> = Required<TotalsByMonthRecord<Tdate>> & BaseSystemFields<Texpand>
+export type TotalsByMonthResponse<Tdate = unknown, Texpenses = unknown, Tfunding = unknown, Tpayments = unknown, Trevenue = unknown, Ttransfers = unknown, Texpand = unknown> = Required<TotalsByMonthRecord<Tdate, Texpenses, Tfunding, Tpayments, Trevenue, Ttransfers>> & BaseSystemFields<Texpand>
 export type TransactionsResponse<Texpand = unknown> = Required<TransactionsRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
+export type WebhookEventsResponse<Texpand = unknown> = Required<WebhookEventsRecord> & BaseSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
@@ -365,11 +387,13 @@ export type CollectionRecords = {
 	grouped_transactions: GroupedTransactionsRecord
 	jobs: JobsRecord
 	organizations: OrganizationsRecord
+	plaid_tokens: PlaidTokensRecord
 	statement_details: StatementDetailsRecord
 	statements: StatementsRecord
 	totals_by_month: TotalsByMonthRecord
 	transactions: TransactionsRecord
 	users: UsersRecord
+	webhook_events: WebhookEventsRecord
 }
 
 export type CollectionResponses = {
@@ -389,11 +413,13 @@ export type CollectionResponses = {
 	grouped_transactions: GroupedTransactionsResponse
 	jobs: JobsResponse
 	organizations: OrganizationsResponse
+	plaid_tokens: PlaidTokensResponse
 	statement_details: StatementDetailsResponse
 	statements: StatementsResponse
 	totals_by_month: TotalsByMonthResponse
 	transactions: TransactionsResponse
 	users: UsersResponse
+	webhook_events: WebhookEventsResponse
 }
 
 // Type for usage with type asserted PocketBase instance
@@ -416,9 +442,11 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'grouped_transactions'): RecordService<GroupedTransactionsResponse>
 	collection(idOrName: 'jobs'): RecordService<JobsResponse>
 	collection(idOrName: 'organizations'): RecordService<OrganizationsResponse>
+	collection(idOrName: 'plaid_tokens'): RecordService<PlaidTokensResponse>
 	collection(idOrName: 'statement_details'): RecordService<StatementDetailsResponse>
 	collection(idOrName: 'statements'): RecordService<StatementsResponse>
 	collection(idOrName: 'totals_by_month'): RecordService<TotalsByMonthResponse>
 	collection(idOrName: 'transactions'): RecordService<TransactionsResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>
+	collection(idOrName: 'webhook_events'): RecordService<WebhookEventsResponse>
 }
