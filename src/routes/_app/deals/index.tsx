@@ -79,7 +79,7 @@ function RouteComponent() {
             <TableHead className="min-w-[150px] max-w-[150px]">Title</TableHead>
             <TableHead className="min-w-[250px] max-w-[250px]">Merchant</TableHead>
             <TableHead className="min-w-[150px] max-w-[150px]">Industry</TableHead>
-            <TableHead className="min-w-[150px] max-w-[150px]">Bank</TableHead>
+            <TableHead className="min-w-[200px] max-w-[200px]">Bank</TableHead>
             <TableHead className="min-w-[150px] max-w-[150px]">Credit Score</TableHead>
             <TableHead className="min-w-[150px] max-w-[150px]">State</TableHead>
             <TableHead className="min-w-[150px] max-w-[150px]">Created</TableHead>
@@ -96,7 +96,7 @@ function RouteComponent() {
                 <TableCell className="min-w-[150px] max-w-[150px]">{deal.title}</TableCell>
                 <TableCell className="min-w-[250px] max-w-[250px]">{deal.merchant}</TableCell>
                 <TableCell className="min-w-[150px] max-w-[150px]">{deal.industry}</TableCell>
-                <TableCell className="min-w-[150px] max-w-[150px]">{deal.bank}</TableCell>
+                <TableCell className="min-w-[200px] max-w-[200px] truncate">{deal.bank}</TableCell>
                 <TableCell className="min-w-[150px] max-w-[150px]">{deal.credit_score}</TableCell>
                 <TableCell className="min-w-[150px] max-w-[150px]">{deal.state}</TableCell>
                 <TableCell className="min-w-[150px] max-w-[150px]">

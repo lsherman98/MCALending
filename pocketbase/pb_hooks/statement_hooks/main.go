@@ -49,11 +49,14 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		}
 
 		statement := e.Record
+		jobRecord := core.NewRecord(jobsCollection)
+		jobRecord.Set("deal", statement.GetString("deal"))
+		jobRecord.Set("statement", statement.Id)
 
 		routine.FireAndForget(func() {
 			token, err := e.Auth.NewFileToken()
 			if err != nil {
-				e.App.Logger().Error("Statement: failed to create file token: " + err.Error())
+				handleError(e, jobRecord, "failed to create file token", err.Error())
 				return
 			}
 
@@ -69,11 +72,11 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 				URL:  url,
 			})
 			if err != nil {
-				e.App.Logger().Error("Statement: failed to upload file to LlamaIndex: " + err.Error())
+				handleError(e, jobRecord, "failed to upload file to LlamaIndex", err.Error())
+				return
 			}
 
 			statement.Set("llama_index_file_id", upload.ID)
-
 			if err := e.App.Save(statement); err != nil {
 				e.App.Logger().Error("Statement: failed to save statement record: " + err.Error())
 			}
@@ -90,17 +93,17 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 				},
 			})
 			if err != nil {
-				e.App.Logger().Error("Statement: failed to run extraction job: " + err.Error())
+				handleError(e, jobRecord, "failed to run extraction job", err.Error())
+				return
 			}
 
 			run, err := llama.GetRunByJobID(context.Background(), job.ID)
 			if err != nil {
-				e.App.Logger().Error("Statement: failed to get run information: " + err.Error())
+				handleError(e, jobRecord, "failed to get run information", err.Error())
 				return
 			}
 
-			jobRecord := core.NewRecord(jobsCollection)
-			SetJobFields(jobRecord, job.ID, run.ID, agentId, statement.GetString("deal"), statement.Id, job.Status)
+			SetJobFields(jobRecord, job.ID, run.ID, agentId, job.Status)
 			if err := e.App.Save(jobRecord); err != nil {
 				e.App.Logger().Error("Statement: failed to save job record: " + err.Error())
 			}
@@ -110,4 +113,20 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 	})
 
 	return nil
+}
+
+func handleError(e *core.RecordRequestEvent, jobRecord *core.Record, message, err string) {
+	e.App.Logger().Error("Statement: " + message + ": " + err)
+	jobRecord.Set("error", message)
+	jobRecord.Set("status", llama_client.StatusError)
+	if err := e.App.Save(jobRecord); err != nil {
+		e.App.Logger().Error("Statement: failed to save job record: " + err.Error())
+	}
+}
+
+func SetJobFields(job *core.Record, jobId, runId, agentId string, status llama_client.StatusEnum) {
+	job.Set("job_id", jobId)
+	job.Set("run_id", runId)
+	job.Set("status", status)
+	job.Set("agent_id", agentId)
 }

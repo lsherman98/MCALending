@@ -193,9 +193,9 @@ export async function createLinkToken() {
     });
 }
 
-export async function setAccessToken(public_token: string) {
+export async function setAccessToken(public_token: string, deal?: string) {
     return await pb.send<{ access_token: string; item_id: string }>('/api/plaid/set-access-token', {
         method: 'POST',
-        body: JSON.stringify({ public_token, user: getUserId() }),
+        body: JSON.stringify({ public_token, user: getUserId(), deal }),
     });
 }

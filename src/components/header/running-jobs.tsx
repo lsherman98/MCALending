@@ -43,7 +43,7 @@ export function RunningJobs({}) {
               <div key={job.id} className="flex items-center justify-between mb-2 ml-2">
                 <div className="flex items-center gap-2">
                   <File size={12} />
-                  <span className="text-xs">{(job.expand as ExpandStatement).statement.filename}</span>
+                  <span className="text-xs max-w-30 truncate">{(job.expand as ExpandStatement).statement.filename}</span>
                 </div>
                 {job.status === "PENDING" && (
                   <div className="flex items-center gap-2">

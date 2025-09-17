@@ -17,13 +17,13 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 			var body CreateLinkTokenRequest
 			err := e.BindBody(&body)
 			if err != nil {
-				e.App.Logger().Error("Failed to read body: " + err.Error())
-				return err
+				e.App.Logger().Error("Plaid: failed to read body: " + err.Error())
+				return e.BadRequestError("Invalid request body", err)
 			}
 
 			if body.UserID == "" {
-				e.App.Logger().Error("User is required")
-				return nil
+				e.App.Logger().Error("Plaid: user id is missing from body")
+				return e.BadRequestError("User ID is required", nil)
 			}
 
 			user := plaid.LinkTokenCreateRequestUser{
@@ -36,9 +36,8 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 
 			resp, _, err := plaid_client.PlaidApi.LinkTokenCreate(context.Background()).LinkTokenCreateRequest(*request).Execute()
 			if err != nil {
-				e.App.Logger().Error("Failed to create link token: " + err.Error())
-				e.App.Logger().Error(fmt.Sprintf("%+v", resp))
-				return err
+				e.App.Logger().Error("Plaid: Failed to create link token: " + err.Error())
+				return e.InternalServerError("Failed to create link token", err)
 			}
 
 			return e.JSON(http.StatusOK, map[string]any{
@@ -50,8 +49,8 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 			var body SetAccessTokenRequest
 			err := e.BindBody(&body)
 			if err != nil {
-				e.App.Logger().Error("Failed to read body: " + err.Error())
-				return err
+				e.App.Logger().Error("Plaid: failed to read body: " + err.Error())
+				return e.BadRequestError("Invalid request body", err)
 			}
 
 			exchangePublicTokenReq := plaid.NewItemPublicTokenExchangeRequest(body.PublicToken)
@@ -59,28 +58,25 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 				*exchangePublicTokenReq,
 			).Execute()
 			if err != nil {
-				e.App.Logger().Error("Failed to exchange public token: " + err.Error())
-				return err
+				e.App.Logger().Error("Plaid: failed to exchange public token: " + err.Error())
+				return e.InternalServerError("Failed to exchange public token", err)
 			}
 
 			accessToken := exchangePublicTokenResp.GetAccessToken()
 			itemID := exchangePublicTokenResp.GetItemId()
-			userId := body.UserID
 
 			plaidTokensCollection, err := e.App.FindCollectionByNameOrId("plaid_tokens")
 			if err != nil {
-				e.App.Logger().Error("Failed to find plaid_tokens collection: " + err.Error())
-				return err
+				return e.InternalServerError("Failed to find collection", err)
 			}
 
 			record := core.NewRecord(plaidTokensCollection)
-			record.Set("user", userId)
+			record.Set("user", body.User)
+			record.Set("deal", body.Deal)
 			record.Set("access_token", accessToken)
 			record.Set("item_id", itemID)
-
 			if err := e.App.Save(record); err != nil {
-				e.App.Logger().Error("Failed to save plaid token record: " + err.Error())
-				return err
+				return e.InternalServerError("Failed to save plaid token record", err)
 			}
 
 			return e.JSON(http.StatusOK, map[string]any{
@@ -93,18 +89,19 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 			var body WebhookRequest
 			err := e.BindBody(&body)
 			if err != nil {
-				e.App.Logger().Error("Failed to read body: " + err.Error())
-				return err
+				e.App.Logger().Error("Plaid: failed to read body: " + err.Error())
+				return e.BadRequestError("Invalid request body", err)
 			}
 
 			accessTokenRecord, err := e.App.FindFirstRecordByData("plaid_tokens", "item_id", body.ItemID)
 			if err != nil {
-				e.App.Logger().Error("Failed to find access token record: " + err.Error())
-				return err
+				e.App.Logger().Error("Plaid: failed to find access token record: " + err.Error())
+				return e.InternalServerError("Failed to find access token record", err)
 			}
 
 			accessToken := accessTokenRecord.GetString("access_token")
 			userId := accessTokenRecord.GetString("user")
+			deal := accessTokenRecord.GetString("deal")
 
 			switch body.WebhookCode {
 			case "HISTORICAL_UPDATE":
@@ -129,14 +126,13 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 
 				transactionsResp, _, err := plaid_client.PlaidApi.TransactionsGet(e.Request.Context()).TransactionsGetRequest(*request).Execute()
 				if err != nil {
-					e.App.Logger().Error("Failed to get transactions: " + err.Error())
-					return err
+					e.App.Logger().Error("Plaid: failed to get transactions: " + err.Error())
+					return e.InternalServerError("Failed to get transactions", err)
 				}
 
 				plaidTransactionsCollection, err := e.App.FindCollectionByNameOrId("plaid_transactions")
 				if err != nil {
-					e.App.Logger().Error("Failed to find plaid_transactions collection: " + err.Error())
-					return err
+					return e.InternalServerError("Failed to find collection", err)
 				}
 
 				transactions := transactionsResp.GetTransactions()
@@ -148,14 +144,18 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 					record.Set("name", transaction.Name)
 					record.Set("merchant_name", transaction.MerchantName.Get())
 					record.Set("website", transaction.Website.Get())
-					record.Set("user", userId)
 					record.Set("description", transaction.OriginalDescription.Get())
+					record.Set("user", userId)
+					record.Set("deal", deal)
 
 					if err := e.App.Save(record); err != nil {
-						e.App.Logger().Error("Failed to save plaid transaction record: " + err.Error())
+						e.App.Logger().Error("Plaid: failed to save plaid transaction record: " + err.Error())
 						return err
 					}
 				}
+			default:
+				e.App.Logger().Info(fmt.Sprintf("Plaid: received unsupported webhook code: %s", body.WebhookCode))
+				e.JSON(http.StatusOK, map[string]any{"status": "ok"})
 			}
 
 			return e.JSON(http.StatusOK, map[string]any{"status": "ok"})

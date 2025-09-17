@@ -2,9 +2,11 @@
 // Upon rendering of App component, make a request to create and
 // obtain a link token to be used in the Link component
 import { createLinkToken, setAccessToken } from "@/lib/api/api";
+import { useCurrentDealStore } from "@/lib/stores/current-deal-store";
 import React, { useEffect, useState } from "react";
 import { usePlaidLink } from "react-plaid-link";
 const PlaidLink = () => {
+  const { currentDeal } = useCurrentDealStore();
   const [linkToken, setLinkToken] = useState<string | null>(null);
   const generateToken = async () => {
     const data = await createLinkToken();
@@ -15,7 +17,7 @@ const PlaidLink = () => {
     generateToken();
   }, []);
 
-  return linkToken != null ? <Link linkToken={linkToken} /> : <></>;
+  return linkToken != null ? <Link linkToken={linkToken} deal={currentDeal?.id} /> : <></>;
 };
 
 // LINK COMPONENT
@@ -23,11 +25,12 @@ const PlaidLink = () => {
 // in configuration to initialize Plaid Link
 interface LinkProps {
   linkToken: string | null;
+  deal?: string;
 }
 
 const Link: React.FC<LinkProps> = (props: LinkProps) => {
   const onSuccess = React.useCallback(async (public_token: any, _: any) => {
-    await setAccessToken(public_token);
+    await setAccessToken(public_token, props.deal);
   }, []);
 
   const config: Parameters<typeof usePlaidLink>[0] = {

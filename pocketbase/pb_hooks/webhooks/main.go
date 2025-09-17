@@ -8,7 +8,6 @@ import (
 )
 
 func Init(app *pocketbase.PocketBase) error {
-
 	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
 		se.Router.POST("/webhooks/llamaindex", func(e *core.RequestEvent) error {
 			event := LlamaEvent{}
@@ -16,17 +15,16 @@ func Init(app *pocketbase.PocketBase) error {
 				return e.BadRequestError("LlamaIndex Webhook: invalid request body", err)
 			}
 
-            webhookEventsCollection, err := app.FindCollectionByNameOrId("webhook_events")
+            llamaWebhooksCollection, err := app.FindCollectionByNameOrId("llama_webhooks")
             if err != nil {
-                return err
+                return e.InternalServerError("LlamaIndex Webhook: failed to find llama_webhooks collection", err)
             }
 
-            eventRecord := core.NewRecord(webhookEventsCollection)
+            eventRecord := core.NewRecord(llamaWebhooksCollection)
             eventRecord.Set("event_id", event.EventID)
             eventRecord.Set("type", event.EventType)
             eventRecord.Set("run_id", event.Data.RunID)
             eventRecord.Set("job_id", event.Data.JobID)
-
             if err := e.App.Save(eventRecord); err != nil {
                 e.App.Logger().Error("LlamaIndex Webhook: failed to save webhook event record: " + err.Error())
             }
@@ -34,7 +32,7 @@ func Init(app *pocketbase.PocketBase) error {
 			job, err := app.FindFirstRecordByData("jobs", "job_id", event.Data.JobID)
 			if err != nil {
 				e.App.Logger().Error("LlamaIndex Webhook: failed to find job record: " + err.Error())
-				return err
+				return e.InternalServerError("LlamaIndex Webhook: failed to find job record", err)
 			}
 
 			switch event.EventType {
