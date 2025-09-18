@@ -1,10 +1,10 @@
 import type { StatementsResponse } from "@/lib/pocketbase-types";
 import { Eye, MoreVertical } from "lucide-react";
-import { Button } from "./ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Button } from "../ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { useDeleteStatement } from "@/lib/api/mutations";
-import { PDFViewer } from "./pdf-viewer";
+import { PDFViewer } from "../pdf-viewer";
 import { useState } from "react";
 import { useGetStatementUrl } from "@/lib/api/queries";
 

@@ -66,7 +66,7 @@ type WebhookConfiguration struct {
 type JobResultResponse struct {
 	RunID              string             `json:"run_id"`
 	ExtractionAgentID  string             `json:"extraction_agent_id"`
-	Data               Statement          `json:"data"`
+	Data               map[string]any     `json:"data"`
 	ExtractionMetadata ExtractionMetadata `json:"extraction_metadata"`
 }
 
@@ -77,65 +77,4 @@ type ExtractionMetadata struct {
 		OutputTokens   int `json:"num_output_tokens"`
 		PagesExtracted int `json:"num_pages_extracted"`
 	} `json:"usage"`
-}
-
-type Statement struct {
-	Account      AccountSummary      `json:"account_summary"`
-	Bank         BankInformation     `json:"bank_information"`
-	Business     BusinessInformation `json:"business_information"`
-	Checks       []CheckPaid         `json:"checks_paid"`
-	DailyBalance []DailyBalance      `json:"daily_balance_summary"`
-	Fees         FeeSummary          `json:"fee_summary"`
-	Transactions []Transaction       `json:"transactions"`
-}
-
-type AccountSummary struct {
-	BeginningBalance float64 `json:"beginning_balance"`
-	DaysInPeriod     string  `json:"days_in_period"`
-	EndingBalance    float64 `json:"ending_balance"`
-	InterestPaid     float64 `json:"interest_paid"`
-	ServiceCharge    float64 `json:"service_charge"`
-	Debits           float64 `json:"total_checks_debits"`
-	Credits          float64 `json:"total_deposits_credits"`
-}
-
-type BankInformation struct {
-	AccountEnding  string `json:"account_ending"`
-	Name           string `json:"bank_name"`
-	PrimaryAccount string `json:"primary_account"`
-	StatementDate  string `json:"statement_date"`
-}
-
-type BusinessInformation struct {
-	AccountNumber string `json:"account_number"`
-	AccountTitle  string `json:"account_title"`
-	Address       string `json:"address"`
-	City          string `json:"city"`
-	State         string `json:"state"`
-	ZipCode       string `json:"zip_code"`
-	Name          string `json:"company_name"`
-}
-
-type CheckPaid struct {
-	Amount      float64 `json:"amount"`
-	CheckNumber string  `json:"check_number"`
-	Date        string  `json:"date"`
-	Reference   string  `json:"reference"`
-}
-
-type DailyBalance struct {
-	Balance float64 `json:"balance"`
-	Date    string  `json:"date"`
-}
-
-type FeeSummary struct {
-	OverdraftFee     float64 `json:"total_overdraft_fee"`
-	ReturnedItemFees float64 `json:"total_returned_item_fees"`
-}
-
-type Transaction struct {
-	Amount      float64 `json:"amount"`
-	Date        string  `json:"date"`
-	Description string  `json:"description"`
-	TraceNumber *string `json:"trace_number"`
 }

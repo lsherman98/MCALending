@@ -1,5 +1,5 @@
 import { CheckCircleIcon, LoaderCircle, Trash } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { formatFileSize } from "@/lib/utils";
 
 export function UploadedFile({

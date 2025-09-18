@@ -199,3 +199,11 @@ export async function setAccessToken(public_token: string, deal?: string) {
         body: JSON.stringify({ public_token, user: getUserId(), deal }),
     });
 }
+
+// AGENTS
+
+export async function getAgents() {
+    return await pb.collection(Collections.ExtractionAgents).getFullList({
+        sort: 'name'
+    });
+}

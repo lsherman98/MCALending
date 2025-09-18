@@ -21,10 +21,6 @@ func buildUrl(statement *core.Record, token string) string {
 	)
 }
 
-const (
-	agentId = "75a67a3c-c668-4a2a-8acb-bed0d5111e12"
-)
-
 func buildS3Url(collectionId, recordId, filename string) string {
 	return fmt.Sprintf(
 		"https://storage.googleapis.com/%s/%s/%s/%s",
@@ -47,8 +43,17 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		if err != nil {
 			return err
 		}
+		
+		var body map[string]string
+		err = e.BindBody(&body)
+		if err != nil {
+			e.App.Logger().Error("Statement: failed to read body: " + err.Error())
+			return err
+		}
 
 		statement := e.Record
+		agent := body["agent"]
+
 		jobRecord := core.NewRecord(jobsCollection)
 		jobRecord.Set("deal", statement.GetString("deal"))
 		jobRecord.Set("statement", statement.Id)
@@ -83,7 +88,7 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 
 			job, err := llama.RunJob(context.Background(), llama_client.JobRequest{
 				FileID:            upload.ID,
-				ExtractionAgentID: agentId,
+				ExtractionAgentID: agent,
 				WebhookConfigurations: []llama_client.WebhookConfiguration{
 					{
 						WebhookURL:          "https://mca.levisherman.xyz/webhooks/llamaindex",
@@ -103,7 +108,7 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 				return
 			}
 
-			SetJobFields(jobRecord, job.ID, run.ID, agentId, job.Status)
+			SetJobFields(jobRecord, job.ID, run.ID, agent, job.Status)
 			if err := e.App.Save(jobRecord); err != nil {
 				e.App.Logger().Error("Statement: failed to save job record: " + err.Error())
 			}

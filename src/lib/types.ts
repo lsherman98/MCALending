@@ -6,7 +6,7 @@ export type Upload = {
     error?: string;
 };
 
-export type UploadStatementData = Omit<StatementsRecord, 'file' | 'id'> & { file: File; id?: string };
+export type UploadStatementData = Omit<StatementsRecord, 'file' | 'id' | 'agent'> & { file: File; agent: string; id?: string };
 
 export type ExpandDeal = {
     deal: DealsResponse

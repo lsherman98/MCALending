@@ -1,12 +1,14 @@
-import { CloudUploadIcon } from "lucide-react";
+import { CloudUploadIcon, CircleAlert } from "lucide-react";
 import { Dropzone, DropZoneArea, DropzoneTrigger, useDropzone } from "@/components/dropzone";
 import { toast } from "sonner";
 import type { Upload } from "@/lib/types";
-import { UploadedFile } from "@/components/uploaded-file";
-import { Button } from "./ui/button";
-import { Progress } from "./ui/progress";
+import { UploadedFile } from "@/components/deals/uploaded-file";
+import { Button } from "../ui/button";
+import { Progress } from "../ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import type { StatementsResponse } from "@/lib/pocketbase-types";
 import { UploadedStatement } from "./uploaded-statement";
+import { useGetAgents } from "@/lib/api/queries";
 
 export function FileUpload({
   uploads,
@@ -14,13 +16,19 @@ export function FileUpload({
   handleUpload,
   disabled,
   statements,
+  agentId,
+  setAgentId,
 }: {
   uploads: Upload[];
   setUploads: React.Dispatch<React.SetStateAction<Upload[]>>;
   handleUpload: () => void;
   disabled?: boolean;
   statements: StatementsResponse[];
+  agentId: string;
+  setAgentId: React.Dispatch<React.SetStateAction<string>>;
 }) {
+  const { data: agents } = useGetAgents();
+
   const allowedMimeTypes = ["application/pdf"];
 
   const validateFile = (file: File): { valid: boolean; error?: string } => {
@@ -125,9 +133,24 @@ export function FileUpload({
                 >
                   Add Files
                 </Button>
+                <Select value={agentId} onValueChange={setAgentId}>
+                  <SelectTrigger
+                    className={`w-[180px] ${!agentId ? "border border-destructive !text-destructive" : ""}`}
+                  >
+                    {!agentId && <CircleAlert className="text-destructive" />}
+                    <SelectValue placeholder="Select agent" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {agents?.map((agent) => (
+                      <SelectItem key={agent.id} value={agent.agent_id}>
+                        {agent.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Button
                   onClick={handleUpload}
-                  disabled={uploads.filter((u) => u.status === "pending").length === 0}
+                  disabled={uploads.filter((u) => u.status === "pending").length === 0 || !agentId}
                 >
                   Start Upload
                 </Button>

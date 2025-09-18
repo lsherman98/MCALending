@@ -21,7 +21,6 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 		extraction := e.Record
 
 		fileKey := extraction.BaseFilesPath() + "/" + extraction.GetString("data")
-
 		fsys, err := e.App.NewFilesystem()
 		if err != nil {
 			e.App.Logger().Error("Extraction: failed to initialize filesystem: " + err.Error())
@@ -40,27 +39,6 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 		_, err = io.Copy(content, r)
 		if err != nil {
 			e.App.Logger().Error("Extraction: failed to read file content: " + err.Error())
-			return err
-		}
-
-		var data llama_client.Statement
-		if err := json.Unmarshal(content.Bytes(), &data); err != nil {
-			e.App.Logger().Error("Extraction: failed to unmarshal JSON: " + err.Error())
-			return err
-		}
-
-		statementDetailsCollection, err := e.App.FindCollectionByNameOrId("statement_details")
-		if err != nil {
-			return err
-		}
-
-		checksPaidCollection, err := e.App.FindCollectionByNameOrId("checks_paid")
-		if err != nil {
-			return err
-		}
-
-		dailyBalanceCollection, err := e.App.FindCollectionByNameOrId("daily_balance")
-		if err != nil {
 			return err
 		}
 
@@ -87,57 +65,82 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			return err
 		}
 
-		routine.FireAndForget(func() {
-			SetDealRecordFields(data, deal)
-			if err := e.App.Save(deal); err != nil {
-				e.App.Logger().Error("Extraction: failed to save deal record: " + err.Error())
-			}
-		})
-
-		routine.FireAndForget(func() {
-			statement_details := core.NewRecord(statementDetailsCollection)
-			SetStatementDetailsRecordFields(data, statement_details, statement, deal)
-			if err := e.App.Save(statement_details); err != nil {
-				e.App.Logger().Error("Extraction: failed to create statement_details record: " + err.Error())
-			}
-
-			statement.Set("details", statement_details.Id)
-			if err := e.App.Save(statement); err != nil {
-				e.App.Logger().Error("Extraction: failed to update statement record: " + err.Error())
-			}
-		})
-
-		for _, checkPaid := range data.Checks {
-			routine.FireAndForget(func() {
-				checkPaidRecord := core.NewRecord(checksPaidCollection)
-				SetCheckPaidRecordFields(checkPaid, checkPaidRecord, statement, deal)
-				if err := e.App.Save(checkPaidRecord); err != nil {
-					e.App.Logger().Error("Extraction: failed to create checks_paid record: " + err.Error())
-				}
-			})
+		agentId := job.GetString("agent_id")
+		agent, err := e.App.FindFirstRecordByData("exctraction_agents", "agent_id", agentId)
+		if err != nil {
+			e.App.Logger().Error("Extraction: failed to find extraction agent record: " + err.Error())
+			return err
 		}
 
-		for _, dailyBalance := range data.DailyBalance {
-			routine.FireAndForget(func() {
-				dailyBalanceRecord := core.NewRecord(dailyBalanceCollection)
-				SetDailyBalanceRecordFields(dailyBalance, dailyBalanceRecord, statement, deal)
-				if err := e.App.Save(dailyBalanceRecord); err != nil {
-					e.App.Logger().Error("Extraction: failed to create daily_balance record: " + err.Error())
-				}
-			})
+		key := agent.GetString("key")
+		var transactions []Transaction
+
+		switch key {
+		// case "ascend":
+		// 	var data AscendStatement
+		// case "bmo":
+		// 	var data BMOStatement
+		// case "choice_one":
+		// 	var data ChoiceOneStatement
+		// case "chase":
+		// 	var data ChaseStatement
+		// case "wells_fargo":
+		// 	var data WellsFargoStatement
+		// case "first_loyal":
+		// 	var data FirstLoyalStatement
+		case "universal":
+			err := UniversalLoader(content.Bytes(), e, statement, deal, &transactions)
+			if err != nil {
+				e.App.Logger().Error("Extraction: UniversalLoader failed: " + err.Error())
+				return err
+			}
+		default:
+			e.App.Logger().Error("Extraction: unknown extraction agent key: " + key)
+			return nil
+
 		}
+
+		// 	routine.FireAndForget(func() {
+		// 	statement_details := core.NewRecord(statementDetailsCollection)
+		// 	SetStatementDetailsRecordFields(statement_details, )
+		// 	if err := e.App.Save(statement_details); err != nil {
+		// 		e.App.Logger().Error("Extraction: failed to create statement_details record: " + err.Error())
+		// 	}
+
+		// 	statement.Set("details", statement_details.Id)
+		// 	if err := e.App.Save(statement); err != nil {
+		// 		e.App.Logger().Error("Extraction: failed to update statement record: " + err.Error())
+		// 	}
+		// })
+
+		// for _, dailyBalance := range data.DailyBalance {
+		// 	routine.FireAndForget(func() {
+		// 		dailyBalanceRecord := core.NewRecord(dailyBalanceCollection)
+		// 		SetDailyBalanceRecordFields(dailyBalance, dailyBalanceRecord, statement, deal)
+		// 		if err := e.App.Save(dailyBalanceRecord); err != nil {
+		// 			e.App.Logger().Error("Extraction: failed to create daily_balance record: " + err.Error())
+		// 		}
+		// 	})
+		// }
+
+		// routine.FireAndForget(func() {
+		// 	SetDealRecordFields(deal, )
+		// 	if err := e.App.Save(deal); err != nil {
+		// 		e.App.Logger().Error("Extraction: failed to save deal record: " + err.Error())
+		// 	}
+		// })
 
 		var wg sync.WaitGroup
 		var mu sync.Mutex
-		allCategorizedTransactions := make([]TransactionType, len(data.Transactions))
+		allCategorizedTransactions := make([]TransactionType, len(transactions))
 
-		for i := 0; i < len(data.Transactions); i += transactionChunkSize {
+		for i := 0; i < len(transactions); i += transactionChunkSize {
 			wg.Add(1)
 			go func(start int) {
 				defer wg.Done()
 
-				end := min(start + transactionChunkSize, len(data.Transactions))
-				chunk := data.Transactions[start:end]
+				end := min(start+transactionChunkSize, len(transactions))
+				chunk := transactions[start:end]
 
 				transactionsJSON, err := json.Marshal(chunk)
 				if err != nil {
@@ -186,7 +189,7 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 
 		wg.Wait()
 
-		for i, transaction := range data.Transactions {
+		for i, transaction := range transactions {
 			routine.FireAndForget(func() {
 				transactionRecord := core.NewRecord(transactionsCollection)
 				SetTransactionRecordFields(transaction, transactionRecord, statement, deal)

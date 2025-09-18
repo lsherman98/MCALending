@@ -1,5 +1,5 @@
 import { createDealFormSchema, DealForm } from "@/components/deal/deal-form";
-import { FileUpload } from "@/components/file-upload";
+import { FileUpload } from "@/components/deals/file-upload";
 import { Button } from "@/components/ui/button";
 import { useUpdateDeal, useUploadStatement } from "@/lib/api/mutations";
 import { useGetDealById, useGetStatementsByDealId } from "@/lib/api/queries";
@@ -25,6 +25,8 @@ function RouteComponent() {
 
   const [formDisabled, setFormDisabled] = useState<boolean>(false);
   const [uploads, setUploads] = useState<Upload[]>([]);
+  // universal extractor = "6c32b864-46f5-4b83-be6c-df03e7bae52b";
+  const [agentId, setAgentId] = useState<string>("");
 
   const updateDealMutation = useUpdateDeal();
   const uploadStatementMutation = useUploadStatement();
@@ -72,6 +74,7 @@ function RouteComponent() {
             deal: dealId,
             file: statement.file,
             filename: statement.file.name,
+            agent: agentId,
           })
           .then(() => setUploads((prev) => prev.filter((u) => u.file.name !== statement.file.name)))
           .then(() => {
@@ -91,6 +94,8 @@ function RouteComponent() {
           statements={statements || []}
           setUploads={setUploads}
           handleUpload={handleUpload}
+          agentId={agentId}
+          setAgentId={setAgentId}
         />
       </div>
       <div className="flex-[2] px-2 flex flex-col justify-center">

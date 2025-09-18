@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAvgDailyBalance, getBalanceOverTime, getCreditsAndDebits, getCurrentDeal, getDailyBalance, getDealById, getDeals, getFirstTransactionDate, getGroupedTransactions, getJobs, getRecentDeals, getStatementById,  getStatementsByDealId, getStatementUrl, getTransactions, getTransactionTotals, searchDeals, searchTransactions } from "./api";
+import { getAgents, getAvgDailyBalance, getBalanceOverTime, getCreditsAndDebits, getCurrentDeal, getDailyBalance, getDealById, getDeals, getFirstTransactionDate, getGroupedTransactions, getJobs, getRecentDeals, getStatementById,  getStatementsByDealId, getStatementUrl, getTransactions, getTransactionTotals, searchDeals, searchTransactions } from "./api";
 import { TransactionsTypeOptions, type JobsResponse } from "../pocketbase-types";
 import { useCurrentDealStore } from "../stores/current-deal-store";
 
@@ -193,5 +193,19 @@ export function useGetCurrentDeal() {
         placeholderData: keepPreviousData,
         retryDelay: 1000,
         refetchOnWindowFocus: false
+    });
+}
+
+// AGENTS
+export function useGetAgents() {
+    return useQuery({
+        queryKey: ["agents"],
+        queryFn: getAgents,
+        placeholderData: keepPreviousData,
+        refetchInterval: false, 
+        refetchIntervalInBackground: false,
+        staleTime: Infinity,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
     });
 }

@@ -13,22 +13,23 @@ export enum Collections {
 	Superusers = "_superusers",
 	AvgDailyBalance = "avg_daily_balance",
 	BalanceOverTime = "balance_over_time",
-	ChecksPaid = "checks_paid",
 	CreditsAndDebits = "credits_and_debits",
 	CurrentDeal = "current_deal",
 	DailyBalance = "daily_balance",
 	Deals = "deals",
+	ExtractionAgents = "extraction_agents",
 	Extractions = "extractions",
 	GroupedTransactions = "grouped_transactions",
 	Jobs = "jobs",
+	LlamaWebhooks = "llama_webhooks",
 	Organizations = "organizations",
 	PlaidTokens = "plaid_tokens",
+	PlaidTransactions = "plaid_transactions",
 	StatementDetails = "statement_details",
 	Statements = "statements",
 	TotalsByMonth = "totals_by_month",
 	Transactions = "transactions",
 	Users = "users",
-	WebhookEvents = "webhook_events",
 }
 
 // Alias types for improved usability
@@ -122,20 +123,8 @@ export type BalanceOverTimeRecord = {
 	id: string
 }
 
-export type ChecksPaidRecord = {
-	amount: number
-	check_number?: number
-	created?: IsoDateString
-	date?: IsoDateString
-	deal: RecordIdString
-	id: string
-	reference?: number
-	statement: RecordIdString
-	updated?: IsoDateString
-}
-
-export type CreditsAndDebitsRecord<Tcredits = unknown> = {
-	credits?: null | Tcredits
+export type CreditsAndDebitsRecord = {
+	credits?: number
 	date?: IsoDateString
 	deal?: string
 	debits?: number
@@ -180,6 +169,14 @@ export type DealsRecord = {
 	zip_code?: string
 }
 
+export type ExtractionAgentsRecord = {
+	agent_id: string
+	created?: IsoDateString
+	id: string
+	name: string
+	updated?: IsoDateString
+}
+
 export type ExtractionsRecord = {
 	created?: IsoDateString
 	data: string
@@ -221,6 +218,7 @@ export type JobsRecord<Tmetadata = unknown> = {
 	created?: IsoDateString
 	deal: RecordIdString
 	document_tokens?: number
+	error?: string
 	extraction?: RecordIdString
 	id: string
 	job_id: string
@@ -230,6 +228,16 @@ export type JobsRecord<Tmetadata = unknown> = {
 	run_id?: string
 	statement: RecordIdString
 	status: JobsStatusOptions
+	updated?: IsoDateString
+}
+
+export type LlamaWebhooksRecord = {
+	created?: IsoDateString
+	event_id?: string
+	id: string
+	job_id?: string
+	run_id?: string
+	type?: string
 	updated?: IsoDateString
 }
 
@@ -248,10 +256,26 @@ export type OrganizationsRecord = {
 export type PlaidTokensRecord = {
 	access_token?: string
 	created?: IsoDateString
+	deal?: RecordIdString
 	id: string
 	item_id?: string
 	updated?: IsoDateString
 	user?: RecordIdString
+}
+
+export type PlaidTransactionsRecord = {
+	account_id?: string
+	amount?: number
+	created?: IsoDateString
+	date?: IsoDateString
+	deal?: RecordIdString
+	description?: string
+	id: string
+	merchant_name?: string
+	name?: string
+	updated?: IsoDateString
+	user?: RecordIdString
+	website?: string
 }
 
 export type StatementDetailsRecord = {
@@ -259,15 +283,10 @@ export type StatementDetailsRecord = {
 	created?: IsoDateString
 	credits?: number
 	date?: IsoDateString
-	days_in_period?: number
 	deal?: RecordIdString
 	debits?: number
 	ending_balance?: number
 	id: string
-	interest_paid?: number
-	overdraft_fee?: number
-	returned_item_fees?: number
-	service_charge?: number
 	statement?: RecordIdString
 	updated?: IsoDateString
 }
@@ -310,7 +329,6 @@ export type TransactionsRecord = {
 	description?: string
 	id: string
 	statement: RecordIdString
-	trace_number?: number
 	type: TransactionsTypeOptions
 	updated?: IsoDateString
 }
@@ -333,16 +351,6 @@ export type UsersRecord = {
 	verified?: boolean
 }
 
-export type WebhookEventsRecord = {
-	created?: IsoDateString
-	event_id?: string
-	id: string
-	job_id?: string
-	run_id?: string
-	type?: string
-	updated?: IsoDateString
-}
-
 // Response types include system fields and match responses from the PocketBase API
 export type AuthoriginsResponse<Texpand = unknown> = Required<AuthoriginsRecord> & BaseSystemFields<Texpand>
 export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRecord> & BaseSystemFields<Texpand>
@@ -351,22 +359,23 @@ export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemF
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type AvgDailyBalanceResponse<Taverage_daily_ending_balance = unknown, Texpand = unknown> = Required<AvgDailyBalanceRecord<Taverage_daily_ending_balance>> & BaseSystemFields<Texpand>
 export type BalanceOverTimeResponse<Texpand = unknown> = Required<BalanceOverTimeRecord> & BaseSystemFields<Texpand>
-export type ChecksPaidResponse<Texpand = unknown> = Required<ChecksPaidRecord> & BaseSystemFields<Texpand>
-export type CreditsAndDebitsResponse<Tcredits = unknown, Texpand = unknown> = Required<CreditsAndDebitsRecord<Tcredits>> & BaseSystemFields<Texpand>
+export type CreditsAndDebitsResponse<Texpand = unknown> = Required<CreditsAndDebitsRecord> & BaseSystemFields<Texpand>
 export type CurrentDealResponse<Texpand = unknown> = Required<CurrentDealRecord> & BaseSystemFields<Texpand>
 export type DailyBalanceResponse<Texpand = unknown> = Required<DailyBalanceRecord> & BaseSystemFields<Texpand>
 export type DealsResponse<Texpand = unknown> = Required<DealsRecord> & BaseSystemFields<Texpand>
+export type ExtractionAgentsResponse<Texpand = unknown> = Required<ExtractionAgentsRecord> & BaseSystemFields<Texpand>
 export type ExtractionsResponse<Texpand = unknown> = Required<ExtractionsRecord> & BaseSystemFields<Texpand>
 export type GroupedTransactionsResponse<Tdates = unknown, Tgdescription = unknown, Ttotal = unknown, Texpand = unknown> = Required<GroupedTransactionsRecord<Tdates, Tgdescription, Ttotal>> & BaseSystemFields<Texpand>
 export type JobsResponse<Tmetadata = unknown, Texpand = unknown> = Required<JobsRecord<Tmetadata>> & BaseSystemFields<Texpand>
+export type LlamaWebhooksResponse<Texpand = unknown> = Required<LlamaWebhooksRecord> & BaseSystemFields<Texpand>
 export type OrganizationsResponse<Texpand = unknown> = Required<OrganizationsRecord> & BaseSystemFields<Texpand>
 export type PlaidTokensResponse<Texpand = unknown> = Required<PlaidTokensRecord> & BaseSystemFields<Texpand>
+export type PlaidTransactionsResponse<Texpand = unknown> = Required<PlaidTransactionsRecord> & BaseSystemFields<Texpand>
 export type StatementDetailsResponse<Texpand = unknown> = Required<StatementDetailsRecord> & BaseSystemFields<Texpand>
 export type StatementsResponse<Texpand = unknown> = Required<StatementsRecord> & BaseSystemFields<Texpand>
 export type TotalsByMonthResponse<Tdate = unknown, Texpenses = unknown, Tfunding = unknown, Tpayments = unknown, Trevenue = unknown, Ttransfers = unknown, Texpand = unknown> = Required<TotalsByMonthRecord<Tdate, Texpenses, Tfunding, Tpayments, Trevenue, Ttransfers>> & BaseSystemFields<Texpand>
 export type TransactionsResponse<Texpand = unknown> = Required<TransactionsRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
-export type WebhookEventsResponse<Texpand = unknown> = Required<WebhookEventsRecord> & BaseSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
@@ -378,22 +387,23 @@ export type CollectionRecords = {
 	_superusers: SuperusersRecord
 	avg_daily_balance: AvgDailyBalanceRecord
 	balance_over_time: BalanceOverTimeRecord
-	checks_paid: ChecksPaidRecord
 	credits_and_debits: CreditsAndDebitsRecord
 	current_deal: CurrentDealRecord
 	daily_balance: DailyBalanceRecord
 	deals: DealsRecord
+	extraction_agents: ExtractionAgentsRecord
 	extractions: ExtractionsRecord
 	grouped_transactions: GroupedTransactionsRecord
 	jobs: JobsRecord
+	llama_webhooks: LlamaWebhooksRecord
 	organizations: OrganizationsRecord
 	plaid_tokens: PlaidTokensRecord
+	plaid_transactions: PlaidTransactionsRecord
 	statement_details: StatementDetailsRecord
 	statements: StatementsRecord
 	totals_by_month: TotalsByMonthRecord
 	transactions: TransactionsRecord
 	users: UsersRecord
-	webhook_events: WebhookEventsRecord
 }
 
 export type CollectionResponses = {
@@ -404,22 +414,23 @@ export type CollectionResponses = {
 	_superusers: SuperusersResponse
 	avg_daily_balance: AvgDailyBalanceResponse
 	balance_over_time: BalanceOverTimeResponse
-	checks_paid: ChecksPaidResponse
 	credits_and_debits: CreditsAndDebitsResponse
 	current_deal: CurrentDealResponse
 	daily_balance: DailyBalanceResponse
 	deals: DealsResponse
+	extraction_agents: ExtractionAgentsResponse
 	extractions: ExtractionsResponse
 	grouped_transactions: GroupedTransactionsResponse
 	jobs: JobsResponse
+	llama_webhooks: LlamaWebhooksResponse
 	organizations: OrganizationsResponse
 	plaid_tokens: PlaidTokensResponse
+	plaid_transactions: PlaidTransactionsResponse
 	statement_details: StatementDetailsResponse
 	statements: StatementsResponse
 	totals_by_month: TotalsByMonthResponse
 	transactions: TransactionsResponse
 	users: UsersResponse
-	webhook_events: WebhookEventsResponse
 }
 
 // Type for usage with type asserted PocketBase instance
@@ -433,20 +444,21 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
 	collection(idOrName: 'avg_daily_balance'): RecordService<AvgDailyBalanceResponse>
 	collection(idOrName: 'balance_over_time'): RecordService<BalanceOverTimeResponse>
-	collection(idOrName: 'checks_paid'): RecordService<ChecksPaidResponse>
 	collection(idOrName: 'credits_and_debits'): RecordService<CreditsAndDebitsResponse>
 	collection(idOrName: 'current_deal'): RecordService<CurrentDealResponse>
 	collection(idOrName: 'daily_balance'): RecordService<DailyBalanceResponse>
 	collection(idOrName: 'deals'): RecordService<DealsResponse>
+	collection(idOrName: 'extraction_agents'): RecordService<ExtractionAgentsResponse>
 	collection(idOrName: 'extractions'): RecordService<ExtractionsResponse>
 	collection(idOrName: 'grouped_transactions'): RecordService<GroupedTransactionsResponse>
 	collection(idOrName: 'jobs'): RecordService<JobsResponse>
+	collection(idOrName: 'llama_webhooks'): RecordService<LlamaWebhooksResponse>
 	collection(idOrName: 'organizations'): RecordService<OrganizationsResponse>
 	collection(idOrName: 'plaid_tokens'): RecordService<PlaidTokensResponse>
+	collection(idOrName: 'plaid_transactions'): RecordService<PlaidTransactionsResponse>
 	collection(idOrName: 'statement_details'): RecordService<StatementDetailsResponse>
 	collection(idOrName: 'statements'): RecordService<StatementsResponse>
 	collection(idOrName: 'totals_by_month'): RecordService<TotalsByMonthResponse>
 	collection(idOrName: 'transactions'): RecordService<TransactionsResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>
-	collection(idOrName: 'webhook_events'): RecordService<WebhookEventsResponse>
 }
