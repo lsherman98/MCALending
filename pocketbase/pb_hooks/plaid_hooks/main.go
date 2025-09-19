@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/lsherman98/mca-platform/pocketbase/collections"
 	plaid "github.com/plaid/plaid-go/v31/plaid"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
@@ -65,7 +66,7 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 			accessToken := exchangePublicTokenResp.GetAccessToken()
 			itemID := exchangePublicTokenResp.GetItemId()
 
-			plaidTokensCollection, err := e.App.FindCollectionByNameOrId("plaid_tokens")
+			plaidTokensCollection, err := e.App.FindCollectionByNameOrId(collections.PlaidTokens)
 			if err != nil {
 				return e.InternalServerError("Failed to find collection", err)
 			}
@@ -93,7 +94,7 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 				return e.BadRequestError("Invalid request body", err)
 			}
 
-			accessTokenRecord, err := e.App.FindFirstRecordByData("plaid_tokens", "item_id", body.ItemID)
+			accessTokenRecord, err := e.App.FindFirstRecordByData(collections.PlaidTokens, "item_id", body.ItemID)
 			if err != nil {
 				e.App.Logger().Error("Plaid: failed to find access token record: " + err.Error())
 				return e.InternalServerError("Failed to find access token record", err)
@@ -130,7 +131,7 @@ func Init(app *pocketbase.PocketBase, plaid_client *plaid.APIClient) error {
 					return e.InternalServerError("Failed to get transactions", err)
 				}
 
-				plaidTransactionsCollection, err := e.App.FindCollectionByNameOrId("plaid_transactions")
+				plaidTransactionsCollection, err := e.App.FindCollectionByNameOrId(collections.PlaidTransactions)
 				if err != nil {
 					return e.InternalServerError("Failed to find collection", err)
 				}

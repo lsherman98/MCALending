@@ -7,7 +7,7 @@ import type { Upload } from "@/lib/types";
 import { getUserId } from "@/lib/utils";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MoveRight } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type z from "zod";
 
 export const Route = createFileRoute("/_app/deals/$dealId")({
@@ -17,6 +17,14 @@ export const Route = createFileRoute("/_app/deals/$dealId")({
   },
 });
 
+function debounce<T extends (...args: any[]) => any>(func: T, delay: number) {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
 function RouteComponent() {
   const { dealId } = Route.useParams();
 
@@ -25,30 +33,32 @@ function RouteComponent() {
 
   const [formDisabled, setFormDisabled] = useState<boolean>(false);
   const [uploads, setUploads] = useState<Upload[]>([]);
-  // universal extractor = "6c32b864-46f5-4b83-be6c-df03e7bae52b";
   const [agentId, setAgentId] = useState<string>("");
 
   const updateDealMutation = useUpdateDeal();
   const uploadStatementMutation = useUploadStatement();
 
-  const handleUpdateDeal = (data: z.infer<typeof createDealFormSchema>) => {
-    if (!dealId) return;
-    updateDealMutation.mutate({
-      id: dealId,
-      data: {
-        address: data.address,
-        state: data.state,
-        zip_code: data.zipCode,
-        credit_score: data.creditScore,
-        bank: data.bank,
-        founded: data.founded?.toISOString(),
-        industry: data.industry,
-        merchant: data.merchant,
-        title: data.title,
-        iso: data.iso,
-      },
-    });
-  };
+  const handleUpdateDeal = useCallback(
+    debounce((data: z.infer<typeof createDealFormSchema>) => {
+      if (!dealId) return;
+      updateDealMutation.mutate({
+        id: dealId,
+        data: {
+          address: data.address,
+          state: data.state,
+          zip_code: data.zipCode,
+          credit_score: data.creditScore,
+          bank: data.bank,
+          founded: data.founded?.toISOString(),
+          industry: data.industry,
+          merchant: data.merchant,
+          title: data.title,
+          iso: data.iso,
+        },
+      });
+    }, 500),
+    [dealId, updateDealMutation]
+  );
 
   const updateStatus = (fileName: string, status: Upload["status"], error?: string) => {
     setUploads((prev) =>

@@ -3,6 +3,7 @@ package webhooks
 import (
 	"net/http"
 
+	"github.com/lsherman98/mca-platform/pocketbase/collections"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
 )
@@ -15,21 +16,21 @@ func Init(app *pocketbase.PocketBase) error {
 				return e.BadRequestError("LlamaIndex Webhook: invalid request body", err)
 			}
 
-            llamaWebhooksCollection, err := app.FindCollectionByNameOrId("llama_webhooks")
-            if err != nil {
-                return e.InternalServerError("LlamaIndex Webhook: failed to find llama_webhooks collection", err)
-            }
+			llamaWebhooksCollection, err := app.FindCollectionByNameOrId(collections.LlamaWebhooks)
+			if err != nil {
+				return e.InternalServerError("LlamaIndex Webhook: failed to find llama_webhooks collection", err)
+			}
 
-            eventRecord := core.NewRecord(llamaWebhooksCollection)
-            eventRecord.Set("event_id", event.EventID)
-            eventRecord.Set("type", event.EventType)
-            eventRecord.Set("run_id", event.Data.RunID)
-            eventRecord.Set("job_id", event.Data.JobID)
-            if err := e.App.Save(eventRecord); err != nil {
-                e.App.Logger().Error("LlamaIndex Webhook: failed to save webhook event record: " + err.Error())
-            }
+			eventRecord := core.NewRecord(llamaWebhooksCollection)
+			eventRecord.Set("event_id", event.EventID)
+			eventRecord.Set("type", event.EventType)
+			eventRecord.Set("run_id", event.Data.RunID)
+			eventRecord.Set("job_id", event.Data.JobID)
+			if err := e.App.Save(eventRecord); err != nil {
+				e.App.Logger().Error("LlamaIndex Webhook: failed to save webhook event record: " + err.Error())
+			}
 
-			job, err := app.FindFirstRecordByData("jobs", "job_id", event.Data.JobID)
+			job, err := app.FindFirstRecordByData(collections.Jobs, "job_id", event.Data.JobID)
 			if err != nil {
 				e.App.Logger().Error("LlamaIndex Webhook: failed to find job record: " + err.Error())
 				return e.InternalServerError("LlamaIndex Webhook: failed to find job record", err)
@@ -39,13 +40,13 @@ func Init(app *pocketbase.PocketBase) error {
 			case EventTypeExtractSuccess:
 				job.Set("status", "CLASSIFY")
 			case EventTypeExtractError:
-                e.App.Logger().Error("LlamaIndex Webhook: Extract Error", "event", event)
+				e.App.Logger().Error("LlamaIndex Webhook: Extract Error", "event", event)
 				job.Set("status", "ERROR")
 			case EventTypeExtractPartialSuccess:
-                e.App.Logger().Error("LlamaIndex Webhook: Extract Partial Success", "event", event)
+				e.App.Logger().Error("LlamaIndex Webhook: Extract Partial Success", "event", event)
 				job.Set("status", "PARTIAL_SUCCESS")
 			case EventTypeExtractCancelled:
-                e.App.Logger().Error("LlamaIndex Webhook: Extract Cancelled", "event", event)
+				e.App.Logger().Error("LlamaIndex Webhook: Extract Cancelled", "event", event)
 				job.Set("status", "CANCELLED")
 			default:
 				e.App.Logger().Error("LlamaIndex Webhook: Unknown Event Type", "event", event.EventType)

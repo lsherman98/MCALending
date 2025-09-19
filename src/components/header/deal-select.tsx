@@ -39,7 +39,7 @@ export function DealSelect({ path }: { path?: string }) {
     <Select
       value={currentDeal?.id || ""}
       onValueChange={(value) => {
-        const deal = recentDeals?.items?.find((d) => d.id === value);
+        const deal = recentDeals?.find((d) => d.id === value);
         if (deal) {
           handleDealClick(deal);
         }
@@ -51,7 +51,7 @@ export function DealSelect({ path }: { path?: string }) {
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Recent Deals</SelectLabel>
-          {recentDeals?.items?.map((deal) => (
+          {recentDeals?.map((deal) => (
             <SelectItem key={deal.id} value={deal.id}>
               {deal.title} - #{deal.id}
             </SelectItem>

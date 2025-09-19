@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/lsherman98/mca-platform/pocketbase/collections"
 	"github.com/lsherman98/mca-platform/pocketbase/llama_client"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
@@ -13,7 +14,7 @@ import (
 )
 
 func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
-	app.OnRecordAfterCreateSuccess("jobs").BindFunc(func(e *core.RecordEvent) error {
+	app.OnRecordAfterCreateSuccess(collections.Jobs).BindFunc(func(e *core.RecordEvent) error {
 		if os.Getenv("DEV") == "false" {
 			return e.Next()
 		}
@@ -49,7 +50,7 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		return e.Next()
 	})
 
-	app.OnRecordAfterUpdateSuccess("jobs").BindFunc(func(e *core.RecordEvent) error {
+	app.OnRecordAfterUpdateSuccess(collections.Jobs).BindFunc(func(e *core.RecordEvent) error {
 		job := e.Record
 		status := job.GetString("status")
 
@@ -57,7 +58,7 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 			return e.Next()
 		}
 
-		extractionsCollection, err := app.FindCollectionByNameOrId("extractions")
+		extractionsCollection, err := app.FindCollectionByNameOrId(collections.Extractions)
 		if err != nil {
 			return err
 		}
@@ -103,7 +104,7 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		return e.Next()
 	})
 
-	app.OnRecordAfterDeleteSuccess("jobs").BindFunc(func(e *core.RecordEvent) error {
+	app.OnRecordAfterDeleteSuccess(collections.Jobs).BindFunc(func(e *core.RecordEvent) error {
 		job := e.Record
 		run_id := job.GetString("run_id")
 

@@ -4,18 +4,19 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/lsherman98/mca-platform/pocketbase/collections"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
 )
 
 func Init(app *pocketbase.PocketBase) error {
 	app.OnRecordsListRequest("current_deal").BindFunc(func(e *core.RecordsListRequestEvent) error {
-		currentDealCollection, err := e.App.FindCollectionByNameOrId("current_deal")
+		currentDealCollection, err := e.App.FindCollectionByNameOrId(collections.CurrentDeal)
 		if err != nil {
 			return err
 		}
 
-		dealsCollection, err := e.App.FindCollectionByNameOrId("deals")
+		dealsCollection, err := e.App.FindCollectionByNameOrId(collections.Deals)
 		if err != nil {
 			return err
 		}

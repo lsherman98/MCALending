@@ -7,6 +7,7 @@ import (
 	"io"
 	"sync"
 
+	"github.com/lsherman98/mca-platform/pocketbase/collections"
 	"github.com/lsherman98/mca-platform/pocketbase/llama_client"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
@@ -17,7 +18,7 @@ import (
 const transactionChunkSize = 15
 
 func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
-	app.OnRecordAfterCreateSuccess("extractions").BindFunc(func(e *core.RecordEvent) error {
+	app.OnRecordAfterCreateSuccess(collections.Extractions).BindFunc(func(e *core.RecordEvent) error {
 		extraction := e.Record
 
 		fileKey := extraction.BaseFilesPath() + "/" + extraction.GetString("data")
@@ -42,31 +43,31 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			return err
 		}
 
-		transactionsCollection, err := e.App.FindCollectionByNameOrId("transactions")
+		transactionsCollection, err := e.App.FindCollectionByNameOrId(collections.Transactions)
 		if err != nil {
 			return err
 		}
 
-		statement, err := e.App.FindRecordById("statements", extraction.GetString("statement"))
+		statement, err := e.App.FindRecordById(collections.Statements, extraction.GetString("statement"))
 		if err != nil {
 			e.App.Logger().Error("Extraction: failed to find statement record: " + err.Error())
 			return err
 		}
 
-		job, err := e.App.FindRecordById("jobs", extraction.GetString("job"))
+		job, err := e.App.FindRecordById(collections.Jobs, extraction.GetString("job"))
 		if err != nil {
 			e.App.Logger().Error("Extraction: failed to find job record: " + err.Error())
 			return err
 		}
 
-		deal, err := e.App.FindRecordById("deals", statement.GetString("deal"))
+		deal, err := e.App.FindRecordById(collections.Deals, statement.GetString("deal"))
 		if err != nil {
 			e.App.Logger().Error("Extraction: failed to find deal record: " + err.Error())
 			return err
 		}
 
 		agentId := job.GetString("agent_id")
-		agent, err := e.App.FindFirstRecordByData("extraction_agents", "agent_id", agentId)
+		agent, err := e.App.FindFirstRecordByData(collections.ExtractionAgents, "agent_id", agentId)
 		if err != nil {
 			e.App.Logger().Error("Extraction: failed to find extraction agent record: " + err.Error())
 			return err

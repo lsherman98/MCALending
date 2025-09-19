@@ -9,7 +9,7 @@ export async function getDeals() {
 }
 
 export async function getRecentDeals() {
-    return await pb.collection(Collections.Deals).getList(1, 5, {
+    return await pb.collection(Collections.Deals).getFullList({
         sort: '-updated',
     });
 }
@@ -201,7 +201,6 @@ export async function setAccessToken(public_token: string, deal?: string) {
 }
 
 // AGENTS
-
 export async function getAgents() {
     return await pb.collection(Collections.ExtractionAgents).getFullList({
         sort: 'name'

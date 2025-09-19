@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/lsherman98/mca-platform/pocketbase/collections"
 	"github.com/lsherman98/mca-platform/pocketbase/llama_client"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
@@ -14,7 +15,7 @@ import (
 func buildUrl(statement *core.Record, token string) string {
 	return fmt.Sprintf(
 		"https://mca.levisherman.xyz/api/files/%s/%s/%s?token=%s",
-		"statements",
+		collections.Statements,
 		statement.Id,
 		statement.GetString("file"),
 		token,
@@ -34,12 +35,12 @@ func buildS3Url(collectionId, recordId, filename string) string {
 func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 	dev := os.Getenv("DEV")
 
-	app.OnRecordCreateRequest("statements").BindFunc(func(e *core.RecordRequestEvent) error {
+	app.OnRecordCreateRequest(collections.Statements).BindFunc(func(e *core.RecordRequestEvent) error {
 		if err := e.Next(); err != nil {
 			return err
 		}
 
-		jobsCollection, err := app.FindCollectionByNameOrId("jobs")
+		jobsCollection, err := app.FindCollectionByNameOrId(collections.Jobs)
 		if err != nil {
 			return err
 		}

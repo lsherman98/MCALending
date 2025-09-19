@@ -3,6 +3,7 @@ package extraction_hooks
 import (
 	"encoding/json"
 
+	"github.com/lsherman98/mca-platform/pocketbase/collections"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/routine"
 )
@@ -15,12 +16,12 @@ func BMOLoader(content []byte, e *core.RecordEvent, statement, deal *core.Record
 		return err
 	}
 
-	statementDetailsCollection, err := e.App.FindCollectionByNameOrId("statement_details")
+	statementDetailsCollection, err := e.App.FindCollectionByNameOrId(collections.StatementDetails)
 	if err != nil {
 		return err
 	}
 
-	dailyBalanceCollection, err := e.App.FindCollectionByNameOrId("daily_balance")
+	dailyBalanceCollection, err := e.App.FindCollectionByNameOrId(collections.DailyBalance)
 	if err != nil {
 		return err
 	}

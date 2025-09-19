@@ -20,6 +20,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
+import { useEffect } from "react";
 
 export const createDealFormSchema = z.object({
   title: z.string().min(2).max(100),
@@ -61,22 +62,20 @@ export function DealForm({
     },
   });
 
-  function onSubmit(values: z.infer<typeof createDealFormSchema>) {
-    handleUpdateDeal(values);
-  }
-
-  function onReset() {
-    form.reset();
-    form.clearErrors();
-  }
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      form.trigger().then((isValid) => {
+        if (isValid) {
+          handleUpdateDeal(values as z.infer<typeof createDealFormSchema>);
+        }
+      });
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        onReset={onReset}
-        className="flex items-center justify-center h-full"
-      >
+      <form className="flex items-center justify-center h-full">
         <div className="space-y-6 h-full">
           <div className="italic text-sm text-muted-foreground">Deal Reference number: {deal?.id}</div>
           <FormInput disabled={disabled} form={form} name="title" type="text" icon={PencilLine} label="Title" />
@@ -167,9 +166,6 @@ export function DealForm({
             <FormInput disabled={disabled} form={form} name="state" type="text" icon={Map} label="State" />
             <FormInput disabled={disabled} form={form} name="zipCode" type="number" icon={MapPin} label="Zip Code" />
           </div>
-          <Button type="submit" variant="default" disabled={disabled}>
-            Save
-          </Button>
         </div>
       </form>
     </Form>
