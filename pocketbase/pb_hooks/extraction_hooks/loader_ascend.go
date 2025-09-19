@@ -11,7 +11,7 @@ func AscendLoader(content []byte, e *core.RecordEvent, statement, deal *core.Rec
 	var data AscendStatement
 
 	if err := json.Unmarshal(content, &data); err != nil {
-		e.App.Logger().Error("Extraction: failed to unmarshal JSON: " + err.Error())
+		e.App.Logger().Error("Ascend Credit Union Loader: failed to unmarshal JSON: " + err.Error())
 		return err
 	}
 
@@ -28,7 +28,7 @@ func AscendLoader(content []byte, e *core.RecordEvent, statement, deal *core.Rec
 	routine.FireAndForget(func() {
 		SetDealRecordFields(deal, data.Business.Name, data.Business.Address, data.Business.City, data.Business.State, data.Business.ZipCode, data.Bank.Name)
 		if err := e.App.Save(deal); err != nil {
-			e.App.Logger().Error("Extraction: failed to save deal record: " + err.Error())
+			e.App.Logger().Error("Ascend Credit Union Loader: failed to save deal record: " + err.Error())
 		}
 	})
 
@@ -71,7 +71,7 @@ func AscendLoader(content []byte, e *core.RecordEvent, statement, deal *core.Rec
 				dailyBalanceRecord.Set("balance", transaction.Balance)
 
 				if err := e.App.Save(dailyBalanceRecord); err != nil {
-					e.App.Logger().Error("Extraction: failed to create daily_balance record: " + err.Error())
+					e.App.Logger().Error("Ascend Credit Union Loader: failed to create daily_balance record: " + err.Error())
 				}
 			})
 
@@ -83,13 +83,13 @@ func AscendLoader(content []byte, e *core.RecordEvent, statement, deal *core.Rec
 		statement_details := core.NewRecord(statementDetailsCollection)
 		SetStatementDetailsRecordFields(statement_details, statement.Id, deal.Id, data.Bank.StatementDate, totalBeginningBalance, totalCredits, totalDebits, totalEndingBalance)
 		if err := e.App.Save(statement_details); err != nil {
-			e.App.Logger().Error("Extraction: failed to create statement_details record: " + err.Error())
+			e.App.Logger().Error("Ascend Credit Union Loader: failed to create statement_details record: " + err.Error())
 			return
 		}
 
 		statement.Set("details", statement_details.Id)
 		if err := e.App.Save(statement); err != nil {
-			e.App.Logger().Error("Extraction: failed to update statement record: " + err.Error())
+			e.App.Logger().Error("Ascend Credit Union Loader: failed to update statement record: " + err.Error())
 		}
 	})
 

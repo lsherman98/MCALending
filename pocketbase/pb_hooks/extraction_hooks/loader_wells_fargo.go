@@ -11,7 +11,7 @@ func WellsFargoLoader(content []byte, e *core.RecordEvent, statement, deal *core
 	var data WellsFargoStatement
 
 	if err := json.Unmarshal(content, &data); err != nil {
-		e.App.Logger().Error("Extraction: failed to unmarshal JSON: " + err.Error())
+		e.App.Logger().Error("Wells Fargo Loader: failed to unmarshal JSON: " + err.Error())
 		return err
 	}
 
@@ -29,20 +29,20 @@ func WellsFargoLoader(content []byte, e *core.RecordEvent, statement, deal *core
 		statement_details := core.NewRecord(statementDetailsCollection)
 		SetStatementDetailsRecordFields(statement_details, statement.Id, deal.Id, data.Bank.StatementDate, data.Account.BeginningBalance, data.Account.Credits, data.Account.Debits, data.Account.EndingBalance)
 		if err := e.App.Save(statement_details); err != nil {
-			e.App.Logger().Error("Extraction: failed to create statement_details record: " + err.Error())
+			e.App.Logger().Error("Wells Fargo Loader: failed to create statement_details record: " + err.Error())
 			return
 		}
 
 		statement.Set("details", statement_details.Id)
 		if err := e.App.Save(statement); err != nil {
-			e.App.Logger().Error("Extraction: failed to update statement record: " + err.Error())
+			e.App.Logger().Error("Wells Fargo Loader: failed to update statement record: " + err.Error())
 		}
 	})
 
 	routine.FireAndForget(func() {
 		SetDealRecordFields(deal, data.Business.Name, data.Business.Address, data.Business.City, data.Business.State, data.Business.ZipCode, data.Bank.Name)
 		if err := e.App.Save(deal); err != nil {
-			e.App.Logger().Error("Extraction: failed to save deal record: " + err.Error())
+			e.App.Logger().Error("Wells Fargo Loader: failed to save deal record: " + err.Error())
 		}
 	})
 
@@ -64,10 +64,10 @@ func WellsFargoLoader(content []byte, e *core.RecordEvent, statement, deal *core
 				dailyBalanceRecord.Set("statement", statement.Id)
 				dailyBalanceRecord.Set("deal", deal.Id)
 				dailyBalanceRecord.Set("date", transaction.Date)
-				dailyBalanceRecord.Set("balance", *transaction.EndingDailyBalance)
+				dailyBalanceRecord.Set("balance", transaction.EndingDailyBalance)
 
 				if err := e.App.Save(dailyBalanceRecord); err != nil {
-					e.App.Logger().Error("Extraction: failed to create daily_balance record: " + err.Error())
+					e.App.Logger().Error("Wells Fargo Loader: failed to create daily_balance record: " + err.Error())
 				}
 			})
 		}
