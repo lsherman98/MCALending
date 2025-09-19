@@ -20,13 +20,10 @@ export function TableHeader({
       </div>
       <div
         className={`flex-shrink-0 ${
-          open ? "w-80" : "w-120"
+          open ? "w-100" : "w-140"
         } px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden`}
       >
         Description
-      </div>
-      <div className="flex-shrink-0 w-26 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden">
-        Reference
       </div>
       <div
         className="flex-shrink-0 w-32 px-3 py-2 text-sm text-left font-semibold border-r whitespace-nowrap overflow-hidden cursor-pointer hover:bg-muted/70 flex items-center gap-1"

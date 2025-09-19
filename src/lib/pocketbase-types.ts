@@ -169,10 +169,20 @@ export type DealsRecord = {
 	zip_code?: string
 }
 
+export enum ExtractionAgentsKeyOptions {
+	"ascend" = "ascend",
+	"bmo" = "bmo",
+	"choice_one" = "choice_one",
+	"chase" = "chase",
+	"universal" = "universal",
+	"wells_fargo" = "wells_fargo",
+	"first_loyal" = "first_loyal",
+}
 export type ExtractionAgentsRecord = {
 	agent_id: string
 	created?: IsoDateString
 	id: string
+	key: ExtractionAgentsKeyOptions
 	name: string
 	updated?: IsoDateString
 }

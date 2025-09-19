@@ -66,32 +66,49 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 		}
 
 		agentId := job.GetString("agent_id")
-		agent, err := e.App.FindFirstRecordByData("exctraction_agents", "agent_id", agentId)
+		agent, err := e.App.FindFirstRecordByData("extraction_agents", "agent_id", agentId)
 		if err != nil {
 			e.App.Logger().Error("Extraction: failed to find extraction agent record: " + err.Error())
 			return err
 		}
-
 		key := agent.GetString("key")
 		var transactions []Transaction
 
 		switch key {
-		// case "ascend":
-		// 	var data AscendStatement
-		// case "bmo":
-		// 	var data BMOStatement
-		// case "choice_one":
-		// 	var data ChoiceOneStatement
-		// case "chase":
-		// 	var data ChaseStatement
-		// case "wells_fargo":
-		// 	var data WellsFargoStatement
-		// case "first_loyal":
-		// 	var data FirstLoyalStatement
+		case "ascend":
+			if err := AscendLoader(content.Bytes(), e, statement, deal, &transactions); err != nil {
+				e.App.Logger().Error("Extraction: Ascend Loader failed: " + err.Error())
+				return err
+			}
+		case "bmo":
+			if err := BMOLoader(content.Bytes(), e, statement, deal, &transactions); err != nil {
+				e.App.Logger().Error("Extraction: BMO Loader failed: " + err.Error())
+				return err
+			}
+		case "choice_one":
+			if err := ChoiceOneLoader(content.Bytes(), e, statement, deal, &transactions); err != nil {
+				e.App.Logger().Error("Extraction: Choice One Loader failed: " + err.Error())
+				return err
+			}
+		case "chase":
+			if err := ChaseLoader(content.Bytes(), e, statement, deal, &transactions); err != nil {
+				e.App.Logger().Error("Extraction: Chase Loader failed: " + err.Error())
+				return err
+			}
+		case "wells_fargo":
+			if err := WellsFargoLoader(content.Bytes(), e, statement, deal, &transactions); err != nil {
+				e.App.Logger().Error("Extraction: Wells Fargo Loader failed: " + err.Error())
+				return err
+			}
+		case "first_loyal":
+			if err := FirstLoyalLoader(content.Bytes(), e, statement, deal, &transactions); err != nil {
+				e.App.Logger().Error("Extraction: First Loyal Loader failed: " + err.Error())
+				return err
+			}
 		case "universal":
 			err := UniversalLoader(content.Bytes(), e, statement, deal, &transactions)
 			if err != nil {
-				e.App.Logger().Error("Extraction: UniversalLoader failed: " + err.Error())
+				e.App.Logger().Error("Extraction: Universal Loader failed: " + err.Error())
 				return err
 			}
 		default:
@@ -100,51 +117,19 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 
 		}
 
-		// 	routine.FireAndForget(func() {
-		// 	statement_details := core.NewRecord(statementDetailsCollection)
-		// 	SetStatementDetailsRecordFields(statement_details, )
-		// 	if err := e.App.Save(statement_details); err != nil {
-		// 		e.App.Logger().Error("Extraction: failed to create statement_details record: " + err.Error())
-		// 	}
-
-		// 	statement.Set("details", statement_details.Id)
-		// 	if err := e.App.Save(statement); err != nil {
-		// 		e.App.Logger().Error("Extraction: failed to update statement record: " + err.Error())
-		// 	}
-		// })
-
-		// for _, dailyBalance := range data.DailyBalance {
-		// 	routine.FireAndForget(func() {
-		// 		dailyBalanceRecord := core.NewRecord(dailyBalanceCollection)
-		// 		SetDailyBalanceRecordFields(dailyBalance, dailyBalanceRecord, statement, deal)
-		// 		if err := e.App.Save(dailyBalanceRecord); err != nil {
-		// 			e.App.Logger().Error("Extraction: failed to create daily_balance record: " + err.Error())
-		// 		}
-		// 	})
-		// }
-
-		// routine.FireAndForget(func() {
-		// 	SetDealRecordFields(deal, )
-		// 	if err := e.App.Save(deal); err != nil {
-		// 		e.App.Logger().Error("Extraction: failed to save deal record: " + err.Error())
-		// 	}
-		// })
-
 		var wg sync.WaitGroup
-		var mu sync.Mutex
-		allCategorizedTransactions := make([]TransactionType, len(transactions))
-
 		for i := 0; i < len(transactions); i += transactionChunkSize {
 			wg.Add(1)
-			go func(start int) {
+			start := i
+			routine.FireAndForget(func() {
 				defer wg.Done()
-
 				end := min(start+transactionChunkSize, len(transactions))
 				chunk := transactions[start:end]
 
 				transactionsJSON, err := json.Marshal(chunk)
 				if err != nil {
 					e.App.Logger().Error("Failed to marshal transactions chunk: " + err.Error())
+					saveTransactions(e.App, transactionsCollection, statement, deal, chunk, nil)
 					return
 				}
 
@@ -167,57 +152,62 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 					config,
 				)
 				if err != nil {
-					e.App.Logger().Error("Extraction: Gemini transaction categorization failed: " + err.Error())
+					saveTransactions(e.App, transactionsCollection, statement, deal, chunk, nil)
 					return
 				}
 
 				var transactionsWithTypes TransactionTypeList
 				if err := json.Unmarshal([]byte(result.Text()), &transactionsWithTypes); err != nil {
 					e.App.Logger().Error("Extraction: failed to parse Gemini response: " + err.Error())
+					saveTransactions(e.App, transactionsCollection, statement, deal, chunk, nil)
 					return
 				}
 
-				mu.Lock()
-				defer mu.Unlock()
-				for i, t := range transactionsWithTypes.Transactions {
-					if start+i < len(allCategorizedTransactions) {
-						allCategorizedTransactions[start+i] = t
-					}
-				}
-			}(i)
-		}
-
-		wg.Wait()
-
-		for i, transaction := range transactions {
-			routine.FireAndForget(func() {
-				transactionRecord := core.NewRecord(transactionsCollection)
-				SetTransactionRecordFields(transaction, transactionRecord, statement, deal)
-
-				if i < len(allCategorizedTransactions) {
-					transactionType := allCategorizedTransactions[i].Type
-					if transactionType == "revenue" || transactionType == "funding" || transactionType == "transfer" || transactionType == "payment" || transactionType == "expense" {
-						transactionRecord.Set("type", transactionType)
-					} else {
-						transactionRecord.Set("type", "none")
-					}
-				}
-
-				if err := e.App.Save(transactionRecord); err != nil {
-					e.App.Logger().Error("Extraction: failed to create transactions record: " + err.Error())
-				}
+				saveTransactions(e.App, transactionsCollection, statement, deal, chunk, transactionsWithTypes.Transactions)
 			})
 		}
 
-		job.Set("status", llama_client.StatusSuccess)
-		job.Set("extraction", extraction.Id)
-		if err := e.App.Save(job); err != nil {
-			e.App.Logger().Error("Extraction: failed to save job record: " + err.Error())
-			return err
-		}
+		routine.FireAndForget(func() {
+			wg.Wait()
+
+			job.Set("status", llama_client.StatusSuccess)
+			job.Set("extraction", extraction.Id)
+			if err := e.App.Save(job); err != nil {
+				e.App.Logger().Error("Extraction: failed to save job record: " + err.Error())
+			}
+		})
 
 		return e.Next()
 	})
 
 	return nil
+}
+
+func saveTransactions(
+	app core.App,
+	transactionsCollection *core.Collection,
+	statement *core.Record,
+	deal *core.Record,
+	chunk []Transaction,
+	categorizedChunk []TransactionType,
+) {
+	for i, transaction := range chunk {
+		routine.FireAndForget(func() {
+			transactionRecord := core.NewRecord(transactionsCollection)
+			SetTransactionRecordFields(transaction, transactionRecord, statement, deal)
+
+			transactionType := "none"
+			if categorizedChunk != nil && i < len(categorizedChunk) {
+				tt := categorizedChunk[i].Type
+				if tt == "revenue" || tt == "funding" || tt == "transfer" || tt == "payment" || tt == "expense" {
+					transactionType = tt
+				}
+			}
+			transactionRecord.Set("type", transactionType)
+
+			if err := app.Save(transactionRecord); err != nil {
+				app.Logger().Error("Extraction: failed to create transactions record: " + err.Error())
+			}
+		})
+	}
 }

@@ -914,8 +914,8 @@ func init() {
 				"viewRule": ""
 			},
 			{
-				"createRule": "",
-				"deleteRule": "",
+				"createRule": "@request.auth.id != \"\" && @request.auth.id = user.id",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = user.id",
 				"fields": [
 					{
 						"autogeneratePattern": "[0-9]{6}",
@@ -1128,17 +1128,19 @@ func init() {
 					}
 				],
 				"id": "pbc_612317808",
-				"indexes": [],
-				"listRule": "",
+				"indexes": [
+					"CREATE INDEX ` + "`" + `idx_mE7DHgxobZ` + "`" + ` ON ` + "`" + `deals` + "`" + ` (` + "`" + `user` + "`" + `)"
+				],
+				"listRule": "@request.auth.id != \"\" && @request.auth.id = user.id",
 				"name": "deals",
 				"system": false,
 				"type": "base",
-				"updateRule": "",
-				"viewRule": ""
+				"updateRule": "@request.auth.id != \"\" && @request.auth.id = user.id",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.id = user.id"
 			},
 			{
-				"createRule": "",
-				"deleteRule": "",
+				"createRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -1246,17 +1248,19 @@ func init() {
 					}
 				],
 				"id": "pbc_2222278443",
-				"indexes": [],
-				"listRule": "",
+				"indexes": [
+					"CREATE INDEX ` + "`" + `idx_dCSknbzP2Q` + "`" + ` ON ` + "`" + `statements` + "`" + ` (` + "`" + `deal` + "`" + `)"
+				],
+				"listRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
 				"name": "statements",
 				"system": false,
 				"type": "base",
-				"updateRule": "",
-				"viewRule": ""
+				"updateRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id"
 			},
 			{
-				"createRule": "",
-				"deleteRule": "",
+				"createRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -1303,18 +1307,6 @@ func init() {
 						"max": null,
 						"min": null,
 						"name": "amount",
-						"onlyInt": false,
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "number"
-					},
-					{
-						"hidden": false,
-						"id": "number3419982991",
-						"max": null,
-						"min": null,
-						"name": "trace_number",
 						"onlyInt": false,
 						"presentable": false,
 						"required": false,
@@ -1387,138 +1379,20 @@ func init() {
 					}
 				],
 				"id": "pbc_3174063690",
-				"indexes": [],
-				"listRule": "",
+				"indexes": [
+					"CREATE INDEX ` + "`" + `idx_VdqnlhVbfN` + "`" + ` ON ` + "`" + `transactions` + "`" + ` (` + "`" + `deal` + "`" + `)",
+					"CREATE INDEX ` + "`" + `idx_mBNlGtD4Xm` + "`" + ` ON ` + "`" + `transactions` + "`" + ` (\n  ` + "`" + `deal` + "`" + `,\n  ` + "`" + `statement` + "`" + `\n)"
+				],
+				"listRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
 				"name": "transactions",
 				"system": false,
 				"type": "base",
-				"updateRule": "",
-				"viewRule": ""
+				"updateRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id"
 			},
 			{
-				"createRule": "",
-				"deleteRule": "",
-				"fields": [
-					{
-						"autogeneratePattern": "[a-z0-9]{15}",
-						"hidden": false,
-						"id": "text3208210256",
-						"max": 15,
-						"min": 15,
-						"name": "id",
-						"pattern": "^[a-z0-9]+$",
-						"presentable": false,
-						"primaryKey": true,
-						"required": true,
-						"system": true,
-						"type": "text"
-					},
-					{
-						"hidden": false,
-						"id": "date2862495610",
-						"max": "",
-						"min": "",
-						"name": "date",
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "date"
-					},
-					{
-						"hidden": false,
-						"id": "number3814778619",
-						"max": null,
-						"min": null,
-						"name": "check_number",
-						"onlyInt": false,
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "number"
-					},
-					{
-						"hidden": false,
-						"id": "number2392944706",
-						"max": null,
-						"min": null,
-						"name": "amount",
-						"onlyInt": false,
-						"presentable": false,
-						"required": true,
-						"system": false,
-						"type": "number"
-					},
-					{
-						"hidden": false,
-						"id": "number2929936659",
-						"max": null,
-						"min": null,
-						"name": "reference",
-						"onlyInt": false,
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "number"
-					},
-					{
-						"cascadeDelete": true,
-						"collectionId": "pbc_612317808",
-						"hidden": false,
-						"id": "relation3825123606",
-						"maxSelect": 1,
-						"minSelect": 0,
-						"name": "deal",
-						"presentable": false,
-						"required": true,
-						"system": false,
-						"type": "relation"
-					},
-					{
-						"cascadeDelete": true,
-						"collectionId": "pbc_2222278443",
-						"hidden": false,
-						"id": "relation987542998",
-						"maxSelect": 1,
-						"minSelect": 0,
-						"name": "statement",
-						"presentable": false,
-						"required": true,
-						"system": false,
-						"type": "relation"
-					},
-					{
-						"hidden": false,
-						"id": "autodate2990389176",
-						"name": "created",
-						"onCreate": true,
-						"onUpdate": false,
-						"presentable": false,
-						"system": false,
-						"type": "autodate"
-					},
-					{
-						"hidden": false,
-						"id": "autodate3332085495",
-						"name": "updated",
-						"onCreate": true,
-						"onUpdate": true,
-						"presentable": false,
-						"system": false,
-						"type": "autodate"
-					}
-				],
-				"id": "pbc_3127774936",
-				"indexes": [],
-				"listRule": "",
-				"name": "checks_paid",
-				"system": false,
-				"type": "base",
-				"updateRule": "",
-				"viewRule": ""
-			},
-			{
-				"createRule": "",
-				"deleteRule": "",
+				"createRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -1605,17 +1479,19 @@ func init() {
 					}
 				],
 				"id": "pbc_2585916283",
-				"indexes": [],
-				"listRule": "",
+				"indexes": [
+					"CREATE INDEX ` + "`" + `idx_vPe3eNAbwM` + "`" + ` ON ` + "`" + `daily_balance` + "`" + ` (` + "`" + `deal` + "`" + `)"
+				],
+				"listRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
 				"name": "daily_balance",
 				"system": false,
 				"type": "base",
-				"updateRule": "",
-				"viewRule": ""
+				"updateRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id"
 			},
 			{
-				"createRule": "",
-				"deleteRule": "",
+				"createRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -1692,6 +1568,20 @@ func init() {
 						]
 					},
 					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text1574812785",
+						"max": 0,
+						"min": 0,
+						"name": "error",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
 						"hidden": false,
 						"id": "json1326724116",
 						"maxSize": 0,
@@ -1738,6 +1628,17 @@ func init() {
 						"type": "number"
 					},
 					{
+						"hidden": false,
+						"id": "date989355118",
+						"max": "",
+						"min": "",
+						"name": "completed",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "date"
+					},
+					{
 						"cascadeDelete": true,
 						"collectionId": "pbc_612317808",
 						"hidden": false,
@@ -1778,17 +1679,6 @@ func init() {
 					},
 					{
 						"hidden": false,
-						"id": "date989355118",
-						"max": "",
-						"min": "",
-						"name": "completed",
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "date"
-					},
-					{
-						"hidden": false,
 						"id": "autodate2990389176",
 						"name": "created",
 						"onCreate": true,
@@ -1809,17 +1699,19 @@ func init() {
 					}
 				],
 				"id": "pbc_2409499253",
-				"indexes": [],
-				"listRule": "@request.auth.id = deal.user",
+				"indexes": [
+					"CREATE INDEX ` + "`" + `idx_sMwbHBpzXt` + "`" + ` ON ` + "`" + `jobs` + "`" + ` (` + "`" + `deal` + "`" + `)"
+				],
+				"listRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
 				"name": "jobs",
 				"system": false,
 				"type": "base",
-				"updateRule": "",
-				"viewRule": ""
+				"updateRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id"
 			},
 			{
-				"createRule": "",
-				"deleteRule": "",
+				"createRule": "@request.auth.id != \"\" && @request.auth.id = statement.deal.user.id",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = statement.deal.user.id",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -1843,7 +1735,7 @@ func init() {
 						"mimeTypes": [
 							"application/json"
 						],
-						"name": "file",
+						"name": "data",
 						"presentable": false,
 						"protected": true,
 						"required": true,
@@ -1879,16 +1771,6 @@ func init() {
 					},
 					{
 						"hidden": false,
-						"id": "json2918445923",
-						"maxSize": 0,
-						"name": "data",
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "json"
-					},
-					{
-						"hidden": false,
 						"id": "autodate2990389176",
 						"name": "created",
 						"onCreate": true,
@@ -1910,16 +1792,16 @@ func init() {
 				],
 				"id": "pbc_3180628588",
 				"indexes": [],
-				"listRule": "",
+				"listRule": "@request.auth.id != \"\" && @request.auth.id = statement.deal.user.id",
 				"name": "extractions",
 				"system": false,
 				"type": "base",
-				"updateRule": "",
-				"viewRule": ""
+				"updateRule": "@request.auth.id != \"\" && @request.auth.id = statement.deal.user.id",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.id = statement.deal.user.id"
 			},
 			{
-				"createRule": "",
-				"deleteRule": "",
+				"createRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -1984,70 +1866,10 @@ func init() {
 					},
 					{
 						"hidden": false,
-						"id": "number1806475522",
-						"max": null,
-						"min": null,
-						"name": "service_charge",
-						"onlyInt": false,
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "number"
-					},
-					{
-						"hidden": false,
-						"id": "number1403005876",
-						"max": null,
-						"min": null,
-						"name": "interest_paid",
-						"onlyInt": false,
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "number"
-					},
-					{
-						"hidden": false,
 						"id": "number1739540707",
 						"max": null,
 						"min": null,
 						"name": "ending_balance",
-						"onlyInt": false,
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "number"
-					},
-					{
-						"hidden": false,
-						"id": "number2513799993",
-						"max": null,
-						"min": null,
-						"name": "days_in_period",
-						"onlyInt": false,
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "number"
-					},
-					{
-						"hidden": false,
-						"id": "number2008163050",
-						"max": null,
-						"min": null,
-						"name": "overdraft_fee",
-						"onlyInt": false,
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "number"
-					},
-					{
-						"hidden": false,
-						"id": "number2856067821",
-						"max": null,
-						"min": null,
-						"name": "returned_item_fees",
 						"onlyInt": false,
 						"presentable": false,
 						"required": false,
@@ -2102,13 +1924,15 @@ func init() {
 					}
 				],
 				"id": "pbc_3855846597",
-				"indexes": [],
-				"listRule": "",
+				"indexes": [
+					"CREATE INDEX ` + "`" + `idx_W8dqf9NU52` + "`" + ` ON ` + "`" + `statement_details` + "`" + ` (` + "`" + `statement` + "`" + `)"
+				],
+				"listRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
 				"name": "statement_details",
 				"system": false,
 				"type": "base",
-				"updateRule": "",
-				"viewRule": ""
+				"updateRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id"
 			},
 			{
 				"createRule": null,
@@ -2144,7 +1968,7 @@ func init() {
 					},
 					{
 						"hidden": false,
-						"id": "_clone_zgto",
+						"id": "_clone_Aph1",
 						"max": "",
 						"min": "",
 						"name": "date",
@@ -2155,7 +1979,7 @@ func init() {
 					},
 					{
 						"hidden": false,
-						"id": "_clone_IGH0",
+						"id": "_clone_a20o",
 						"max": null,
 						"min": null,
 						"name": "beginning_balance",
@@ -2167,7 +1991,7 @@ func init() {
 					},
 					{
 						"hidden": false,
-						"id": "_clone_hMPZ",
+						"id": "_clone_5vkb",
 						"max": null,
 						"min": null,
 						"name": "ending_balance",
@@ -2180,17 +2004,17 @@ func init() {
 				],
 				"id": "pbc_1404239436",
 				"indexes": [],
-				"listRule": "",
+				"listRule": "@request.auth.id != \"\"",
 				"name": "balance_over_time",
 				"system": false,
 				"type": "view",
 				"updateRule": null,
 				"viewQuery": "SELECT\n    (ROW_NUMBER() OVER()) as id,\n    CAST(t.deal as TEXT) as deal,\n    sd.date,\n    sd.beginning_balance,\n    sd.ending_balance\nFROM\n    statement_details sd\nJOIN (SELECT DISTINCT deal, statement FROM transactions) t ON sd.statement = t.statement\nORDER BY\n    t.deal, sd.date;",
-				"viewRule": ""
+				"viewRule": "@request.auth.id != \"\""
 			},
 			{
-				"createRule": "",
-				"deleteRule": "",
+				"createRule": "@request.auth.id != \"\" && @request.auth.id = user.id",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = user.id",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -2254,13 +2078,15 @@ func init() {
 					}
 				],
 				"id": "pbc_2077617270",
-				"indexes": [],
-				"listRule": "",
+				"indexes": [
+					"CREATE INDEX ` + "`" + `idx_AlFKg9cpb8` + "`" + ` ON ` + "`" + `current_deal` + "`" + ` (` + "`" + `user` + "`" + `)"
+				],
+				"listRule": "@request.auth.id != \"\" && @request.auth.id = user.id",
 				"name": "current_deal",
 				"system": false,
 				"type": "base",
-				"updateRule": "",
-				"viewRule": ""
+				"updateRule": "@request.auth.id != \"\" && @request.auth.id = user.id",
+				"viewRule": "@request.auth.id != \"\" && @request.auth.id = user.id"
 			},
 			{
 				"createRule": null,
@@ -2282,7 +2108,7 @@ func init() {
 					},
 					{
 						"hidden": false,
-						"id": "_clone_FuP0",
+						"id": "_clone_2AK4",
 						"max": "",
 						"min": "",
 						"name": "date",
@@ -2309,7 +2135,7 @@ func init() {
 						"cascadeDelete": true,
 						"collectionId": "pbc_2222278443",
 						"hidden": false,
-						"id": "_clone_XqdC",
+						"id": "_clone_FMpS",
 						"maxSelect": 1,
 						"minSelect": 0,
 						"name": "statement",
@@ -2320,7 +2146,7 @@ func init() {
 					},
 					{
 						"hidden": false,
-						"id": "_clone_Ksku",
+						"id": "_clone_2QJ6",
 						"max": null,
 						"min": null,
 						"name": "debits",
@@ -2332,24 +2158,26 @@ func init() {
 					},
 					{
 						"hidden": false,
-						"id": "json1092079998",
-						"maxSize": 1,
+						"id": "_clone_hwJY",
+						"max": null,
+						"min": null,
 						"name": "credits",
+						"onlyInt": false,
 						"presentable": false,
 						"required": false,
 						"system": false,
-						"type": "json"
+						"type": "number"
 					}
 				],
 				"id": "pbc_3400703803",
 				"indexes": [],
-				"listRule": "",
+				"listRule": "@request.auth.id != \"\"",
 				"name": "credits_and_debits",
 				"system": false,
 				"type": "view",
 				"updateRule": null,
-				"viewQuery": "SELECT\n    (ROW_NUMBER() OVER()) as id,\n    sd.date,\n    CAST(t.deal as TEXT) as deal,\n    sd.statement,\n    sd.debits,\n    IFNULL(cp.total_checks_amount, 0) as credits\nFROM\n    statement_details sd\nJOIN\n    (SELECT DISTINCT deal, statement FROM transactions) t ON sd.statement = t.statement\nLEFT JOIN\n    (SELECT statement, SUM(amount) as total_checks_amount FROM checks_paid GROUP BY statement) cp ON sd.statement = cp.statement\nORDER BY\n    t.deal, sd.date;",
-				"viewRule": ""
+				"viewQuery": "SELECT\n    (ROW_NUMBER() OVER()) as id,\n    sd.date,\n    CAST(t.deal as TEXT) as deal,\n    sd.statement,\n    sd.debits,\n    sd.credits\nFROM\n    statement_details sd\nJOIN\n    (SELECT DISTINCT deal, statement FROM transactions) t ON sd.statement = t.statement\nORDER BY\n    t.deal, sd.date;",
+				"viewRule": "@request.auth.id != \"\""
 			},
 			{
 				"createRule": null,
@@ -2446,13 +2274,13 @@ func init() {
 				],
 				"id": "pbc_2848304293",
 				"indexes": [],
-				"listRule": "",
+				"listRule": "@request.auth.id != \"\" ",
 				"name": "totals_by_month",
 				"system": false,
 				"type": "view",
 				"updateRule": null,
-				"viewQuery": "SELECT\n    (ROW_NUMBER() OVER()) as id,\n    CAST(t.deal as TEXT) as deal,\n    STRFTIME('%Y-%m-%d', t.date) AS date,\n    t.funding,\n    t.revenue,\n    t.payments,\n    t.expenses,\n    t.transfers\nFROM (\n    SELECT\n        t.deal,\n        sd.date,\n        t.statement,\n        SUM(CASE WHEN t.type = 'funding' THEN t.amount ELSE 0 END) as funding,\n        SUM(CASE WHEN type = 'revenue' OR (t.amount > 0 AND t.type = 'none') THEN t.amount ELSE 0 END) as revenue,\n  SUM(CASE WHEN t.type = 'payment' THEN t.amount ELSE 0 END) as payments,\n  SUM(CASE WHEN t.type = 'expense' OR (t.amount < 0 AND t.type = 'none') THEN t.amount ELSE 0 END) as expenses,\n  SUM(CASE WHEN t.type = 'transfer' THEN t.amount ELSE 0 END) as transfers\n    FROM\n        transactions t\n     JOIN (SELECT DISTINCT date, statement FROM statement_details) sd ON sd.statement = t.statement\n    GROUP BY\n        deal,\n        sd.date\n) t;",
-				"viewRule": ""
+				"viewQuery": "SELECT\n    (ROW_NUMBER() OVER()) as id,\n    CAST(t.deal as TEXT) as deal,\n    STRFTIME('%Y-%m-%d', t.date) AS date,\n    t.funding,\n    t.revenue,\n    abs(t.payments) as payments,\n    abs(t.expenses) as expenses,\n    t.transfers\nFROM (\n    SELECT\n        t.deal,\n        sd.date,\n        t.statement,\n        SUM(CASE WHEN t.type = 'funding' THEN t.amount ELSE 0 END) as funding,\n        SUM(CASE WHEN type = 'revenue' OR (t.amount > 0 AND t.type = 'none') THEN t.amount ELSE 0 END) as revenue,\n  SUM(CASE WHEN t.type = 'payment' THEN t.amount ELSE 0 END) as payments,\n  SUM(CASE WHEN t.type = 'expense' OR (t.amount < 0 AND t.type = 'none') THEN t.amount ELSE 0 END) as expenses,\n  SUM(CASE WHEN t.type = 'transfer' THEN t.amount ELSE 0 END) as transfers\n    FROM\n        transactions t\n     JOIN (SELECT DISTINCT date, statement FROM statement_details) sd ON sd.statement = t.statement\n    GROUP BY\n        deal,\n        sd.date\n) t;",
+				"viewRule": "@request.auth.id != \"\" "
 			},
 			{
 				"createRule": null,
@@ -2506,7 +2334,7 @@ func init() {
 					},
 					{
 						"hidden": false,
-						"id": "_clone_Ngep",
+						"id": "_clone_O1lD",
 						"maxSelect": 1,
 						"name": "type",
 						"presentable": false,
@@ -2526,7 +2354,7 @@ func init() {
 						"cascadeDelete": true,
 						"collectionId": "pbc_612317808",
 						"hidden": false,
-						"id": "_clone_pF2y",
+						"id": "_clone_AJWo",
 						"maxSelect": 1,
 						"minSelect": 0,
 						"name": "deal",
@@ -2548,13 +2376,13 @@ func init() {
 				],
 				"id": "pbc_2813799467",
 				"indexes": [],
-				"listRule": "",
+				"listRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id ",
 				"name": "grouped_transactions",
 				"system": false,
 				"type": "view",
 				"updateRule": null,
 				"viewQuery": "SELECT\n    (ROW_NUMBER() OVER()) as id,\n    REPLACE(\n        REPLACE(\n            REPLACE(\n                REPLACE(\n                    REPLACE(\n                        REPLACE(\n                            REPLACE(\n                                REPLACE(\n                                    REPLACE(\n                                        REPLACE(\n                                            REPLACE(\n                                                description, '0', ''),\n                                            '1', ''),\n                                        '2', ''),\n                                    '3', ''),\n                                '4', ''),\n                            '5', ''),\n                        '6', ''),\n                    '7', ''),\n                '8', ''),\n            '9', ''),\n        ' ', ' ') AS gdescription,\n    ROUND(SUM(amount), 2) as total,\n    COUNT(id) as count,\n    type,\n    deal,\n    STRING_AGG(date, ', ') AS dates\nFROM\n    transactions\nWHERE\n    type = \"funding\" OR type = \"payment\"\nGROUP BY\n    gdescription,\n    deal,\n    type;",
-				"viewRule": ""
+				"viewRule": "@request.auth.id != \"\" && @request.auth.id = deal.user.id "
 			},
 			{
 				"createRule": null,
@@ -2615,13 +2443,481 @@ func init() {
 				],
 				"id": "pbc_2574898529",
 				"indexes": [],
-				"listRule": "",
+				"listRule": "@request.auth.id != \"\" ",
 				"name": "avg_daily_balance",
 				"system": false,
 				"type": "view",
 				"updateRule": null,
 				"viewQuery": "SELECT\n(ROW_NUMBER() OVER()) as id,\nCAST(STRFTIME('%Y-%m', date) AS TEXT) AS month,\nCAST(deal AS TEXT) AS deal,\nROUND(AVG(balance), 2) AS average_daily_ending_balance\nFROM\ndaily_balance\nGROUP BY\nmonth,\ndeal;",
-				"viewRule": ""
+				"viewRule": "@request.auth.id != \"\""
+			},
+			{
+				"createRule": null,
+				"deleteRule": null,
+				"fields": [
+					{
+						"autogeneratePattern": "[a-z0-9]{15}",
+						"hidden": false,
+						"id": "text3208210256",
+						"max": 15,
+						"min": 15,
+						"name": "id",
+						"pattern": "^[a-z0-9]+$",
+						"presentable": false,
+						"primaryKey": true,
+						"required": true,
+						"system": true,
+						"type": "text"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text1912072331",
+						"max": 0,
+						"min": 0,
+						"name": "event_id",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text2363381545",
+						"max": 0,
+						"min": 0,
+						"name": "type",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text2229534404",
+						"max": 0,
+						"min": 0,
+						"name": "run_id",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text199249577",
+						"max": 0,
+						"min": 0,
+						"name": "job_id",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"hidden": false,
+						"id": "autodate2990389176",
+						"name": "created",
+						"onCreate": true,
+						"onUpdate": false,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					},
+					{
+						"hidden": false,
+						"id": "autodate3332085495",
+						"name": "updated",
+						"onCreate": true,
+						"onUpdate": true,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					}
+				],
+				"id": "pbc_1564425120",
+				"indexes": [],
+				"listRule": null,
+				"name": "llama_webhooks",
+				"system": false,
+				"type": "base",
+				"updateRule": null,
+				"viewRule": null
+			},
+			{
+				"createRule": null,
+				"deleteRule": null,
+				"fields": [
+					{
+						"autogeneratePattern": "[a-z0-9]{15}",
+						"hidden": false,
+						"id": "text3208210256",
+						"max": 15,
+						"min": 15,
+						"name": "id",
+						"pattern": "^[a-z0-9]+$",
+						"presentable": false,
+						"primaryKey": true,
+						"required": true,
+						"system": true,
+						"type": "text"
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "_pb_users_auth_",
+						"hidden": false,
+						"id": "relation2375276105",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "user",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text3064126824",
+						"max": 0,
+						"min": 0,
+						"name": "access_token",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text309285470",
+						"max": 0,
+						"min": 0,
+						"name": "item_id",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "pbc_612317808",
+						"hidden": false,
+						"id": "relation3825123606",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "deal",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
+					},
+					{
+						"hidden": false,
+						"id": "autodate2990389176",
+						"name": "created",
+						"onCreate": true,
+						"onUpdate": false,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					},
+					{
+						"hidden": false,
+						"id": "autodate3332085495",
+						"name": "updated",
+						"onCreate": true,
+						"onUpdate": true,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					}
+				],
+				"id": "pbc_109631713",
+				"indexes": [],
+				"listRule": null,
+				"name": "plaid_tokens",
+				"system": false,
+				"type": "base",
+				"updateRule": null,
+				"viewRule": null
+			},
+			{
+				"createRule": null,
+				"deleteRule": null,
+				"fields": [
+					{
+						"autogeneratePattern": "[a-z0-9]{15}",
+						"hidden": false,
+						"id": "text3208210256",
+						"max": 15,
+						"min": 15,
+						"name": "id",
+						"pattern": "^[a-z0-9]+$",
+						"presentable": false,
+						"primaryKey": true,
+						"required": true,
+						"system": true,
+						"type": "text"
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "_pb_users_auth_",
+						"hidden": false,
+						"id": "relation2375276105",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "user",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text2607505338",
+						"max": 0,
+						"min": 0,
+						"name": "account_id",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"hidden": false,
+						"id": "number2392944706",
+						"max": null,
+						"min": null,
+						"name": "amount",
+						"onlyInt": false,
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "number"
+					},
+					{
+						"hidden": false,
+						"id": "date2862495610",
+						"max": "",
+						"min": "",
+						"name": "date",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "date"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text1579384326",
+						"max": 0,
+						"min": 0,
+						"name": "name",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text522236173",
+						"max": 0,
+						"min": 0,
+						"name": "merchant_name",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text1198480871",
+						"max": 0,
+						"min": 0,
+						"name": "website",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text1843675174",
+						"max": 0,
+						"min": 0,
+						"name": "description",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "pbc_612317808",
+						"hidden": false,
+						"id": "relation3825123606",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "deal",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
+					},
+					{
+						"hidden": false,
+						"id": "autodate2990389176",
+						"name": "created",
+						"onCreate": true,
+						"onUpdate": false,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					},
+					{
+						"hidden": false,
+						"id": "autodate3332085495",
+						"name": "updated",
+						"onCreate": true,
+						"onUpdate": true,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					}
+				],
+				"id": "pbc_2872113279",
+				"indexes": [],
+				"listRule": null,
+				"name": "plaid_transactions",
+				"system": false,
+				"type": "base",
+				"updateRule": null,
+				"viewRule": null
+			},
+			{
+				"createRule": null,
+				"deleteRule": null,
+				"fields": [
+					{
+						"autogeneratePattern": "[a-z0-9]{15}",
+						"hidden": false,
+						"id": "text3208210256",
+						"max": 15,
+						"min": 15,
+						"name": "id",
+						"pattern": "^[a-z0-9]+$",
+						"presentable": false,
+						"primaryKey": true,
+						"required": true,
+						"system": true,
+						"type": "text"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text1579384326",
+						"max": 0,
+						"min": 0,
+						"name": "name",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": true,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text873754891",
+						"max": 0,
+						"min": 0,
+						"name": "agent_id",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": true,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"hidden": false,
+						"id": "select2324736937",
+						"maxSelect": 1,
+						"name": "key",
+						"presentable": false,
+						"required": true,
+						"system": false,
+						"type": "select",
+						"values": [
+							"ascend",
+							"bmo",
+							"choice_one",
+							"chase",
+							"universal",
+							"wells_fargo",
+							"first_loyal"
+						]
+					},
+					{
+						"hidden": false,
+						"id": "autodate2990389176",
+						"name": "created",
+						"onCreate": true,
+						"onUpdate": false,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					},
+					{
+						"hidden": false,
+						"id": "autodate3332085495",
+						"name": "updated",
+						"onCreate": true,
+						"onUpdate": true,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					}
+				],
+				"id": "pbc_2699979480",
+				"indexes": [],
+				"listRule": "@request.auth.id != \"\"",
+				"name": "extraction_agents",
+				"system": false,
+				"type": "base",
+				"updateRule": null,
+				"viewRule": null
 			}
 		]`
 

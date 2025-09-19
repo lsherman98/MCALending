@@ -133,7 +133,7 @@ export function FileUpload({
                 >
                   Add Files
                 </Button>
-                <Select value={agentId} onValueChange={setAgentId}>
+                {uploads.filter((u) => u.status === "pending").length > 0 && <Select value={agentId} onValueChange={setAgentId}>
                   <SelectTrigger
                     className={`w-[180px] ${!agentId ? "border border-destructive !text-destructive" : ""}`}
                   >
@@ -147,7 +147,7 @@ export function FileUpload({
                       </SelectItem>
                     ))}
                   </SelectContent>
-                </Select>
+                </Select>}
                 <Button
                   onClick={handleUpload}
                   disabled={uploads.filter((u) => u.status === "pending").length === 0 || !agentId}

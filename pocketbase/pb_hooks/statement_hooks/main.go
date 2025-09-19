@@ -43,8 +43,8 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		if err != nil {
 			return err
 		}
-		
-		var body map[string]string
+
+		body := map[string]any{}
 		err = e.BindBody(&body)
 		if err != nil {
 			e.App.Logger().Error("Statement: failed to read body: " + err.Error())
@@ -52,7 +52,11 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 		}
 
 		statement := e.Record
-		agent := body["agent"]
+		agent, ok := body["agent"].(string)
+		if !ok {
+			e.App.Logger().Error("Statement: agent not found in body")
+			return e.BadRequestError("agent not found in body", nil)
+		}
 
 		jobRecord := core.NewRecord(jobsCollection)
 		jobRecord.Set("deal", statement.GetString("deal"))

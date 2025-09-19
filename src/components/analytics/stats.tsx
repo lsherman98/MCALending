@@ -62,40 +62,50 @@ export function Stats({ dealId }: { dealId: string }) {
           <CardTitle className={getColor(averageMonthlyPayments)}>{formatCurrency(averageMonthlyPayments)}</CardTitle>
         </CardHeader>
       </Card>
-      <Card className="shadow-sm min-w-[200px] py-2">
-        <CardHeader className="whitespace-nowrap">
-          <CardDescription>% Financing to Revenue</CardDescription>
-          <CardTitle className={getColor(ratioFundingToRevenue)}>{formatPercentage(ratioFundingToRevenue)}</CardTitle>
-        </CardHeader>
-      </Card>
-      <Card className="shadow-sm min-w-[200px] py-2">
-        <CardHeader className="whitespace-nowrap">
-          <CardDescription>% Payment to Financing</CardDescription>
-          <CardTitle className={getColor(ratioAvgPaymentToAvgFunding)}>
-            {formatPercentage(ratioAvgPaymentToAvgFunding)}
-          </CardTitle>
-        </CardHeader>
-      </Card>
-      <Card className="shadow-sm min-w-[200px] py-2">
-        <CardHeader className="whitespace-nowrap">
-          <CardDescription>% Payment to Revenue</CardDescription>
-          <CardTitle className={getColor(ratioAvgPaymentToAvgRevenue)}>
-            {formatPercentage(ratioAvgPaymentToAvgRevenue)}
-          </CardTitle>
-        </CardHeader>
-      </Card>
-      <Card className="shadow-sm min-w-[200px] py-2">
-        <CardHeader className="whitespace-nowrap text-muted-foreground text-sm">
-          <CardDescription>First Financing</CardDescription>
-          {firstFundingDate && <CardTitle>{format(new TZDate(firstFundingDate, "UTC"), "MMM dd, yyyy")}</CardTitle>}
-        </CardHeader>
-      </Card>
-      <Card className="shadow-sm min-w-[200px] py-2">
-        <CardHeader className="whitespace-nowrap text-muted-foreground text-sm">
-          <CardDescription>First Payment</CardDescription>
-          {firstPaymentDate && <CardTitle>{format(new TZDate(firstPaymentDate, "UTC"), "MMM dd, yyyy")}</CardTitle>}
-        </CardHeader>
-      </Card>
+      {ratioFundingToRevenue && (
+        <Card className="shadow-sm min-w-[200px] py-2">
+          <CardHeader className="whitespace-nowrap">
+            <CardDescription>% Financing to Revenue</CardDescription>
+            <CardTitle className={getColor(ratioFundingToRevenue)}>{formatPercentage(ratioFundingToRevenue)}</CardTitle>
+          </CardHeader>
+        </Card>
+      )}
+      {ratioAvgPaymentToAvgFunding && (
+        <Card className="shadow-sm min-w-[200px] py-2">
+          <CardHeader className="whitespace-nowrap">
+            <CardDescription>% Payment to Financing</CardDescription>
+            <CardTitle className={getColor(ratioAvgPaymentToAvgFunding)}>
+              {formatPercentage(ratioAvgPaymentToAvgFunding)}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+      )}
+      {ratioAvgPaymentToAvgRevenue && (
+        <Card className="shadow-sm min-w-[200px] py-2">
+          <CardHeader className="whitespace-nowrap">
+            <CardDescription>% Payment to Revenue</CardDescription>
+            <CardTitle className={getColor(ratioAvgPaymentToAvgRevenue)}>
+              {formatPercentage(ratioAvgPaymentToAvgRevenue)}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+      )}
+      {firstFundingDate && (
+        <Card className="shadow-sm min-w-[200px] py-2">
+          <CardHeader className="whitespace-nowrap text-muted-foreground text-sm">
+            <CardDescription>First Financing</CardDescription>
+            <CardTitle>{format(new TZDate(firstFundingDate, "UTC"), "MMM dd, yyyy")}</CardTitle>
+          </CardHeader>
+        </Card>
+      )}
+      {firstPaymentDate && (
+        <Card className="shadow-sm min-w-[200px] py-2">
+          <CardHeader className="whitespace-nowrap text-muted-foreground text-sm">
+            <CardDescription>First Payment</CardDescription>
+            <CardTitle>{format(new TZDate(firstPaymentDate, "UTC"), "MMM dd, yyyy")}</CardTitle>
+          </CardHeader>
+        </Card>
+      )}
       <Card className="shadow-sm min-w-[200px] py-2">
         <CardHeader className="whitespace-nowrap">
           <CardDescription>Net Cash Flow</CardDescription>

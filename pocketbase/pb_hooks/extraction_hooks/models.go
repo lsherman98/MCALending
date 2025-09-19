@@ -6,11 +6,11 @@ type BankInformation struct {
 }
 
 type BusinessInformation struct {
-	Address      string `json:"address"`
-	City         string `json:"city"`
-	State        string `json:"state"`
-	ZipCode      string `json:"zip_code"`
-	Name         string `json:"company_name"`
+	Address string `json:"address"`
+	City    string `json:"city"`
+	State   string `json:"state"`
+	ZipCode string `json:"zip_code"`
+	Name    string `json:"company_name"`
 }
 
 type DailyBalance struct {
@@ -37,8 +37,8 @@ type UniversalStatement struct {
 	Account struct {
 		BeginningBalance float64 `json:"beginning_balance"`
 		EndingBalance    float64 `json:"ending_balance"`
-		Debits           float64 `json:"deposits"`
-		Credits          float64 `json:"withdrawals"`
+		Credits          float64 `json:"deposits"`
+		Debits           float64 `json:"withdrawals"`
 	} `json:"account_summary"`
 	Bank         BankInformation     `json:"bank_information"`
 	Business     BusinessInformation `json:"business_information"`
@@ -49,8 +49,8 @@ type ChoiceOneStatement struct {
 	Account struct {
 		BeginningBalance float64 `json:"beginning_balance"`
 		EndingBalance    float64 `json:"ending_balance"`
-		Debits           float64 `json:"total_deposits_credits"`
-		Credits          float64 `json:"total_checks_debits"`
+		Credits          float64 `json:"total_deposits_credits"`
+		Debits           float64 `json:"total_checks_debits"`
 	} `json:"account_summary"`
 	Bank         BankInformation     `json:"bank_information"`
 	Business     BusinessInformation `json:"business_information"`
@@ -64,8 +64,8 @@ type FirstLoyalStatement struct {
 	Account  struct {
 		BeginningBalance float64 `json:"beginning_balance"`
 		EndingBalance    float64 `json:"ending_balance"`
-		Deposits         float64 `json:"deposits"`
-		Withdrawals      float64 `json:"withdrawals"`
+		Credits          float64 `json:"deposits"`
+		Debits           float64 `json:"withdrawals"`
 	} `json:"account_summary"`
 	Deposits []struct {
 		Date        string  `json:"date"`
@@ -94,15 +94,15 @@ type WellsFargoStatement struct {
 	Business BusinessInformation `json:"business_information"`
 	Account  struct {
 		BeginningBalance float64 `json:"beginning_balance"`
-		Deposits         float64 `json:"deposits"`
-		Withdrawals      float64 `json:"withdrawals"`
+		Credits          float64 `json:"deposits"`
+		Debits           float64 `json:"withdrawals"`
 		EndingBalance    float64 `json:"ending_balance"`
 	} `json:"account_summary"`
 	TransactionHistory []struct {
 		Date               string   `json:"date"`
 		Description        string   `json:"description"`
-		Deposits           *float64 `json:"deposits"`
-		Withdrawals        *float64 `json:"withdrawals"`
+		Credits            *float64 `json:"deposits"`
+		Debits             *float64 `json:"withdrawals"`
 		EndingDailyBalance *float64 `json:"ending_daily_balance"`
 	} `json:"transaction_history"`
 }
@@ -113,16 +113,16 @@ type ChaseStatement struct {
 	Account  struct {
 		BeginningBalance      float64 `json:"beginning_balance"`
 		EndingBalance         float64 `json:"ending_balance"`
-		Deposits              float64 `json:"deposits"`
+		Credits               float64 `json:"deposits"`
 		ChecksPaid            float64 `json:"checks_paid"`
-		AtmDebitWithdrawals   float64 `json:"atm_debit_withdrawals"`
+		ATMDebitWithdrawals   float64 `json:"atm_debit_withdrawals"`
 		ElectronicWithdrawals float64 `json:"electronic_withdrawals"`
 	} `json:"account_summary"`
 	Deposits              []Transaction  `json:"deposits"`
 	ChecksPaid            []Transaction  `json:"checks_paid"`
-	AtmDebitWithdrawals   []Transaction  `json:"atm_debit_withdrawals"`
+	ATMDebitWithdrawals   []Transaction  `json:"atm_debit_withdrawals"`
 	ElectronicWithdrawals []Transaction  `json:"electronic_withdrawals"`
-	DailyEndingBalance    []DailyBalance `json:"daily_ending_balance"`
+	DailyBalance          []DailyBalance `json:"daily_ending_balance"`
 }
 
 type BMOStatement struct {
@@ -130,16 +130,16 @@ type BMOStatement struct {
 	Business BusinessInformation `json:"business_information"`
 	Account  struct {
 		BeginningBalance float64 `json:"beginning_balance"`
-		DepositAmount    float64 `json:"deposit_amount"`
-		WithdrawalAmount float64 `json:"withdrawal_amount"`
+		Credits          float64 `json:"deposit_amount"`
+		Debits           float64 `json:"withdrawal_amount"`
 		EndingBalance    float64 `json:"ending_balance"`
 	} `json:"account_summary"`
 	Transactions []struct {
-		Date        string  `json:"date"`
-		Description string  `json:"description"`
-		Withdrawal  float64 `json:"withdrawal"`
-		Deposit     float64 `json:"deposit"`
-		Balance     float64 `json:"balance"`
+		Date        string   `json:"date"`
+		Description string   `json:"description"`
+		Deposit     *float64 `json:"deposit"`
+		Withdrawal  *float64 `json:"withdrawal"`
+		Balance     *float64 `json:"balance"`
 	} `json:"transactions"`
 }
 
@@ -147,23 +147,23 @@ type AscendStatement struct {
 	Bank     BankInformation     `json:"bank_information"`
 	Business BusinessInformation `json:"business_information"`
 	Accounts []struct {
-		AccountTitle   string `json:"account_title"`
-		AccountSummary struct {
+		Title   string `json:"account_title"`
+		Account struct {
 			BeginningBalance float64 `json:"beginning_balance"`
-			TotalDeposits    float64 `json:"total_deposits"`
-			TotalWithdrawals float64 `json:"total_withdrawals"`
+			Credits          float64 `json:"total_deposits"`
+			Debits           float64 `json:"total_withdrawals"`
 			EndingBalance    float64 `json:"ending_balance"`
 		} `json:"account_summary"`
 		ChecksPaid []*struct {
 			Amount float64 `json:"amount"`
-			Date   string `json:"date"`
+			Date   string  `json:"date"`
 		} `json:"checks_paid"`
 		Transactions []struct {
-			Date        string  `json:"date"`
-			Deposit     float64 `json:"deposit"`
-			Withdrawal  float64 `json:"withdrawal"`
-			Description string  `json:"description"`
-			Balance     float64 `json:"balance"`
+			Date        string   `json:"date"`
+			Description string   `json:"description"`
+			Deposit     *float64 `json:"deposit"`
+			Withdrawal  *float64 `json:"withdrawal"`
+			Balance     float64  `json:"balance"`
 		} `json:"transactions"`
 	} `json:"accounts"`
 }

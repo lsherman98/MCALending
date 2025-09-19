@@ -23,18 +23,11 @@ export function RowContent({
       <div
         className={`flex-shrink-0 px-3 py-3 border-r flex items-center whitespace-nowrap overflow-hidden ${
           selected ? "text-primary font-bold" : "font-medium"
-        } ${open ? "w-80" : "w-120"}`}
+        } ${open ? "w-100" : "w-140"}`}
       >
         <span className="text-sm truncate" title={transaction.description}>
           {transaction.description}
         </span>
-      </div>
-      <div
-        className={`flex-shrink-0 w-26 px-3 py-3 border-r text-xs text-muted-foreground flex items-center whitespace-nowrap overflow-hidden ${
-          selected ? "text-primary font-bold" : "font-medium"
-        }`}
-      >
-        <span className="truncate">{transaction.trace_number || "—"}</span>
       </div>
       <div className="flex-shrink-0 w-32 px-3 py-3 border-r flex items-center whitespace-nowrap overflow-hidden">
         <div className="flex items-center gap-2 min-w-0">

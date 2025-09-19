@@ -33,7 +33,6 @@ export function TransactionCard({
       description: transaction.description,
       amount: transaction.amount,
       date: date,
-      trace_number: transaction.trace_number,
       type: transaction.type,
     });
   };
@@ -48,7 +47,6 @@ export function TransactionCard({
         description: editFormData.description,
         amount: editFormData.amount,
         date: editFormData.date,
-        trace_number: editFormData.trace_number,
         type: editFormData.type,
       },
     });
@@ -63,7 +61,6 @@ export function TransactionCard({
       description: "",
       amount: undefined,
       date: undefined,
-      trace_number: undefined,
       type: undefined,
     });
   };
@@ -105,10 +102,6 @@ export function TransactionCard({
                     >
                       {transaction.amount > 0 ? "+" : ""}${transaction.amount.toFixed(2)}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-muted-foreground text-sm">Reference</div>
-                    <div className="font-mono">{transaction.trace_number || "—"}</div>
                   </div>
                 </>
               ) : (
@@ -162,20 +155,6 @@ export function TransactionCard({
                       onKeyDown={(e) => e.stopPropagation()}
                       className="h-8 w-36"
                       placeholder="0.00"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Label htmlFor="edit-reference" className="text-sm w-21 flex-shrink-0">
-                      Reference
-                    </Label>
-                    <Input
-                      id="edit-reference"
-                      type="text"
-                      inputMode="numeric"
-                      value={editFormData?.trace_number}
-                      onChange={(e) => setEditFormData({ ...editFormData, trace_number: e.target.valueAsNumber })}
-                      onKeyDown={(e) => e.stopPropagation()}
-                      className="h-8 w-36"
                     />
                   </div>
                 </div>

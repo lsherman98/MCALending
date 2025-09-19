@@ -31,6 +31,7 @@ func UniversalLoader(content []byte, e *core.RecordEvent, statement, deal *core.
 		SetStatementDetailsRecordFields(statement_details, statement.Id, deal.Id, data.Bank.StatementDate, data.Account.BeginningBalance, data.Account.Credits, data.Account.Debits, data.Account.EndingBalance)
 		if err := e.App.Save(statement_details); err != nil {
 			e.App.Logger().Error("Extraction: failed to create statement_details record: " + err.Error())
+			return
 		}
 
 		statement.Set("details", statement_details.Id)
@@ -63,7 +64,7 @@ func UniversalLoader(content []byte, e *core.RecordEvent, statement, deal *core.
 		}
 	})
 
-    *transactions = data.Transactions
+	*transactions = data.Transactions
 
 	return nil
 }
@@ -92,3 +93,33 @@ func calculateDailyBalances(transactions []Transaction, beginningBalance float64
 
 	return dailyBalances
 }
+
+// 	routine.FireAndForget(func() {
+// 	statement_details := core.NewRecord(statementDetailsCollection)
+// 	SetStatementDetailsRecordFields(statement_details, )
+// 	if err := e.App.Save(statement_details); err != nil {
+// 		e.App.Logger().Error("Extraction: failed to create statement_details record: " + err.Error())
+// 	}
+
+// 	statement.Set("details", statement_details.Id)
+// 	if err := e.App.Save(statement); err != nil {
+// 		e.App.Logger().Error("Extraction: failed to update statement record: " + err.Error())
+// 	}
+// })
+
+// for _, dailyBalance := range data.DailyBalance {
+// 	routine.FireAndForget(func() {
+// 		dailyBalanceRecord := core.NewRecord(dailyBalanceCollection)
+// 		SetDailyBalanceRecordFields(dailyBalance, dailyBalanceRecord, statement, deal)
+// 		if err := e.App.Save(dailyBalanceRecord); err != nil {
+// 			e.App.Logger().Error("Extraction: failed to create daily_balance record: " + err.Error())
+// 		}
+// 	})
+// }
+
+// routine.FireAndForget(func() {
+// 	SetDealRecordFields(deal, )
+// 	if err := e.App.Save(deal); err != nil {
+// 		e.App.Logger().Error("Extraction: failed to save deal record: " + err.Error())
+// 	}
+// })

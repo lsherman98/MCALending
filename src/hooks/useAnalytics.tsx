@@ -31,9 +31,11 @@ export function useAnalytics(dealId: string) {
   const averageMonthlyFunding = totalFunding / numberOfMonths;
   const averageMonthlyPayments = totalPayments / numberOfMonths;
 
-  const ratioFundingToRevenue = totalFunding / totalRevenue;
-  const ratioAvgPaymentToAvgFunding = averageMonthlyPayments / averageMonthlyFunding;
-  const ratioAvgPaymentToAvgRevenue = averageMonthlyPayments / averageMonthlyRevenue;
+  const ratioFundingToRevenue = totalRevenue === 0 ? undefined : totalFunding / totalRevenue;
+  const ratioAvgPaymentToAvgFunding =
+    averageMonthlyFunding === 0 ? undefined : averageMonthlyPayments / averageMonthlyFunding;
+  const ratioAvgPaymentToAvgRevenue =
+    averageMonthlyRevenue === 0 ? undefined : averageMonthlyPayments / averageMonthlyRevenue;
 
   const firstFundingDate = firstFunding?.date || "";
   const firstPaymentDate = firstPayment?.date || "";
