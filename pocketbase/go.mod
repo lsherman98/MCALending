@@ -4,8 +4,10 @@ go 1.25.0
 
 require (
 	github.com/joho/godotenv v1.5.1
+	github.com/plaid/plaid-go/v31 v31.1.0
+	github.com/pocketbase/dbx v1.11.0
 	github.com/pocketbase/pocketbase v0.30.0
-	google.golang.org/genai v1.23.0
+	google.golang.org/genai v1.25.0
 )
 
 require (
@@ -34,8 +36,6 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
-	github.com/plaid/plaid-go/v31 v31.1.0 // indirect
-	github.com/pocketbase/dbx v1.11.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/spf13/cast v1.9.2 // indirect
 	github.com/spf13/cobra v1.10.1 // indirect
