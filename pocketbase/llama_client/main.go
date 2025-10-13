@@ -132,7 +132,7 @@ func (c *LlamaClient) GetRunByJobID(ctx context.Context, jobID string) (*RunResp
 	return &response, nil
 }
 
-func (c *LlamaClient) do(ctx context.Context, method, endpointPath string, queryParams url.Values, reqBody, resBody interface{}) error {
+func (c *LlamaClient) do(ctx context.Context, method, endpointPath string, queryParams url.Values, reqBody, resBody any) error {
 	endpoint, err := c.BaseURL.Parse(path.Join(c.BaseURL.Path, endpointPath))
 	if err != nil {
 		c.App.Logger().Error("LlamaIndex:: failed to parse endpoint URL", "error", err)
