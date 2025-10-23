@@ -1,6 +1,6 @@
 # MCA Platform
 
-A full-stack application for managing Merchant Cash Advance (MCA) deals, bank statements, and transaction analysis.
+A full stack application for managing Merchant Cash Advance (MCA) deals, bank statements, and transaction analysis.
 
 ## Tech Stack
 
@@ -11,7 +11,6 @@ A full-stack application for managing Merchant Cash Advance (MCA) deals, bank st
 - **TanStack Router** - Type-safe routing
 - **TanStack Query** - Data fetching and caching
 - **Tailwind CSS** - Styling
-- **Radix UI** - Accessible UI components
 - **shadcn/ui** - Component library
 
 ### Backend
@@ -55,25 +54,12 @@ mca-platform/
 
 ## Development
 
-### Prerequisites
-
-- Node.js 18+
-- Go 1.21+
-- pnpm
-
 ### Setup
 
 1. Install dependencies:
 
 ```bash
 pnpm install
-```
-
-2. Set up environment variables:
-
-```bash
-# Create .env file in pocketbase/ directory
-GEMINI_API_KEY=your_key
 ```
 
 3. Run development servers:
@@ -85,24 +71,3 @@ pnpm dev
 # Terminal 2: Backend
 pnpm pb:serve
 ```
-
-## Key Features
-
-### Deal Management
-
-- Create and manage MCA deals
-- Track deal status and details
-- Associate statements with deals
-
-### Statement Processing
-
-- Upload bank statements (PDF)
-- Automatic data extraction via AI
-- Support for multiple bank formats
-
-### Transaction Analysis
-
-- Automatic transaction classification
-- Revenue, funding, payment tracking
-- Analytics and visualizations
-- Search and filtering
