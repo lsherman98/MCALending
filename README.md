@@ -2,23 +2,6 @@
 
 A full stack application for managing Merchant Cash Advance (MCA) deals, bank statements, and transaction analysis.
 
-## Tech Stack
-
-### Frontend
-
-- **React** with **TypeScript**
-- **Vite** - Build tool and dev server
-- **TanStack Router** - Type-safe routing
-- **TanStack Query** - Data fetching and caching
-- **Tailwind CSS** - Styling
-- **shadcn/ui** - Component library
-
-### Backend
-
-- **PocketBase** (Go) - Backend as a Service
-- **Gemini AI** - Transaction classification
-- **LLaMA Index** - Document processing
-
 ## Project Structure
 
 ```
