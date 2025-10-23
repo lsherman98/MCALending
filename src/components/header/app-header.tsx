@@ -1,6 +1,5 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { ModeToggle } from "../mode-toggle";
 import { useLocation, useMatches, useNavigate } from "@tanstack/react-router";
 import { useCurrentDealStore } from "@/lib/stores/current-deal-store";
 import { useEffect } from "react";
@@ -51,7 +50,7 @@ export function AppHeader() {
         {currentDeal?.id && <Shortcuts pathname={route.pathname} currentDealId={currentDeal.id} />}
         <div className="ml-auto flex items-center gap-2">
           <RunningJobs />
-          <ModeToggle />
+          {/* <ModeToggle /> */}
         </div>
       </div>
     </header>

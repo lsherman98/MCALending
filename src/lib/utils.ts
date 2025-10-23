@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge"
 import { pb } from "./pocketbase";
 import { toast } from "sonner";
 import type { GroupedTransactionsResponse } from "./pocketbase-types";
+import { CURRENCY_FORMAT, FILE_SIZE, PAYMENT_FREQUENCY_THRESHOLDS, VALIDATION } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -28,22 +29,23 @@ export function getUserId(msg: string = 'No logged in user detected.'): string |
   return user.id;
 }
 
-export const formatFileSize = (size: number) => {
-  if (size < 1024) return `${size} B`;
-  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
-  return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+export const formatFileSize = (size: number): string => {
+  if (size < FILE_SIZE.KILOBYTE) return `${size} B`;
+  if (size < FILE_SIZE.MEGABYTE) return `${(size / FILE_SIZE.KILOBYTE).toFixed(1)} KB`;
+  return `${(size / FILE_SIZE.MEGABYTE).toFixed(2)} MB`;
 };
 
-export const formatCurrency = (value: string | number | undefined) => {
+export const formatCurrency = (value: string | number | undefined): string => {
   if (!value) return "$0.00";
   const numValue = typeof value === "string" ? parseFloat(value) : value;
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat(CURRENCY_FORMAT.LOCALE, {
     style: "currency",
-    currency: "USD",
+    currency: CURRENCY_FORMAT.CURRENCY,
   }).format(numValue);
 };
 
-export const formatPercentage = (value: string | number | undefined) => {
+
+export const formatPercentage = (value: string | number | undefined): string => {
   if (!value) return "0%";
   const numValue = typeof value === "string" ? parseFloat(value) : value;
   return `${numValue.toFixed(2)}%`;
@@ -66,7 +68,7 @@ export const areDescriptionsSimilar = (desc1: string | null, desc2: string | nul
   const longer = norm1.length > norm2.length ? norm1 : norm2;
   const shorter = norm1.length > norm2.length ? norm2 : norm1;
 
-  return longer.includes(shorter) && shorter.length > 3;
+  return longer.includes(shorter) && shorter.length > VALIDATION.MIN_DESCRIPTION_LENGTH;
 };
 
 export const calculatePaymentFrequency = (datesString: string): string => {
@@ -74,7 +76,7 @@ export const calculatePaymentFrequency = (datesString: string): string => {
     .split(",")
     .map((d) => new Date(d.trim()))
     .sort();
-  if (dates.length < 2) return "one-time";
+  if (dates.length < VALIDATION.MIN_TRANSACTIONS_FOR_FREQUENCY) return "one-time";
 
   const intervals = [];
   for (let i = 1; i < dates.length; i++) {
@@ -84,12 +86,12 @@ export const calculatePaymentFrequency = (datesString: string): string => {
 
   const avgInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
 
-  if (avgInterval <= 1.5) return "daily";
-  if (avgInterval <= 3.5) return "every-few-days";
-  if (avgInterval <= 8) return "weekly";
-  if (avgInterval <= 16) return "bi-weekly";
-  if (avgInterval <= 35) return "monthly";
-  if (avgInterval <= 95) return "quarterly";
+  if (avgInterval <= PAYMENT_FREQUENCY_THRESHOLDS.DAILY) return "daily";
+  if (avgInterval <= PAYMENT_FREQUENCY_THRESHOLDS.EVERY_FEW_DAYS) return "every-few-days";
+  if (avgInterval <= PAYMENT_FREQUENCY_THRESHOLDS.WEEKLY) return "weekly";
+  if (avgInterval <= PAYMENT_FREQUENCY_THRESHOLDS.BI_WEEKLY) return "bi-weekly";
+  if (avgInterval <= PAYMENT_FREQUENCY_THRESHOLDS.MONTHLY) return "monthly";
+  if (avgInterval <= PAYMENT_FREQUENCY_THRESHOLDS.QUARTERLY) return "quarterly";
   return "irregular";
 };
 

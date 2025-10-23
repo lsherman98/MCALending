@@ -2,7 +2,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -10,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { pb } from "@/lib/pocketbase";
-import { CircleUser, CreditCard, EllipsisVertical, LogOut } from "lucide-react";
+import {  EllipsisVertical, LogOut } from "lucide-react";
 
 export function NavUser({ email }: { email: string }) {
   const { isMobile } = useSidebar();
@@ -54,7 +53,7 @@ export function NavUser({ email }: { email: string }) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
+            {/* <DropdownMenuGroup>
               <DropdownMenuItem>
                 <CircleUser />
                 Account
@@ -63,7 +62,7 @@ export function NavUser({ email }: { email: string }) {
                 <CreditCard />
                 Billing
               </DropdownMenuItem>
-            </DropdownMenuGroup>
+            </DropdownMenuGroup> */}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {

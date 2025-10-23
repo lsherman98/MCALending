@@ -2,8 +2,8 @@ import { pb } from "../pocketbase";
 import { Collections, TransactionsTypeOptions, type CurrentDealResponse, type DealsRecord, type DealsResponse, type JobsResponse, type TransactionsRecord, type TransactionsResponse } from "../pocketbase-types";
 import type { ExpandDeal, ExpandStatement, UploadStatementData } from "../types";
 import { getUserId } from "../utils";
+import { buildTransactionFilter, buildTransactionSort } from "./filters";
 
-// DEALS
 export async function getDeals() {
     return await pb.collection(Collections.Deals).getFullList();
 }
@@ -36,7 +36,6 @@ export const searchDeals = async (query: string) => {
     return await pb.send<DealsResponse[]>(`/api/collections/deals/records/full-text-search?search=${query}`, { method: 'GET' });
 }
 
-// STATEMENTS
 export async function getStatementsByDealId(dealId: string) {
     return await pb.collection(Collections.Statements).getFullList({
         filter: `deal = "${dealId}"`,
@@ -67,24 +66,32 @@ export async function getStatementUrl(id: string) {
 
 
 // TRANSACTIONS
-export async function getTransactions(dealId: string, statement?: string, type?: TransactionsTypeOptions[], from?: string, to?: string, hideCredits?: boolean, hideDebits?: boolean, sortField?: string, sortDir?: 'asc' | 'desc') {
-    let filter = `deal = "${dealId}"`;
-    let sort = '';
+export async function getTransactions(
+    dealId: string,
+    statement?: string,
+    type?: TransactionsTypeOptions[],
+    from?: string,
+    to?: string,
+    hideCredits?: boolean,
+    hideDebits?: boolean,
+    sortField?: string,
+    sortDir?: 'asc' | 'desc'
+) {
+    const filter = buildTransactionFilter({
+        dealId,
+        statement,
+        type,
+        from,
+        to,
+        hideCredits,
+        hideDebits
+    });
 
-    if (type && type.length > 0) filter += ` && type ?= "${type.join('","')}"`;
-    if (statement) filter += ` && statement = "${statement}"`;
-    if (from) filter += ` && date >= "${from}"`;
-    if (to) filter += ` && date <= "${to}"`;
-    if (hideCredits) filter += ` && amount < 0`;
-    if (hideDebits) filter += ` && amount > 0`;
-
-    if (sortField) {
-        sort = (sortDir === 'asc' ? '' : '-') + sortField;
-    }
+    const sort = buildTransactionSort(sortField, sortDir);
 
     return await pb.collection(Collections.Transactions).getFullList({
-        filter: filter,
-        sort: sort || 'date',
+        filter,
+        sort,
     });
 }
 
@@ -109,7 +116,6 @@ export const searchTransactions = async (query: string) => {
     return await pb.send<TransactionsResponse[]>(`/api/collections/transactions/records/full-text-search?search=${query}`, { method: 'GET' });
 }
 
-//CURRENT DEAL
 export async function getCurrentDeal() {
     return await pb.collection(Collections.CurrentDeal).getFirstListItem<CurrentDealResponse<ExpandDeal>>(`user = "${getUserId()}"`, {
         expand: 'deal'
@@ -122,7 +128,6 @@ export async function updateCurrentDeal(currentDealId: string, dealId: string) {
     });
 }
 
-// ANALYTICS
 export async function getAvgDailyBalance(deal: string) {
     return await pb.collection(Collections.AvgDailyBalance).getFullList({
         filter: `deal="${deal}"`,
@@ -170,8 +175,6 @@ export async function getFirstTransactionDate(deal: string, type: TransactionsTy
     });
 }
 
-
-// JOBS 
 export async function getJobs() {
     const now = new Date();
     const lastHour = new Date(now.getTime() - 60 * 60 * 1000);
@@ -185,7 +188,6 @@ export async function getJobs() {
     });
 }
 
-//PLAID
 export async function createLinkToken() {
     return await pb.send<{ link_token: string }>('/api/plaid/create-link-token', {
         method: 'POST',
@@ -200,7 +202,6 @@ export async function setAccessToken(public_token: string, deal?: string) {
     });
 }
 
-// AGENTS
 export async function getAgents() {
     return await pb.collection(Collections.ExtractionAgents).getFullList({
         sort: 'name'

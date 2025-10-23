@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { BarChart3, FileText, Handshake, Landmark, Settings } from "lucide-react";
+import { BarChart3, FileText, Handshake, Landmark } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "./ui/button";
 import { pb } from "@/lib/pocketbase";
@@ -34,11 +34,11 @@ const data = {
     },
   ],
   navSecondary: [
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings,
-    },
+    // {
+    //   title: "Settings",
+    //   url: "/settings",
+    //   icon: Settings,
+    // },
   ],
 };
 

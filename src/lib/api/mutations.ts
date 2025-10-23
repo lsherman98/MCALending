@@ -3,8 +3,9 @@ import type { DealsRecord, TransactionsRecord } from "../pocketbase-types";
 import { bulkUpdateTransaction, createDeal, deleteDeal, deleteStatement, deleteTransaction, updateDeal, updateTransaction, uploadStatement } from "./api";
 import { handleError } from "../utils";
 import type { UploadStatementData } from "../types";
+import { QUERY_KEYS } from "../constants";
+import { scheduleJobInvalidations } from "./query-utils";
 
-// DEALS
 export function useCreateDeal() {
     const queryClient = useQueryClient();
 
@@ -12,8 +13,8 @@ export function useCreateDeal() {
         mutationFn: (data: Omit<DealsRecord, 'id'>) => createDeal(data),
         onError: handleError,
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["deals"] });
-            await queryClient.invalidateQueries({ queryKey: ["recentDeals"] });
+            await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DEALS });
+            await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RECENT_DEALS });
         }
     })
 }
@@ -25,7 +26,7 @@ export function useUpdateDeal() {
         mutationFn: ({ id, data }: { id: string, data: Partial<DealsRecord> }) => updateDeal(id, data),
         onError: handleError,
         onSuccess: async (data) => {
-            await queryClient.invalidateQueries({ queryKey: ["deal", data.id] });
+            await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DEAL(data.id) });
         }
     })
 }
@@ -37,12 +38,11 @@ export function useDeleteDeal() {
         mutationFn: (id: string) => deleteDeal(id),
         onError: handleError,
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["deals"] });
+            await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DEALS });
         }
     })
 }
 
-// STATEMENTS
 export function useUploadStatement() {
     const queryClient = useQueryClient();
 
@@ -50,16 +50,8 @@ export function useUploadStatement() {
         mutationFn: (statement: UploadStatementData) => uploadStatement(statement),
         onError: handleError,
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["statements"] });
-            setTimeout(async () => {
-                await queryClient.invalidateQueries({ queryKey: ["jobs"] });
-            }, 3000);
-            setTimeout(async () => {
-                await queryClient.invalidateQueries({ queryKey: ["jobs"] });
-            }, 4000);
-            setTimeout(async () => {
-                await queryClient.invalidateQueries({ queryKey: ["jobs"] });
-            }, 5000);
+            await queryClient.invalidateQueries({ queryKey: ['statements'] });
+            scheduleJobInvalidations(queryClient);
         }
     })
 }
@@ -71,13 +63,12 @@ export function useDeleteStatement() {
         mutationFn: (id: string) => deleteStatement(id),
         onError: handleError,
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["statements"] });
-            await queryClient.invalidateQueries({ queryKey: ["jobs"] });
+            await queryClient.invalidateQueries({ queryKey: ['statements'] });
+            await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOBS });
         }
     })
 }
 
-// TRANSACTIONS
 export function useUpdateTransaction() {
     const queryClient = useQueryClient();
 
@@ -85,7 +76,7 @@ export function useUpdateTransaction() {
         mutationFn: ({ id, data }: { id: string, data: Partial<TransactionsRecord> }) => updateTransaction(id, data),
         onError: handleError,
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+            await queryClient.invalidateQueries({ queryKey: ['transactions'] });
         }
     })
 }
@@ -97,7 +88,7 @@ export function useDeleteTransaction() {
         mutationFn: (id: string) => deleteTransaction(id),
         onError: handleError,
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+            await queryClient.invalidateQueries({ queryKey: ['transactions'] });
         }
     })
 }
@@ -109,7 +100,7 @@ export function useBulkUpdateTransactions() {
         mutationFn: ({ ids, data }: { ids: string[], data: Partial<TransactionsRecord> }) => bulkUpdateTransaction(ids, data),
         onError: handleError,
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+            await queryClient.invalidateQueries({ queryKey: ['transactions'] });
         }
     })
 }
