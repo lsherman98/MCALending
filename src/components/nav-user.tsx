@@ -52,7 +52,7 @@ export function NavUser({ email }: { email: string }) {
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            {/* <DropdownMenuSeparator /> */}
             {/* <DropdownMenuGroup>
               <DropdownMenuItem>
                 <CircleUser />
