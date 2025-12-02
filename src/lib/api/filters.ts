@@ -50,11 +50,3 @@ export function buildTransactionSort(
 
     return sortDir === 'asc' ? sortField : `-${sortField}`;
 }
-
-export function buildDealFilter(dealId: string): string {
-    return `deal = "${dealId}"`;
-}
-
-export function buildStatementFilter(dealId: string): string {
-    return `deal = "${dealId}"`;
-}

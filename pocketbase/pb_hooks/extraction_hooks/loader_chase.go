@@ -28,7 +28,7 @@ func ChaseLoader(content []byte, e *core.RecordEvent, statement, deal *core.Reco
 	routine.FireAndForget(func() {
 		statement_details := core.NewRecord(statementDetailsCollection)
 		totalDebits := data.Account.ChecksPaid + data.Account.ATMDebitWithdrawals + data.Account.ElectronicWithdrawals
-		SetStatementDetailsRecordFields(statement_details, statement.Id, deal.Id, data.Bank.StatementDate, data.Account.BeginningBalance, data.Account.Credits, totalDebits, data.Account.EndingBalance)
+		SetStatementDetailsFields(statement_details, statement.Id, deal.Id, data.Bank.StatementDate, data.Account.BeginningBalance, data.Account.Credits, totalDebits, data.Account.EndingBalance)
 		if err := e.App.Save(statement_details); err != nil {
 			e.App.Logger().Error("Chase Loader: failed to create statement_details record: " + err.Error())
 			return
@@ -43,7 +43,7 @@ func ChaseLoader(content []byte, e *core.RecordEvent, statement, deal *core.Reco
 	for _, dailyBalance := range data.DailyBalance {
 		routine.FireAndForget(func() {
 			dailyBalanceRecord := core.NewRecord(dailyBalanceCollection)
-			SetDailyBalanceRecordFields(dailyBalance, dailyBalanceRecord, statement, deal)
+			SetDailyBalanceFields(dailyBalance, dailyBalanceRecord, statement, deal)
 			if err := e.App.Save(dailyBalanceRecord); err != nil {
 				e.App.Logger().Error("Chase Loader: failed to create daily_balance record: " + err.Error())
 			}
@@ -51,7 +51,7 @@ func ChaseLoader(content []byte, e *core.RecordEvent, statement, deal *core.Reco
 	}
 
 	routine.FireAndForget(func() {
-		SetDealRecordFields(deal, data.Business.Name, data.Business.Address, data.Business.City, data.Business.State, data.Business.ZipCode, data.Bank.Name)
+		SetDealFields(deal, data.Business.Name, data.Business.Address, data.Business.City, data.Business.State, data.Business.ZipCode, data.Bank.Name)
 		if err := e.App.Save(deal); err != nil {
 			e.App.Logger().Error("Chase Loader: failed to save deal record: " + err.Error())
 		}

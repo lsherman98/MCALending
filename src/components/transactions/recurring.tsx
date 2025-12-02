@@ -40,9 +40,11 @@ const patternBadgeColors: { [key: string]: string } = {
 export function Recurring({ transactions }: { transactions?: TransactionsResponse[] }) {
   const bulkUpdateTransactionMutation = useBulkUpdateTransactions();
 
+  const validTransactions = transactions?.filter((t) => t.date && !isNaN(new Date(t.date).getTime())) || [];
+
   const recurringGroups = useMemo(() => {
-    if (!transactions) return [];
-    const groupedByDescription = transactions.reduce((acc, t) => {
+    if (!validTransactions.length) return [];
+    const groupedByDescription = validTransactions.reduce((acc, t) => {
       const description = t.description.trim();
       if (!acc[description]) {
         acc[description] = [];
@@ -54,13 +56,14 @@ export function Recurring({ transactions }: { transactions?: TransactionsRespons
     const filteredGroups = Object.entries(groupedByDescription).filter(([, ts]) => ts.length > 1);
 
     return filteredGroups.map(([description, groupTransactions]) => {
-      const dates = groupTransactions.map((t) => new Date(t.date));
+      const validTransactions = groupTransactions.filter((t) => t.date && !isNaN(new Date(t.date).getTime()));
+      const dates = validTransactions.map((t) => new Date(t.date));
       const pattern = getRecurrencePattern(dates);
-      const sortedTransactions = [...groupTransactions].sort(
+      const sortedTransactions = [...validTransactions].sort(
         (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
       );
 
-      const types = [...new Set(groupTransactions.map((t) => t.type))];
+      const types = [...new Set(validTransactions.map((t) => t.type))];
       const hasUniformType = types.length === 1;
       const sharedType = hasUniformType ? types[0] : null;
 
@@ -137,7 +140,11 @@ export function Recurring({ transactions }: { transactions?: TransactionsRespons
                     <div className="max-h-60 overflow-y-auto">
                       {groupTransactions.map((transaction) => (
                         <div key={transaction.id} className="flex border-b p-2 text-sm items-center">
-                          <div className="w-1/4">{format(new TZDate(transaction.date, "UTC"), "MMM dd, yyyy")}</div>
+                          <div className="w-1/4">
+                            {transaction.date && !isNaN(new Date(transaction.date).getTime())
+                              ? format(new TZDate(transaction.date, "UTC"), "MMM dd, yyyy")
+                              : "No Date"}
+                          </div>
                           <div className="w-1/4 capitalize">
                             <div className="flex items-center gap-2">
                               <div className={`w-2 h-2 rounded-full flex-shrink-0 bg-${transaction.type}`} />

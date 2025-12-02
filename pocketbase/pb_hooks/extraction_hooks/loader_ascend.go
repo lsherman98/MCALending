@@ -10,7 +10,6 @@ import (
 
 func AscendLoader(content []byte, e *core.RecordEvent, statement, deal *core.Record, transactions *[]Transaction) error {
 	var data AscendStatement
-
 	if err := json.Unmarshal(content, &data); err != nil {
 		e.App.Logger().Error("Ascend Credit Union Loader: failed to unmarshal JSON: " + err.Error())
 		return err
@@ -27,7 +26,7 @@ func AscendLoader(content []byte, e *core.RecordEvent, statement, deal *core.Rec
 	}
 
 	routine.FireAndForget(func() {
-		SetDealRecordFields(deal, data.Business.Name, data.Business.Address, data.Business.City, data.Business.State, data.Business.ZipCode, data.Bank.Name)
+		SetDealFields(deal, data.Business.Name, data.Business.Address, data.Business.City, data.Business.State, data.Business.ZipCode, data.Bank.Name)
 		if err := e.App.Save(deal); err != nil {
 			e.App.Logger().Error("Ascend Credit Union Loader: failed to save deal record: " + err.Error())
 		}
@@ -82,7 +81,7 @@ func AscendLoader(content []byte, e *core.RecordEvent, statement, deal *core.Rec
 
 	routine.FireAndForget(func() {
 		statement_details := core.NewRecord(statementDetailsCollection)
-		SetStatementDetailsRecordFields(statement_details, statement.Id, deal.Id, data.Bank.StatementDate, totalBeginningBalance, totalCredits, totalDebits, totalEndingBalance)
+		SetStatementDetailsFields(statement_details, statement.Id, deal.Id, data.Bank.StatementDate, totalBeginningBalance, totalCredits, totalDebits, totalEndingBalance)
 		if err := e.App.Save(statement_details); err != nil {
 			e.App.Logger().Error("Ascend Credit Union Loader: failed to create statement_details record: " + err.Error())
 			return

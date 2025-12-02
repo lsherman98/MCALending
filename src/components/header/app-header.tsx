@@ -50,7 +50,6 @@ export function AppHeader() {
         {currentDeal?.id && <Shortcuts pathname={route.pathname} currentDealId={currentDeal.id} />}
         <div className="ml-auto flex items-center gap-2">
           <RunningJobs />
-          {/* <ModeToggle /> */}
         </div>
       </div>
     </header>

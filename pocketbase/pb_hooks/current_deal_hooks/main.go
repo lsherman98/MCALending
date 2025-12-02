@@ -10,7 +10,7 @@ import (
 )
 
 func Init(app *pocketbase.PocketBase) error {
-	app.OnRecordsListRequest("current_deal").BindFunc(func(e *core.RecordsListRequestEvent) error {
+	app.OnRecordsListRequest(collections.CurrentDeal).BindFunc(func(e *core.RecordsListRequestEvent) error {
 		currentDealCollection, err := e.App.FindCollectionByNameOrId(collections.CurrentDeal)
 		if err != nil {
 			return err
@@ -49,7 +49,6 @@ func Init(app *pocketbase.PocketBase) error {
 			currentDealRecord := core.NewRecord(currentDealCollection)
 			currentDealRecord.Set("user", user)
 			currentDealRecord.Set("deal", deal.Id)
-
 			if err := e.App.Save(currentDealRecord); err != nil {
 				e.App.Logger().Error("Current Deal: failed to create current deal record", "error", err)
 				return e.Next()

@@ -23,6 +23,7 @@ export const Route = createFileRoute("/_app/deals/")({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  
   const deleteDealMutation = useDeleteDeal();
   const createDealMutation = useCreateDeal();
   const { data: deals } = useGetDeals();

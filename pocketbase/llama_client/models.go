@@ -15,21 +15,21 @@ type UploadResponse struct {
 	CreatedAt      string         `json:"created_at"`
 	UpdatedAt      string         `json:"updated_at"`
 	Name           string         `json:"name"`
-	ExternalFileID string         `json:"external_file_id,omitempty"`
+	ExternalFileId string         `json:"external_file_id,omitempty"`
 	FileSize       int            `json:"file_size,omitempty"`
 	FileType       string         `json:"file_type,omitempty"`
-	ProjectID      string         `json:"project_id"`
+	ProjectId      string         `json:"project_id"`
 	LastModifiedAt string         `json:"last_modified_at,omitempty"`
 	ResourceInfo   map[string]any `json:"resource_info,omitempty"`
 	PermissionInfo map[string]any `json:"permission_info,omitempty"`
-	DataSourceID   string         `json:"data_source_id,omitempty"`
+	DataSourceId   string         `json:"data_source_id,omitempty"`
 }
 
 type JobRequest struct {
 	Priority              map[string]any         `json:"priority,omitempty"`
 	WebhookConfigurations []WebhookConfiguration `json:"webhook_configurations,omitempty"`
-	ExtractionAgentID     string                 `json:"extraction_agent_id"`
-	FileID                string                 `json:"file_id"`
+	ExtractionAgentId     string                 `json:"extraction_agent_id"`
+	FileId                string                 `json:"file_id"`
 	DataSchemaOverride    map[string]any         `json:"data_schema_override,omitempty"`
 	ConfigOverride        map[string]any         `json:"config_override,omitempty"`
 }
@@ -45,7 +45,7 @@ const (
 )
 
 type JobResponse struct {
-	ID              string         `json:"id"`
+	Id              string         `json:"id"`
 	ExtractionAgent map[string]any `json:"extraction_agent"`
 	Status          StatusEnum     `json:"status"`
 	Error           string         `json:"error,omitempty"`
@@ -53,7 +53,7 @@ type JobResponse struct {
 }
 
 type RunResponse struct {
-	ID string `json:"id"`
+	Id string `json:"id"`
 }
 
 type WebhookConfiguration struct {
@@ -64,8 +64,8 @@ type WebhookConfiguration struct {
 }
 
 type JobResultResponse struct {
-	RunID              string             `json:"run_id"`
-	ExtractionAgentID  string             `json:"extraction_agent_id"`
+	RunId              string             `json:"run_id"`
+	ExtractionAgentId  string             `json:"extraction_agent_id"`
 	Data               map[string]any     `json:"data"`
 	ExtractionMetadata ExtractionMetadata `json:"extraction_metadata"`
 }

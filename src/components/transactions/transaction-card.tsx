@@ -27,7 +27,10 @@ export function TransactionCard({
     e.stopPropagation();
     e.preventDefault();
     if (!transaction) return;
-    const date = new Date(transaction.date).toISOString().split("T")[0];
+    const date =
+      transaction.date && !isNaN(new Date(transaction.date).getTime())
+        ? new Date(transaction.date).toISOString().split("T")[0]
+        : "";
     setIsEditMode(true);
     setEditFormData({
       description: transaction.description,
@@ -91,7 +94,11 @@ export function TransactionCard({
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="text-muted-foreground text-sm">Date</div>
-                    <div>{format(new TZDate(transaction.date, "UTC"), "MMM dd, yyyy")}</div>
+                    <div>
+                      {transaction.date && !isNaN(new Date(transaction.date).getTime())
+                        ? format(new TZDate(transaction.date, "UTC"), "MMM dd, yyyy")
+                        : "No Date"}
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="text-muted-foreground text-sm">Amount</div>

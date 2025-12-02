@@ -5,7 +5,7 @@ import (
 	"google.golang.org/genai"
 )
 
-func SetDealRecordFields(deal *core.Record, merchant, address, city, state, zipCode, bank string) {
+func SetDealFields(deal *core.Record, merchant, address, city, state, zipCode, bank string) {
 	deal.Set("merchant", merchant)
 	deal.Set("address", address)
 	deal.Set("city", city)
@@ -14,7 +14,7 @@ func SetDealRecordFields(deal *core.Record, merchant, address, city, state, zipC
 	deal.Set("bank", bank)
 }
 
-func SetStatementDetailsRecordFields(statementDetails *core.Record, statementId, dealId, date string, beginningBalance, credits, debits, endingBalance float64) {
+func SetStatementDetailsFields(statementDetails *core.Record, statementId, dealId, date string, beginningBalance, credits, debits, endingBalance float64) {
 	statementDetails.Set("statement", statementId)
 	statementDetails.Set("deal", dealId)
 	statementDetails.Set("date", date)
@@ -24,14 +24,14 @@ func SetStatementDetailsRecordFields(statementDetails *core.Record, statementId,
 	statementDetails.Set("ending_balance", endingBalance)
 }
 
-func SetDailyBalanceRecordFields(data DailyBalance, dailyBalanceRecord *core.Record, statement, deal *core.Record) {
+func SetDailyBalanceFields(data DailyBalance, dailyBalanceRecord *core.Record, statement, deal *core.Record) {
 	dailyBalanceRecord.Set("date", data.Date)
 	dailyBalanceRecord.Set("balance", data.Balance)
 	dailyBalanceRecord.Set("statement", statement.Id)
 	dailyBalanceRecord.Set("deal", deal.Id)
 }
 
-func SetTransactionRecordFields(data Transaction, transaction *core.Record, statement, deal *core.Record) {
+func SetTransactionFields(data Transaction, transaction *core.Record, statement, deal *core.Record) {
 	transaction.Set("date", data.Date)
 	transaction.Set("amount", data.Amount)
 	transaction.Set("description", data.Description)

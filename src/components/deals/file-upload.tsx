@@ -133,21 +133,23 @@ export function FileUpload({
                 >
                   Add Files
                 </Button>
-                {uploads.filter((u) => u.status === "pending").length > 0 && <Select value={agentId} onValueChange={setAgentId}>
-                  <SelectTrigger
-                    className={`w-[180px] ${!agentId ? "border border-destructive !text-destructive" : ""}`}
-                  >
-                    {!agentId && <CircleAlert className="text-destructive" />}
-                    <SelectValue placeholder="Select agent" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {agents?.map((agent) => (
-                      <SelectItem key={agent.id} value={agent.agent_id}>
-                        {agent.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>}
+                {uploads.filter((u) => u.status === "pending").length > 0 && (
+                  <Select value={agentId} onValueChange={setAgentId}>
+                    <SelectTrigger
+                      className={`w-[180px] ${!agentId ? "border border-destructive !text-destructive" : ""}`}
+                    >
+                      {!agentId && <CircleAlert className="text-destructive" />}
+                      <SelectValue placeholder="Select agent" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {agents?.map((agent) => (
+                        <SelectItem key={agent.id} value={agent.agent_id}>
+                          {agent.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
                 <Button
                   onClick={handleUpload}
                   disabled={uploads.filter((u) => u.status === "pending").length === 0 || !agentId}

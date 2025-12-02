@@ -72,8 +72,9 @@ func Init(app *pocketbase.PocketBase, gemini *genai.Client) error {
 			e.App.Logger().Error("Extraction: failed to find extraction agent record: " + err.Error())
 			return err
 		}
-		key := agent.GetString("key")
+
 		var transactions []Transaction
+		key := agent.GetString("key")
 
 		switch key {
 		case "ascend":
@@ -195,7 +196,7 @@ func saveTransactions(
 	for i, transaction := range chunk {
 		routine.FireAndForget(func() {
 			transactionRecord := core.NewRecord(transactionsCollection)
-			SetTransactionRecordFields(transaction, transactionRecord, statement, deal)
+			SetTransactionFields(transaction, transactionRecord, statement, deal)
 
 			transactionType := "none"
 			if categorizedChunk != nil && i < len(categorizedChunk) {

@@ -18,7 +18,11 @@ export function RowContent({
           selected ? "text-primary font-bold" : ""
         }`}
       >
-        <span className="truncate">{transaction.date ? format(new TZDate(transaction.date, "UTC"), "MMM dd, yyyy") : "No Date"}</span>
+        <span className="truncate">
+          {transaction.date && !isNaN(new Date(transaction.date).getTime())
+            ? format(new TZDate(transaction.date, "UTC"), "MMM dd, yyyy")
+            : "No Date"}
+        </span>
       </div>
       <div
         className={`flex-shrink-0 px-3 py-3 border-r flex items-center whitespace-nowrap overflow-hidden ${

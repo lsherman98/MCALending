@@ -32,5 +32,6 @@ func New(app *pocketbase.PocketBase) (*plaid.APIClient, error) {
 	configuration.AddDefaultHeader("PLAID-SECRET", PLAID_SECRET)
 	configuration.UseEnvironment(environments[PLAID_ENV])
 	client := plaid.NewAPIClient(configuration)
+	
 	return client, nil
 }
