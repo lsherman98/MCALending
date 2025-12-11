@@ -92,8 +92,8 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 			}
 
 			job, err := llama.RunJob(context.Background(), llama_client.JobRequest{
-				FileID:            upload.ID,
-				ExtractionAgentID: agent,
+				FileId:            upload.ID,
+				ExtractionAgentId: agent,
 				WebhookConfigurations: []llama_client.WebhookConfiguration{
 					{
 						WebhookURL:          "https://mca.levisherman.xyz/webhooks/llamaindex",
@@ -107,13 +107,13 @@ func Init(app *pocketbase.PocketBase, llama *llama_client.LlamaClient) error {
 				return
 			}
 
-			run, err := llama.GetRunByJobID(context.Background(), job.ID)
+			run, err := llama.GetRunByJobID(context.Background(), job.Id)
 			if err != nil {
 				handleError(e, jobRecord, "failed to get run information", err.Error())
 				return
 			}
 
-			SetJobFields(jobRecord, job.ID, run.ID, agent, job.Status)
+			SetJobFields(jobRecord, job.Id, run.Id, agent, job.Status)
 			if err := e.App.Save(jobRecord); err != nil {
 				e.App.Logger().Error("Statement: failed to save job record: " + err.Error())
 			}

@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge"
 import { pb } from "./pocketbase";
 import { toast } from "sonner";
 import type { GroupedTransactionsResponse } from "./pocketbase-types";
-import { CURRENCY_FORMAT, FILE_SIZE, PAYMENT_FREQUENCY_THRESHOLDS, VALIDATION } from "./constants";
+import { PAYMENT_FREQUENCY_THRESHOLDS } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -30,17 +30,17 @@ export function getUserId(msg: string = 'No logged in user detected.'): string |
 }
 
 export const formatFileSize = (size: number): string => {
-  if (size < FILE_SIZE.KILOBYTE) return `${size} B`;
-  if (size < FILE_SIZE.MEGABYTE) return `${(size / FILE_SIZE.KILOBYTE).toFixed(1)} KB`;
-  return `${(size / FILE_SIZE.MEGABYTE).toFixed(2)} MB`;
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(2)} MB`;
 };
 
 export const formatCurrency = (value: string | number | undefined): string => {
   if (!value) return "$0.00";
   const numValue = typeof value === "string" ? parseFloat(value) : value;
-  return new Intl.NumberFormat(CURRENCY_FORMAT.LOCALE, {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: CURRENCY_FORMAT.CURRENCY,
+    currency: "USD",
   }).format(numValue);
 };
 
@@ -68,7 +68,7 @@ export const areDescriptionsSimilar = (desc1: string | null, desc2: string | nul
   const longer = norm1.length > norm2.length ? norm1 : norm2;
   const shorter = norm1.length > norm2.length ? norm2 : norm1;
 
-  return longer.includes(shorter) && shorter.length > VALIDATION.MIN_DESCRIPTION_LENGTH;
+  return longer.includes(shorter) && shorter.length > 3;
 };
 
 export const calculatePaymentFrequency = (datesString: string): string => {
@@ -76,7 +76,7 @@ export const calculatePaymentFrequency = (datesString: string): string => {
     .split(",")
     .map((d) => new Date(d.trim()))
     .sort();
-  if (dates.length < VALIDATION.MIN_TRANSACTIONS_FOR_FREQUENCY) return "one-time";
+  if (dates.length < 2) return "one-time";
 
   const intervals = [];
   for (let i = 1; i < dates.length; i++) {

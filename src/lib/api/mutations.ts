@@ -3,8 +3,6 @@ import type { DealsRecord, TransactionsRecord } from "../pocketbase-types";
 import { bulkUpdateTransaction, createDeal, deleteDeal, deleteStatement, deleteTransaction, updateDeal, updateTransaction, uploadStatement } from "./api";
 import { handleError } from "../utils";
 import type { UploadStatementData } from "../types";
-import { QUERY_KEYS } from "../constants";
-import { scheduleJobInvalidations } from "./query-utils";
 
 export function useCreateDeal() {
     const queryClient = useQueryClient();
@@ -13,8 +11,8 @@ export function useCreateDeal() {
         mutationFn: (data: Omit<DealsRecord, 'id'>) => createDeal(data),
         onError: handleError,
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DEALS });
-            await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RECENT_DEALS });
+            await queryClient.invalidateQueries({ queryKey: ['deals'] });
+            await queryClient.invalidateQueries({ queryKey: ['recentDeals'] });
         }
     })
 }
@@ -26,7 +24,7 @@ export function useUpdateDeal() {
         mutationFn: ({ id, data }: { id: string, data: Partial<DealsRecord> }) => updateDeal(id, data),
         onError: handleError,
         onSuccess: async (data) => {
-            await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DEAL(data.id) });
+            await queryClient.invalidateQueries({ queryKey: ['deal', data.id] });
         }
     })
 }
@@ -38,7 +36,7 @@ export function useDeleteDeal() {
         mutationFn: (id: string) => deleteDeal(id),
         onError: handleError,
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DEALS });
+            await queryClient.invalidateQueries({ queryKey: ['deals'] });
         }
     })
 }
@@ -51,7 +49,11 @@ export function useUploadStatement() {
         onError: handleError,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['statements'] });
-            scheduleJobInvalidations(queryClient);
+            [3000, 4000, 5000].forEach((delay) => {
+                setTimeout(async () => {
+                    await queryClient.invalidateQueries({ queryKey: ['jobs'] });
+                }, delay);
+            });
         }
     })
 }
@@ -64,7 +66,7 @@ export function useDeleteStatement() {
         onError: handleError,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['statements'] });
-            await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOBS });
+            await queryClient.invalidateQueries({ queryKey: ['jobs'] });
         }
     })
 }
